@@ -9,6 +9,7 @@ from app.middleware.request_context import RequestContextMiddleware
 from app.routers.auth import router as auth_router
 from app.routers.attachments import router as attachment_router
 from app.routers.sessions import router as session_router
+from app.routers.risk import router as risk_router
 
 configure_logging()
 logger = get_logger(__name__)
@@ -19,6 +20,7 @@ app.add_exception_handler(Exception, unhandled_error_handler)
 app.include_router(auth_router)
 app.include_router(attachment_router)
 app.include_router(session_router)
+app.include_router(risk_router)
 
 
 @app.get("/health/live")
