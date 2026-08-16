@@ -1,29 +1,27 @@
-# 默认忽略仓库内容，仅纳入代码和必要工程配置。
+# 默认忽略仓库内容，仅纳入源码、测试和必要工程配置。
 *
 !/.gitignore
 !/AGENTS.md
 
-# 后端 Python 代码
+# 后端、迁移和评估源码
 !/app/
 !/app/**
 !/engines/
 !/engines/**
+!/alembic/
+!/alembic/**
+!/evaluation/
+!/evaluation/**
 
-# 前端代码
+# 前端和测试源码
 !/front/
 !/front/**
-
-# 自动化测试代码
 !/test/
 !/test/**
 !/tests/
 !/tests/**
 
-# 数据库迁移代码
-!/alembic/
-!/alembic/**
-
-# 必要的项目配置和启动文件
+# 必要的工程配置与锁文件
 !/*.py
 !/*.toml
 !/*.yaml
@@ -32,25 +30,48 @@
 !/*.ini
 !/*.cfg
 !/*.conf
-!/*.env.example
+!/*.example
+!/*.lock
 !/Dockerfile
 !/docker-compose.yml
 !/docker-compose.yaml
 !/Makefile
 !/README.md
 
-# Python/前端构建缓存和运行产物继续忽略
+# 本地环境、缓存、构建产物和 IDE 文件
+.env
+.env.*
+!.env.example
+.venv/
+venv/
+.uv-cache/
 __pycache__/
 *.py[cod]
 .pytest_cache/
 .mypy_cache/
 .ruff_cache/
-.venv/
-venv/
-node_modules/
-dist/
-build/
+.coverage
 coverage/
 htmlcov/
+dist/
+build/
+node_modules/
+.idea/
+.vscode/
+.codegraph/
+
+# 运行时数据：不得提交真实财务文件、日志和评估结果
 var/
+var/uploads/
+var/logs/
+evaluation/results/
+evaluation/logs/
+
+# 项目过程记录和本地技能缓存
+skills/
 .learnings/
+.superpowers/
+*.tmp
+*.swp
+Thumbs.db
+ehthumbs.db
