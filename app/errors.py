@@ -18,6 +18,14 @@ class AppError(Exception):
         self.status_code = status_code
 
 
+class AuthorizationError(AppError):
+    """权限不足或数据范围不匹配。"""
+
+    def __init__(self, message: str = "无权执行该操作") -> None:
+        """使用统一 403 错误码构造授权异常。"""
+        super().__init__("forbidden", message, 403)
+
+
 async def app_error_handler(request: Request, exc: Exception) -> JSONResponse:
     """将应用异常转换为统一且不泄露敏感信息的 JSON 响应。"""
     error = exc if isinstance(exc, AppError) else AppError("internal_error", "服务器内部错误", 500)
