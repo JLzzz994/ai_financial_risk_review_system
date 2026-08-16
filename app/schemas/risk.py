@@ -14,6 +14,7 @@ class RiskEvaluationInput(BaseModel):
     amount: Decimal
     supplier_name: str
     evidence: Evidence | None = None
+    currency: str = "CNY"
 
 
 class RiskEvaluationResponse(BaseModel):
@@ -21,3 +22,22 @@ class RiskEvaluationResponse(BaseModel):
 
     document_version_id: UUID
     findings: list[RiskFinding]
+
+
+class ManualReviewRequest(BaseModel):
+    """人工复核提交内容。"""
+
+    reviewer_id: UUID
+    status: str
+    comment: str
+    evidence: Evidence | None = None
+
+
+class ManualReviewResponse(BaseModel):
+    """人工复核结果。"""
+
+    review_id: UUID
+    document_version_id: UUID
+    status: str
+    reviewer_id: UUID | None = None
+    comment: str | None = None
