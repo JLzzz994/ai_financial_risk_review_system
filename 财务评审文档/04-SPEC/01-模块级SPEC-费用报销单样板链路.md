@@ -18,6 +18,8 @@
 
 本模块先打通费用报销单一条完整链路：草稿创建、附件上传、解析/OCR、规则分析、风险复核、审批人员决策和报告生成。其他 4 类单据复用本模块的单据版本、附件、分析、风险、审批和报告框架。
 
+费用报销单不建立独立的第二套单据表或审批状态机。`/api/v1/expense-reimbursements` 仅作为样板链路门面路由，内部统一委托 `financial_documents`、`document_versions` 及对应应用服务；项目说明书规定的 `/api/v1/documents` 是通用单据资源的权威接口。
+
 非目标：MVP 不实现会签/或签/加签/转审/委托、跨币种自动换算、AI 自动审批和外部模型默认调用。
 
 ## 2. 模块边界与代码分层
@@ -212,7 +214,7 @@ frontend/src/components/approval-decision-dialog.vue
 ## 9. 单 Agent 工程化补充
 
 - Agent Engine 负责会话读取、TurnPlan 校验、工具白名单调用和结果编排；不直接修改审批状态。
-- Agent 工具注册和 Prompt 文件位于 `engines/contracts/`、`prompt/jinja2/`；审批和分析流程使用固定状态机，不引入动态 YAML 流程。
+- Agent 工具注册和 Prompt 文件位于 `engines/contracts/`、`prompt/jinja2/`；审批使用固定顺序执行器，但节点来自管理员配置并发布的版本化模板。Agent 不得动态增删、跳过或重排节点，不引入动态 YAML 流程。
 - 多步骤分析通过 SSE 返回 `progress`/`result` 事件；断线后通过任务状态恢复。
 - 会话使用 `slot_state_json + state_version`，采用乐观锁和轮次事务提交。
 - API、Agent、Celery 和工具调用通过 `request_id`、`agent_run_id`、`task_id`、`tool_call_id` 关联。

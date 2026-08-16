@@ -1,5 +1,7 @@
 # 费用报销单样板链路——方法级 SPEC
 
+> 路由说明：费用报销门面路由与项目说明书中的通用 `/api/v1/documents` 路由调用同一应用服务和数据模型，不复制业务状态机。
+
 > 状态：已生成，待用户审核  
 > 粒度：方法级；把模块级边界拆到可编码的方法、输入输出、事务、任务、接口和验收用例。  
 > 依据：PRD、概要设计总纲、`05-数据对象文档.md`、`01-模块级SPEC-费用报销单样板链路.md` 及 R-01～R-17。  
@@ -23,9 +25,9 @@ create_expense_reimbursement
             └─ build_review_report_task (草稿)
 
 approval_task_decision
-  ├─ RETURN → resubmit_expense_reimbursement → 新版本并回到首节点
-  ├─ REJECT → close_rejected_version
-  └─ APPROVE → finalize_review_report
+  ├─ return → resubmit_expense_reimbursement → 新版本并回到首节点
+  ├─ reject → close_rejected_version
+  └─ approve → finalize_review_report
 ```
 
 | 方法 | 所属文件 | 事务/队列 | 结果 |
@@ -112,7 +114,7 @@ class RiskFindingEvidence(BaseModel):
     analyzed_at: datetime
 
 class ApprovalDecisionCommand(BaseModel):
-    decision: Literal["APPROVE", "RETURN", "REJECT"]
+    decision: Literal["approve", "return", "reject"]
     comment: str | None = Field(default=None, max_length=2000)
     idempotency_key: str = Field(min_length=16, max_length=128)
 ```
@@ -188,9 +190,9 @@ build_review_report_task(document_version_id: UUID, idempotency_key: str) -> Non
 
 1. 校验任务属于当前审批人、任务状态为 `pending`，并按 R-03 执行数据范围过滤。
 2. 校验当前任务绑定的 `document_version_id`；同一幂等键或已处理任务返回一致结果，不重复推进流程。
-3. `APPROVE`：完成当前任务；有下一顺序节点则创建下一任务，最终节点才进入报告固化。
-4. `RETURN`：关闭当前版本的未完成任务并保留意见；申请人重提时必须创建新版本并回到首节点，旧版本、任务和意见只读保留。
-5. `REJECT`：终止当前版本审批，保留审批意见和审计记录。
+3. `approve`：完成当前任务；有下一顺序节点则创建下一任务，最终节点才进入报告固化。
+4. `return`：关闭当前版本的未完成任务并保留意见；申请人重提时必须创建新版本并回到首节点，旧版本、任务和意见只读保留。
+5. `reject`：终止当前版本审批，保留审批意见和审计记录。
 6. 所有结果写入 `approval_tasks`、`approval_instances`、`document_status_logs` 和 `audit_logs`；AI/LLM/Agent 无权调用此方法模拟审批人。
 
 签名：`finalize_review_report(document_version_id: UUID, approved_by: UUID) -> ReviewReportView`。仅最终审批通过事务成功后调用，报告绑定同一版本，不覆盖历史报告。
@@ -246,7 +248,10 @@ frontend/src/
 | `POST` | `/api/v1/expense-reimbursements/{document_id}/submit` | 申请人 | `202 SubmissionView` | `REQUIRED_ATTACHMENT_MISSING`、`CURRENCY_NOT_SUPPORTED`、`VERSION_CONFLICT`、`IDEMPOTENCY_CONFLICT` |
 | `GET` | `/api/v1/expense-reimbursements/{document_id}/risk-findings?version_id={uuid}` | 申请人/当前审批人/授权财务 | `200 list[RiskFindingView]` | `DATA_SCOPE_DENIED`、`VERSION_NOT_FOUND` |
 | `POST` | `/api/v1/approval-tasks/{task_id}/decision` | 当前审批人 | `200 ApprovalTaskView` | `TASK_NOT_ASSIGNED`、`TASK_ALREADY_PROCESSED`、`EVIDENCE_PENDING_MANUAL_CONFIRMATION`、`IDEMPOTENCY_CONFLICT` |
+| `GET` | `/api/v1/analysis-tasks/{task_id}/report` | 数据范围 | `200 AnalysisTaskReportView` | `TASK_NOT_FOUND`、`REPORT_NOT_READY` |
 | `GET` | `/api/v1/review-reports/{document_version_id}` | 数据范围 | `200 ReviewReportView`（草稿/最终） | `DATA_SCOPE_DENIED`、`REPORT_NOT_READY` |
+
+两类报告接口返回同一事实链：分析任务接口是任务视角的报告投影，必须带回 `document_version_id` 和 `review_report_id`；版本报告接口是指定不可变版本的权威报告，用于审计、导出和历史追溯。任务接口不得生成脱离 `review_reports` 的第二份报告。
 
 `EVIDENCE_PENDING_MANUAL_CONFIRMATION` 是否阻止审批、以及审批人员是否可选择“带风险处理”，属于用户待审核项；实现默认阻止自动放行，但不替审批人员做最终决定。
 

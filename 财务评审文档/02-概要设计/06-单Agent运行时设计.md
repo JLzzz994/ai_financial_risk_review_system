@@ -37,9 +37,11 @@ Agent 只能返回命令或工具调用结果，不能直接写入 `approval_tas
 
 ## 2. 流程编排选型
 
-### 2.1 当前选择：固定状态机，不采用动态 YAML/LangGraph 编排
+### 2.1 当前选择：固定顺序执行器 + 可配置、可发布的流程模板
 
-本项目的审批流程是固定的顺序流程，MVP 不允许 Agent、YAML 或 LangGraph 动态改变审批节点。审批节点、顺序和状态转换由 Python 状态机与数据库中的审批流程对象共同约束：
+本项目的审批执行器固定为顺序状态机，但审批模板不是写死的。管理员可以在流程配置模块中按单据类型、金额区间、组织和角色维护模板，经过校验和发布后供新实例绑定。已创建的审批实例绑定发布时的模板版本，模板后续修改不会改变进行中的实例。
+
+MVP 不允许 Agent、YAML 或 LangGraph 在运行时动态改变审批节点。审批节点、顺序和状态转换由 Python 顺序状态机执行，并由数据库中的已发布模板约束：
 
 ```text
 草稿
@@ -53,7 +55,7 @@ Agent 只能返回命令或工具调用结果，不能直接写入 `approval_tas
 
 分析流水线同样按固定阶段执行：上传 → 解析 → OCR → 字段抽取 → 规则分析 → 报告草稿。Agent 只负责在分析阶段调用白名单工具，不能创建、删除、跳过或重排审批节点。
 
-如果未来需要支持复杂循环、并行或人工中断，应先新增版本化流程定义和审批配置，再单独评审是否引入 LangGraph；当前不预留动态流程执行器。
+如果未来需要支持会签、或签、循环或并行，应先扩展版本化模板和确定性执行器，再单独评审是否引入 LangGraph；当前不实现动态流程执行器。
 
 ## 3. 会话状态与轮次事务
 
@@ -73,7 +75,7 @@ Agent 只能返回命令或工具调用结果，不能直接写入 `approval_tas
 
 ```python
 class TurnPlan(BaseModel):
-    intent: Literal["IDENTIFY_DOCUMENT", "START_ANALYSIS", "QUERY_RESULT", "CHITCHAT"]
+    intent: Literal["identify_document", "start_analysis", "query_result", "chitchat"]
     slots: dict[str, str]
     missing_slots: list[str]
     confidence: Decimal
@@ -109,7 +111,7 @@ class AgentTool(Protocol):
 ```json
 {"type":"progress","step":"ocr","status":"running","task_id":"uuid"}
 {"type":"progress","step":"risk_analysis","status":"success","task_id":"uuid"}
-{"type":"result","data":{"document_version_id":"uuid","report_status":"DRAFT"}}
+{"type":"result","data":{"document_version_id":"uuid","report_status":"draft"}}
 ```
 
 每帧以 `\n\n` 结尾，JSON 使用 `ensure_ascii=False`。前端按 `type` 分发；断线后通过任务状态接口恢复，不重复创建分析任务。
@@ -147,7 +149,8 @@ RequestIdMiddleware
 
 ## 10. 重点审核
 
-- 是否确认审批流程和分析流水线均采用固定状态机，不引入动态 YAML/LangGraph 编排；
+- 是否确认审批执行器固定为顺序状态机，同时允许管理员配置并发布版本化审批模板；
+- 是否确认 Agent 不能在运行时增删、跳过或重排审批节点；
 - 是否同意 SSE 只用于多步骤分析，普通查询使用普通 JSON；
 - 是否同意 Agent 工具注册表禁止审批状态写入；
 - 是否同意使用 `slot_state_json + state_version` 管理多轮会话；
