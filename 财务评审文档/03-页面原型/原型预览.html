@@ -1,0 +1,2740 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Noto+Sans+SC%3Awght%40100..900&display=swap"
+      rel="stylesheet"
+    />
+
+    <style>
+      *, ::before, ::after {
+        box-sizing: border-box;
+      }
+
+      body {
+        margin: 0;
+      }
+    </style>
+  </head>
+  <body>
+    <div style="height: 1980px; position: relative; width: 7520px">
+      <div
+        data-pencil-name="财务审核工作台"
+        style="align-items: flex-start; background-color: #F4F7FB; box-sizing: border-box; display: flex; flex-direction: column; gap: 24px; height: 900px; justify-content: flex-start; left: 0px; overflow: hidden; padding: 32px; position: absolute; top: 0px; width: 1440px"
+      >
+        <div
+          data-pencil-name="顶部导航"
+          style="align-items: center; box-sizing: border-box; display: flex; flex-direction: row; flex-shrink: 0; gap: 28px; height: 56px; justify-content: flex-start; width: 100%"
+        >
+          <div
+            data-pencil-name="系统名称"
+            style='box-sizing: border-box; color: #123B6D; font-family: "Noto Sans SC", system-ui, sans-serif; font-size: 20px; font-style: normal; font-weight: 600; letter-spacing: 0px; line-height: 27px; text-align: left; white-space: nowrap'
+          >
+            财务风险审核
+          </div>
+          <div
+            data-pencil-name="导航工作台"
+            style='box-sizing: border-box; color: #185ABD; font-family: "Noto Sans SC", system-ui, sans-serif; font-size: 14px; font-style: normal; font-weight: 400; letter-spacing: 0px; line-height: 19px; text-align: left; white-space: nowrap'
+          >
+            工作台
+          </div>
+          <div
+            data-pencil-name="导航我的单据"
+            style='box-sizing: border-box; color: #6B7280; font-family: "Noto Sans SC", system-ui, sans-serif; font-size: 14px; font-style: normal; font-weight: 400; letter-spacing: 0px; line-height: 19px; text-align: left; white-space: nowrap'
+          >
+            我的单据
+          </div>
+          <div
+            data-pencil-name="导航审批任务"
+            style='box-sizing: border-box; color: #6B7280; font-family: "Noto Sans SC", system-ui, sans-serif; font-size: 14px; font-style: normal; font-weight: 400; letter-spacing: 0px; line-height: 19px; text-align: left; white-space: nowrap'
+          >
+            审批任务
+          </div>
+          <div
+            data-pencil-name="导航规则中心"
+            style='box-sizing: border-box; color: #6B7280; font-family: "Noto Sans SC", system-ui, sans-serif; font-size: 14px; font-style: normal; font-weight: 400; letter-spacing: 0px; line-height: 19px; text-align: left; white-space: nowrap'
+          >
+            规则中心
+          </div>
+          <div
+            data-pencil-name="导航占位"
+            style="align-items: flex-start; box-sizing: border-box; display: flex; flex-direction: row; flex: 1 1 0; gap: 0px; height: 1px; justify-content: flex-start"
+          ></div>
+          <div
+            data-pencil-name="当前用户"
+            style='box-sizing: border-box; color: #1A1A1A; font-family: "Noto Sans SC", system-ui, sans-serif; font-size: 14px; font-style: normal; font-weight: 400; letter-spacing: 0px; line-height: 19px; text-align: left; white-space: nowrap'
+          >
+            李财务 · 财务部
+          </div>
+        </div>
+        <div
+          data-pencil-name="工作台标题区"
+          style="align-items: center; box-sizing: border-box; display: flex; flex-direction: row; flex-shrink: 0; gap: 16px; height: fit-content; justify-content: flex-start; width: 100%"
+        >
+          <div
+            data-pencil-name="标题文字组"
+            style="align-items: flex-start; box-sizing: border-box; display: flex; flex-direction: column; flex: 1 1 0; gap: 6px; height: fit-content; justify-content: flex-start"
+          >
+            <div
+              data-pencil-name="页面标题"
+              style='box-sizing: border-box; color: #123B6D; font-family: "Noto Sans SC", system-ui, sans-serif; font-size: 30px; font-style: normal; font-weight: 600; letter-spacing: 0px; line-height: 41px; text-align: left; white-space: nowrap'
+            >
+              审核工作台
+            </div>
+            <div
+              data-pencil-name="页面说明"
+              style='box-sizing: border-box; color: #6B7280; font-family: "Noto Sans SC", system-ui, sans-serif; font-size: 14px; font-style: normal; font-weight: 400; letter-spacing: 0px; line-height: 19px; text-align: left; white-space: nowrap'
+            >
+              聚焦待处理单据与高风险事项，完成从解析到审批的闭环。
+            </div>
+          </div>
+          <div
+            data-pencil-name="新建报销单按钮"
+            style="align-items: flex-start; background-color: #185ABD; border-radius: 6px; box-sizing: border-box; display: flex; flex-direction: row; flex-shrink: 0; gap: 0px; height: fit-content; justify-content: flex-start; padding: 11px 18px; width: fit-content"
+          >
+            <div
+              data-pencil-name="新建按钮文字"
+              style='box-sizing: border-box; color: #FFFFFF; font-family: "Noto Sans SC", system-ui, sans-serif; font-size: 14px; font-style: normal; font-weight: 600; letter-spacing: 0px; line-height: 19px; text-align: left; white-space: nowrap'
+            >
+              + 新建费用报销单
+            </div>
+          </div>
+        </div>
+        <div
+          data-pencil-name="关键指标区"
+          style="align-items: flex-start; box-sizing: border-box; display: flex; flex-direction: row; flex-shrink: 0; gap: 16px; height: fit-content; justify-content: flex-start; width: 100%"
+        >
+          <div
+            data-pencil-name="待我审批"
+            style="align-items: flex-start; background-color: #FFFFFF; border-radius: 8px; box-sizing: border-box; display: flex; flex-direction: column; flex: 1 1 0; gap: 10px; height: fit-content; justify-content: flex-start; padding: 20px"
+          >
+            <div
+              data-pencil-name="待我审批标签"
+              style='box-sizing: border-box; color: #6B7280; font-family: "Noto Sans SC", system-ui, sans-serif; font-size: 13px; font-style: normal; font-weight: 400; letter-spacing: 0px; line-height: 18px; text-align: left; white-space: nowrap'
+            >
+              待我审批
+            </div>
+            <div
+              data-pencil-name="待我审批数值"
+              style='box-sizing: border-box; color: #B42318; font-family: "Noto Sans SC", system-ui, sans-serif; font-size: 28px; font-style: normal; font-weight: 600; letter-spacing: 0px; line-height: 38px; text-align: left; white-space: nowrap'
+            >
+              12
+            </div>
+            <div
+              data-pencil-name="待我审批说明"
+              style='box-sizing: border-box; color: #6B7280; font-family: "Noto Sans SC", system-ui, sans-serif; font-size: 12px; font-style: normal; font-weight: 400; letter-spacing: 0px; line-height: 16px; text-align: left; white-space: nowrap'
+            >
+              3 项高风险待处理
+            </div>
+          </div>
+          <div
+            data-pencil-name="解析中"
+            style="align-items: flex-start; background-color: #FFFFFF; border-radius: 8px; box-sizing: border-box; display: flex; flex-direction: column; flex: 1 1 0; gap: 10px; height: fit-content; justify-content: flex-start; padding: 20px"
+          >
+            <div
+              data-pencil-name="解析中标签"
+              style='box-sizing: border-box; color: #6B7280; font-family: "Noto Sans SC", system-ui, sans-serif; font-size: 13px; font-style: normal; font-weight: 400; letter-spacing: 0px; line-height: 18px; text-align: left; white-space: nowrap'
+            >
+              解析中
+            </div>
+            <div
+              data-pencil-name="解析中数值"
+              style='box-sizing: border-box; color: #1A1A1A; font-family: "Noto Sans SC", system-ui, sans-serif; font-size: 28px; font-style: normal; font-weight: 600; letter-spacing: 0px; line-height: 38px; text-align: left; white-space: nowrap'
+            >
+              6
+            </div>
+            <div
+              data-pencil-name="解析中说明"
+              style='box-sizing: border-box; color: #6B7280; font-family: "Noto Sans SC", system-ui, sans-serif; font-size: 12px; font-style: normal; font-weight: 400; letter-spacing: 0px; line-height: 16px; text-align: left; white-space: nowrap'
+            >
+              平均 2 分钟完成
+            </div>
+          </div>
+          <div
+            data-pencil-name="本周已通过"
+            style="align-items: flex-start; background-color: #FFFFFF; border-radius: 8px; box-sizing: border-box; display: flex; flex-direction: column; flex: 1 1 0; gap: 10px; height: fit-content; justify-content: flex-start; padding: 20px"
+          >
+            <div
+              data-pencil-name="本周已通过标签"
+              style='box-sizing: border-box; color: #6B7280; font-family: "Noto Sans SC", system-ui, sans-serif; font-size: 13px; font-style: normal; font-weight: 400; letter-spacing: 0px; line-height: 18px; text-align: left; white-space: nowrap'
+            >
+              本周已通过
+            </div>
+            <div
+              data-pencil-name="本周已通过数值"
+              style='box-sizing: border-box; color: #087443; font-family: "Noto Sans SC", system-ui, sans-serif; font-size: 28px; font-style: normal; font-weight: 600; letter-spacing: 0px; line-height: 38px; text-align: left; white-space: nowrap'
+            >
+              48
+            </div>
+            <div
+              data-pencil-name="本周已通过说明"
+              style='box-sizing: border-box; color: #6B7280; font-family: "Noto Sans SC", system-ui, sans-serif; font-size: 12px; font-style: normal; font-weight: 400; letter-spacing: 0px; line-height: 16px; text-align: left; white-space: nowrap'
+            >
+              通过率 86%
+            </div>
+          </div>
+          <div
+            data-pencil-name="待补充材料"
+            style="align-items: flex-start; background-color: #FFFFFF; border-radius: 8px; box-sizing: border-box; display: flex; flex-direction: column; flex: 1 1 0; gap: 10px; height: fit-content; justify-content: flex-start; padding: 20px"
+          >
+            <div
+              data-pencil-name="待补充材料标签"
+              style='box-sizing: border-box; color: #6B7280; font-family: "Noto Sans SC", system-ui, sans-serif; font-size: 13px; font-style: normal; font-weight: 400; letter-spacing: 0px; line-height: 18px; text-align: left; white-space: nowrap'
+            >
+              待补充材料
+            </div>
+            <div
+              data-pencil-name="待补充材料数值"
+              style='box-sizing: border-box; color: #B54708; font-family: "Noto Sans SC", system-ui, sans-serif; font-size: 28px; font-style: normal; font-weight: 600; letter-spacing: 0px; line-height: 38px; text-align: left; white-space: nowrap'
+            >
+              7
+            </div>
+            <div
+              data-pencil-name="待补充材料说明"
+              style='box-sizing: border-box; color: #6B7280; font-family: "Noto Sans SC", system-ui, sans-serif; font-size: 12px; font-style: normal; font-weight: 400; letter-spacing: 0px; line-height: 16px; text-align: left; white-space: nowrap'
+            >
+              较昨日 +2
+            </div>
+          </div>
+        </div>
+        <div
+          data-pencil-name="工作台主体"
+          style="align-items: flex-start; box-sizing: border-box; display: flex; flex-direction: row; flex: 1 1 0; gap: 20px; justify-content: flex-start; width: 100%"
+        >
+          <div
+            data-pencil-name="待处理单据列表"
+            style="align-items: flex-start; background-color: #FFFFFF; border-radius: 8px; box-sizing: border-box; display: flex; flex-direction: column; flex: 1 1 0; gap: 16px; height: fit-content; justify-content: flex-start; padding: 20px"
+          >
+            <div
+              data-pencil-name="列表标题栏"
+              style="align-items: center; box-sizing: border-box; display: flex; flex-direction: row; flex-shrink: 0; gap: 0px; height: fit-content; justify-content: flex-start; width: 100%"
+            >
+              <div
+                data-pencil-name="列表标题组"
+                style="align-items: flex-start; box-sizing: border-box; display: flex; flex-direction: column; flex: 1 1 0; gap: 4px; height: fit-content; justify-content: flex-start"
+              >
+                <div
+                  data-pencil-name="列表标题"
+                  style='box-sizing: border-box; color: #1A1A1A; font-family: "Noto Sans SC", system-ui, sans-serif; font-size: 18px; font-style: normal; font-weight: 600; letter-spacing: 0px; line-height: 24px; text-align: left; white-space: nowrap'
+                >
+                  待处理单据
+                </div>
+                <div
+                  data-pencil-name="列表副标题"
+                  style='box-sizing: border-box; color: #6B7280; font-family: "Noto Sans SC", system-ui, sans-serif; font-size: 12px; font-style: normal; font-weight: 400; letter-spacing: 0px; line-height: 16px; text-align: left; white-space: nowrap'
+                >
+                  按最近更新时间排序 · 共 12 条
+                </div>
+              </div>
+              <div
+                data-pencil-name="查看全部"
+                style='box-sizing: border-box; color: #356AE6; font-family: "Noto Sans SC", system-ui, sans-serif; font-size: 13px; font-style: normal; font-weight: 400; letter-spacing: 0px; line-height: 18px; text-align: left; white-space: nowrap'
+              >
+                查看全部 →
+              </div>
+            </div>
+            <div
+              data-pencil-name="单据表格"
+              style="align-items: flex-start; box-sizing: border-box; display: flex; flex-direction: column; flex-shrink: 0; gap: 0px; height: fit-content; justify-content: flex-start; width: 100%"
+            >
+              <div
+                data-pencil-name="表头行"
+                style="align-items: center; box-sizing: border-box; display: flex; flex-direction: row; flex-shrink: 0; gap: 10px; height: fit-content; justify-content: flex-start; padding: 14px 0px; width: 100%"
+              >
+                <div
+                  data-pencil-name="表头单元格0"
+                  style="align-items: flex-start; box-sizing: border-box; display: flex; flex-direction: row; flex: 1 1 0; gap: 0px; height: fit-content; justify-content: flex-start; padding: 6px 12px"
+                >
+                  <div
+                    data-pencil-name="表头文本0"
+                    style='box-sizing: border-box; color: #6B7280; font-family: "Noto Sans SC", system-ui, sans-serif; font-size: 12px; font-style: normal; font-weight: 600; letter-spacing: 0px; line-height: 16px; text-align: left; white-space: nowrap'
+                  >
+                    单据 / 申请人
+                  </div>
+                </div>
+                <div
+                  data-pencil-name="表头单元格1"
+                  style="align-items: flex-start; box-sizing: border-box; display: flex; flex-direction: row; flex: 1 1 0; gap: 0px; height: fit-content; justify-content: flex-start; padding: 6px 12px"
+                >
+                  <div
+                    data-pencil-name="表头文本1"
+                    style='box-sizing: border-box; color: #6B7280; font-family: "Noto Sans SC", system-ui, sans-serif; font-size: 12px; font-style: normal; font-weight: 600; letter-spacing: 0px; line-height: 16px; text-align: left; white-space: nowrap'
+                  >
+                    类型
+                  </div>
+                </div>
+                <div
+                  data-pencil-name="表头单元格2"
+                  style="align-items: flex-start; box-sizing: border-box; display: flex; flex-direction: row; flex: 1 1 0; gap: 0px; height: fit-content; justify-content: flex-start; padding: 6px 12px"
+                >
+                  <div
+                    data-pencil-name="表头文本2"
+                    style='box-sizing: border-box; color: #6B7280; font-family: "Noto Sans SC", system-ui, sans-serif; font-size: 12px; font-style: normal; font-weight: 600; letter-spacing: 0px; line-height: 16px; text-align: left; white-space: nowrap'
+                  >
+                    金额
+                  </div>
+                </div>
+                <div
+                  data-pencil-name="表头单元格3"
+                  style="align-items: flex-start; box-sizing: border-box; display: flex; flex-direction: row; flex: 1 1 0; gap: 0px; height: fit-content; justify-content: flex-start; padding: 6px 12px"
+                >
+                  <div
+                    data-pencil-name="表头文本3"
+                    style='box-sizing: border-box; color: #6B7280; font-family: "Noto Sans SC", system-ui, sans-serif; font-size: 12px; font-style: normal; font-weight: 600; letter-spacing: 0px; line-height: 16px; text-align: left; white-space: nowrap'
+                  >
+                    状态
+                  </div>
+                </div>
+                <div
+                  data-pencil-name="表头单元格4"
+                  style="align-items: flex-start; box-sizing: border-box; display: flex; flex-direction: row; flex: 1 1 0; gap: 0px; height: fit-content; justify-content: flex-start; padding: 6px 12px"
+                >
+                  <div
+                    data-pencil-name="表头文本4"
+                    style='box-sizing: border-box; color: #6B7280; font-family: "Noto Sans SC", system-ui, sans-serif; font-size: 12px; font-style: normal; font-weight: 600; letter-spacing: 0px; line-height: 16px; text-align: left; white-space: nowrap'
+                  >
+                    更新时间
+                  </div>
+                </div>
+              </div>
+              <div
+                data-pencil-name="报销单-20260816行"
+                style="align-items: center; box-sizing: border-box; display: flex; flex-direction: row; flex-shrink: 0; gap: 10px; height: fit-content; justify-content: flex-start; padding: 14px 0px; width: 100%"
+              >
+                <div
+                  data-pencil-name="报销单-20260816单元格0"
+                  style="align-items: flex-start; box-sizing: border-box; display: flex; flex-direction: row; flex: 1 1 0; gap: 0px; height: fit-content; justify-content: flex-start; padding: 6px 12px"
+                >
+                  <div
+                    data-pencil-name="报销单-20260816文本0"
+                    style='box-sizing: border-box; color: #374151; font-family: "Noto Sans SC", system-ui, sans-serif; font-size: 13px; font-style: normal; font-weight: 400; letter-spacing: 0px; line-height: 18px; text-align: left; white-space: nowrap'
+                  >
+                    差旅报销 / 王敏
+                  </div>
+                </div>
+                <div
+                  data-pencil-name="报销单-20260816单元格1"
+                  style="align-items: flex-start; box-sizing: border-box; display: flex; flex-direction: row; flex: 1 1 0; gap: 0px; height: fit-content; justify-content: flex-start; padding: 6px 12px"
+                >
+                  <div
+                    data-pencil-name="报销单-20260816文本1"
+                    style='box-sizing: border-box; color: #374151; font-family: "Noto Sans SC", system-ui, sans-serif; font-size: 13px; font-style: normal; font-weight: 400; letter-spacing: 0px; line-height: 18px; text-align: left; white-space: nowrap'
+                  >
+                    费用报销
+                  </div>
+                </div>
+                <div
+                  data-pencil-name="报销单-20260816单元格2"
+                  style="align-items: flex-start; box-sizing: border-box; display: flex; flex-direction: row; flex: 1 1 0; gap: 0px; height: fit-content; justify-content: flex-start; padding: 6px 12px"
+                >
+                  <div
+                    data-pencil-name="报销单-20260816文本2"
+                    style='box-sizing: border-box; color: #374151; font-family: "Noto Sans SC", system-ui, sans-serif; font-size: 13px; font-style: normal; font-weight: 400; letter-spacing: 0px; line-height: 18px; text-align: left; white-space: nowrap'
+                  >
+                    ¥ 3,280.00
+                  </div>
+                </div>
+                <div
+                  data-pencil-name="报销单-20260816单元格3"
+                  style="align-items: flex-start; box-sizing: border-box; display: flex; flex-direction: row; flex: 1 1 0; gap: 0px; height: fit-content; justify-content: flex-start; padding: 6px 12px"
+                >
+                  <div
+                    data-pencil-name="报销单-20260816文本3"
+                    style='box-sizing: border-box; color: #1A1A1A; font-family: "Noto Sans SC", system-ui, sans-serif; font-size: 13px; font-style: normal; font-weight: 400; letter-spacing: 0px; line-height: 18px; text-align: left; white-space: nowrap'
+                  >
+                    待我审批
+                  </div>
+                </div>
+                <div
+                  data-pencil-name="报销单-20260816单元格4"
+                  style="align-items: flex-start; box-sizing: border-box; display: flex; flex-direction: row; flex: 1 1 0; gap: 0px; height: fit-content; justify-content: flex-start; padding: 6px 12px"
+                >
+                  <div
+                    data-pencil-name="报销单-20260816文本4"
+                    style='box-sizing: border-box; color: #374151; font-family: "Noto Sans SC", system-ui, sans-serif; font-size: 13px; font-style: normal; font-weight: 400; letter-spacing: 0px; line-height: 18px; text-align: left; white-space: nowrap'
+                  >
+                    10 分钟前
+                  </div>
+                </div>
+              </div>
+              <div
+                data-pencil-name="报销单-20260815行"
+                style="align-items: center; box-sizing: border-box; display: flex; flex-direction: row; flex-shrink: 0; gap: 10px; height: fit-content; justify-content: flex-start; padding: 14px 0px; width: 100%"
+              >
+                <div
+                  data-pencil-name="报销单-20260815单元格0"
+                  style="align-items: flex-start; box-sizing: border-box; display: flex; flex-direction: row; flex: 1 1 0; gap: 0px; height: fit-content; justify-content: flex-start; padding: 6px 12px"
+                >
+                  <div
+                    data-pencil-name="报销单-20260815文本0"
+                    style='box-sizing: border-box; color: #374151; font-family: "Noto Sans SC", system-ui, sans-serif; font-size: 13px; font-style: normal; font-weight: 400; letter-spacing: 0px; line-height: 18px; text-align: left; white-space: nowrap'
+                  >
+                    市场活动 / 陈卓
+                  </div>
+                </div>
+                <div
+                  data-pencil-name="报销单-20260815单元格1"
+                  style="align-items: flex-start; box-sizing: border-box; display: flex; flex-direction: row; flex: 1 1 0; gap: 0px; height: fit-content; justify-content: flex-start; padding: 6px 12px"
+                >
+                  <div
+                    data-pencil-name="报销单-20260815文本1"
+                    style='box-sizing: border-box; color: #374151; font-family: "Noto Sans SC", system-ui, sans-serif; font-size: 13px; font-style: normal; font-weight: 400; letter-spacing: 0px; line-height: 18px; text-align: left; white-space: nowrap'
+                  >
+                    费用报销
+                  </div>
+                </div>
+                <div
+                  data-pencil-name="报销单-20260815单元格2"
+                  style="align-items: flex-start; box-sizing: border-box; display: flex; flex-direction: row; flex: 1 1 0; gap: 0px; height: fit-content; justify-content: flex-start; padding: 6px 12px"
+                >
+                  <div
+                    data-pencil-name="报销单-20260815文本2"
+                    style='box-sizing: border-box; color: #374151; font-family: "Noto Sans SC", system-ui, sans-serif; font-size: 13px; font-style: normal; font-weight: 400; letter-spacing: 0px; line-height: 18px; text-align: left; white-space: nowrap'
+                  >
+                    ¥ 12,600.00
+                  </div>
+                </div>
+                <div
+                  data-pencil-name="报销单-20260815单元格3"
+                  style="align-items: flex-start; box-sizing: border-box; display: flex; flex-direction: row; flex: 1 1 0; gap: 0px; height: fit-content; justify-content: flex-start; padding: 6px 12px"
+                >
+                  <div
+                    data-pencil-name="报销单-20260815文本3"
+                    style='box-sizing: border-box; color: #1A1A1A; font-family: "Noto Sans SC", system-ui, sans-serif; font-size: 13px; font-style: normal; font-weight: 400; letter-spacing: 0px; line-height: 18px; text-align: left; white-space: nowrap'
+                  >
+                    高风险
+                  </div>
+                </div>
+                <div
+                  data-pencil-name="报销单-20260815单元格4"
+                  style="align-items: flex-start; box-sizing: border-box; display: flex; flex-direction: row; flex: 1 1 0; gap: 0px; height: fit-content; justify-content: flex-start; padding: 6px 12px"
+                >
+                  <div
+                    data-pencil-name="报销单-20260815文本4"
+                    style='box-sizing: border-box; color: #374151; font-family: "Noto Sans SC", system-ui, sans-serif; font-size: 13px; font-style: normal; font-weight: 400; letter-spacing: 0px; line-height: 18px; text-align: left; white-space: nowrap'
+                  >
+                    昨天 18:32
+                  </div>
+                </div>
+              </div>
+              <div
+                data-pencil-name="报销单-20260814行"
+                style="align-items: center; box-sizing: border-box; display: flex; flex-direction: row; flex-shrink: 0; gap: 10px; height: fit-content; justify-content: flex-start; padding: 14px 0px; width: 100%"
+              >
+                <div
+                  data-pencil-name="报销单-20260814单元格0"
+                  style="align-items: flex-start; box-sizing: border-box; display: flex; flex-direction: row; flex: 1 1 0; gap: 0px; height: fit-content; justify-content: flex-start; padding: 6px 12px"
+                >
+                  <div
+                    data-pencil-name="报销单-20260814文本0"
+                    style='box-sizing: border-box; color: #374151; font-family: "Noto Sans SC", system-ui, sans-serif; font-size: 13px; font-style: normal; font-weight: 400; letter-spacing: 0px; line-height: 18px; text-align: left; white-space: nowrap'
+                  >
+                    产品部 / 刘洋
+                  </div>
+                </div>
+                <div
+                  data-pencil-name="报销单-20260814单元格1"
+                  style="align-items: flex-start; box-sizing: border-box; display: flex; flex-direction: row; flex: 1 1 0; gap: 0px; height: fit-content; justify-content: flex-start; padding: 6px 12px"
+                >
+                  <div
+                    data-pencil-name="报销单-20260814文本1"
+                    style='box-sizing: border-box; color: #374151; font-family: "Noto Sans SC", system-ui, sans-serif; font-size: 13px; font-style: normal; font-weight: 400; letter-spacing: 0px; line-height: 18px; text-align: left; white-space: nowrap'
+                  >
+                    费用报销
+                  </div>
+                </div>
+                <div
+                  data-pencil-name="报销单-20260814单元格2"
+                  style="align-items: flex-start; box-sizing: border-box; display: flex; flex-direction: row; flex: 1 1 0; gap: 0px; height: fit-content; justify-content: flex-start; padding: 6px 12px"
+                >
+                  <div
+                    data-pencil-name="报销单-20260814文本2"
+                    style='box-sizing: border-box; color: #374151; font-family: "Noto Sans SC", system-ui, sans-serif; font-size: 13px; font-style: normal; font-weight: 400; letter-spacing: 0px; line-height: 18px; text-align: left; white-space: nowrap'
+                  >
+                    ¥ 860.00
+                  </div>
+                </div>
+                <div
+                  data-pencil-name="报销单-20260814单元格3"
+                  style="align-items: flex-start; box-sizing: border-box; display: flex; flex-direction: row; flex: 1 1 0; gap: 0px; height: fit-content; justify-content: flex-start; padding: 6px 12px"
+                >
+                  <div
+                    data-pencil-name="报销单-20260814文本3"
+                    style='box-sizing: border-box; color: #1A1A1A; font-family: "Noto Sans SC", system-ui, sans-serif; font-size: 13px; font-style: normal; font-weight: 400; letter-spacing: 0px; line-height: 18px; text-align: left; white-space: nowrap'
+                  >
+                    解析中
+                  </div>
+                </div>
+                <div
+                  data-pencil-name="报销单-20260814单元格4"
+                  style="align-items: flex-start; box-sizing: border-box; display: flex; flex-direction: row; flex: 1 1 0; gap: 0px; height: fit-content; justify-content: flex-start; padding: 6px 12px"
+                >
+                  <div
+                    data-pencil-name="报销单-20260814文本4"
+                    style='box-sizing: border-box; color: #374151; font-family: "Noto Sans SC", system-ui, sans-serif; font-size: 13px; font-style: normal; font-weight: 400; letter-spacing: 0px; line-height: 18px; text-align: left; white-space: nowrap'
+                  >
+                    昨天 15:10
+                  </div>
+                </div>
+              </div>
+              <div
+                data-pencil-name="报销单-20260813行"
+                style="align-items: center; box-sizing: border-box; display: flex; flex-direction: row; flex-shrink: 0; gap: 10px; height: fit-content; justify-content: flex-start; padding: 14px 0px; width: 100%"
+              >
+                <div
+                  data-pencil-name="报销单-20260813单元格0"
+                  style="align-items: flex-start; box-sizing: border-box; display: flex; flex-direction: row; flex: 1 1 0; gap: 0px; height: fit-content; justify-content: flex-start; padding: 6px 12px"
+                >
+                  <div
+                    data-pencil-name="报销单-20260813文本0"
+                    style='box-sizing: border-box; color: #374151; font-family: "Noto Sans SC", system-ui, sans-serif; font-size: 13px; font-style: normal; font-weight: 400; letter-spacing: 0px; line-height: 18px; text-align: left; white-space: nowrap'
+                  >
+                    行政部 / 赵雪
+                  </div>
+                </div>
+                <div
+                  data-pencil-name="报销单-20260813单元格1"
+                  style="align-items: flex-start; box-sizing: border-box; display: flex; flex-direction: row; flex: 1 1 0; gap: 0px; height: fit-content; justify-content: flex-start; padding: 6px 12px"
+                >
+                  <div
+                    data-pencil-name="报销单-20260813文本1"
+                    style='box-sizing: border-box; color: #374151; font-family: "Noto Sans SC", system-ui, sans-serif; font-size: 13px; font-style: normal; font-weight: 400; letter-spacing: 0px; line-height: 18px; text-align: left; white-space: nowrap'
+                  >
+                    费用报销
+                  </div>
+                </div>
+                <div
+                  data-pencil-name="报销单-20260813单元格2"
+                  style="align-items: flex-start; box-sizing: border-box; display: flex; flex-direction: row; flex: 1 1 0; gap: 0px; height: fit-content; justify-content: flex-start; padding: 6px 12px"
+                >
+                  <div
+                    data-pencil-name="报销单-20260813文本2"
+                    style='box-sizing: border-box; color: #374151; font-family: "Noto Sans SC", system-ui, sans-serif; font-size: 13px; font-style: normal; font-weight: 400; letter-spacing: 0px; line-height: 18px; text-align: left; white-space: nowrap'
+                  >
+                    ¥ 2,140.00
+                  </div>
+                </div>
+                <div
+                  data-pencil-name="报销单-20260813单元格3"
+                  style="align-items: flex-start; box-sizing: border-box; display: flex; flex-direction: row; flex: 1 1 0; gap: 0px; height: fit-content; justify-content: flex-start; padding: 6px 12px"
+                >
+                  <div
+                    data-pencil-name="报销单-20260813文本3"
+                    style='box-sizing: border-box; color: #1A1A1A; font-family: "Noto Sans SC", system-ui, sans-serif; font-size: 13px; font-style: normal; font-weight: 400; letter-spacing: 0px; line-height: 18px; text-align: left; white-space: nowrap'
+                  >
+                    待补充材料
+                  </div>
+                </div>
+                <div
+                  data-pencil-name="报销单-20260813单元格4"
+                  style="align-items: flex-start; box-sizing: border-box; display: flex; flex-direction: row; flex: 1 1 0; gap: 0px; height: fit-content; justify-content: flex-start; padding: 6px 12px"
+                >
+                  <div
+                    data-pencil-name="报销单-20260813文本4"
+                    style='box-sizing: border-box; color: #374151; font-family: "Noto Sans SC", system-ui, sans-serif; font-size: 13px; font-style: normal; font-weight: 400; letter-spacing: 0px; line-height: 18px; text-align: left; white-space: nowrap'
+                  >
+                    昨天 11:05
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div
+            data-pencil-name="风险概览"
+            style="align-items: flex-start; background-color: #EAF2FF; border-radius: 8px; box-sizing: border-box; display: flex; flex-direction: column; flex-shrink: 0; gap: 16px; height: fit-content; justify-content: flex-start; padding: 20px; width: 360px"
+          >
+            <div
+              data-pencil-name="风险标题"
+              style='box-sizing: border-box; color: #123B6D; font-family: "Noto Sans SC", system-ui, sans-serif; font-size: 18px; font-style: normal; font-weight: 600; letter-spacing: 0px; line-height: 24px; text-align: left; white-space: nowrap'
+            >
+              风险概览
+            </div>
+            <div
+              data-pencil-name="风险说明"
+              style='box-sizing: border-box; color: #5B6B83; font-family: "Noto Sans SC", system-ui, sans-serif; font-size: 12px; font-style: normal; font-weight: 400; letter-spacing: 0px; line-height: 16px; text-align: left; white-space: nowrap'
+            >
+              今日待处理风险项 · 18 条
+            </div>
+            <div
+              data-pencil-name="高风险风险项"
+              style="align-items: center; background-color: #FFFFFF; box-sizing: border-box; display: flex; flex-direction: row; flex-shrink: 0; gap: 12px; height: fit-content; justify-content: flex-start; outline-offset: -0.5px; outline: 1px solid #D9E4F2; padding: 12px 14px; width: 100%"
+            >
+              <div
+                data-pencil-name="高风险标记"
+                style="background-color: #F04438; border-radius: 50%; box-sizing: border-box; flex-shrink: 0; height: 10px; width: 10px"
+              ></div>
+              <div
+                data-pencil-name="高风险文字组"
+                style="align-items: flex-start; box-sizing: border-box; display: flex; flex-direction: column; flex: 1 1 0; gap: 3px; height: fit-content; justify-content: flex-start"
+              >
+                <div
+                  data-pencil-name="高风险标签"
+                  style='box-sizing: border-box; color: #123B6D; font-family: "Noto Sans SC", system-ui, sans-serif; font-size: 14px; font-style: normal; font-weight: 600; letter-spacing: 0px; line-height: 19px; text-align: left; white-space: nowrap'
+                >
+                  高风险
+                </div>
+                <div
+                  data-pencil-name="高风险说明"
+                  style='box-sizing: border-box; color: #5B6B83; font-family: "Noto Sans SC", system-ui, sans-serif; font-size: 12px; font-style: normal; font-weight: 400; letter-spacing: 0px; line-height: 16px; text-align: left; white-space: nowrap'
+                >
+                  需审批人员重点关注
+                </div>
+              </div>
+              <div
+                data-pencil-name="高风险数值"
+                style='box-sizing: border-box; color: #123B6D; font-family: "Noto Sans SC", system-ui, sans-serif; font-size: 24px; font-style: normal; font-weight: 600; letter-spacing: 0px; line-height: 32px; text-align: left; white-space: nowrap'
+              >
+                3
+              </div>
+            </div>
+            <div
+              data-pencil-name="中风险风险项"
+              style="align-items: center; background-color: #FFFFFF; box-sizing: border-box; display: flex; flex-direction: row; flex-shrink: 0; gap: 12px; height: fit-content; justify-content: flex-start; outline-offset: -0.5px; outline: 1px solid #D9E4F2; padding: 12px 14px; width: 100%"
+            >
+              <div
+                data-pencil-name="中风险标记"
+                style="background-color: #F79009; border-radius: 50%; box-sizing: border-box; flex-shrink: 0; height: 10px; width: 10px"
+              ></div>
+              <div
+                data-pencil-name="中风险文字组"
+                style="align-items: flex-start; box-sizing: border-box; display: flex; flex-direction: column; flex: 1 1 0; gap: 3px; height: fit-content; justify-content: flex-start"
+              >
+                <div
+                  data-pencil-name="中风险标签"
+                  style='box-sizing: border-box; color: #123B6D; font-family: "Noto Sans SC", system-ui, sans-serif; font-size: 14px; font-style: normal; font-weight: 600; letter-spacing: 0px; line-height: 19px; text-align: left; white-space: nowrap'
+                >
+                  中风险
+                </div>
+                <div
+                  data-pencil-name="中风险说明"
+                  style='box-sizing: border-box; color: #5B6B83; font-family: "Noto Sans SC", system-ui, sans-serif; font-size: 12px; font-style: normal; font-weight: 400; letter-spacing: 0px; line-height: 16px; text-align: left; white-space: nowrap'
+                >
+                  建议补充材料或复核
+                </div>
+              </div>
+              <div
+                data-pencil-name="中风险数值"
+                style='box-sizing: border-box; color: #123B6D; font-family: "Noto Sans SC", system-ui, sans-serif; font-size: 24px; font-style: normal; font-weight: 600; letter-spacing: 0px; line-height: 32px; text-align: left; white-space: nowrap'
+              >
+                9
+              </div>
+            </div>
+            <div
+              data-pencil-name="低风险风险项"
+              style="align-items: center; background-color: #FFFFFF; box-sizing: border-box; display: flex; flex-direction: row; flex-shrink: 0; gap: 12px; height: fit-content; justify-content: flex-start; outline-offset: -0.5px; outline: 1px solid #D9E4F2; padding: 12px 14px; width: 100%"
+            >
+              <div
+                data-pencil-name="低风险标记"
+                style="background-color: #32D583; border-radius: 50%; box-sizing: border-box; flex-shrink: 0; height: 10px; width: 10px"
+              ></div>
+              <div
+                data-pencil-name="低风险文字组"
+                style="align-items: flex-start; box-sizing: border-box; display: flex; flex-direction: column; flex: 1 1 0; gap: 3px; height: fit-content; justify-content: flex-start"
+              >
+                <div
+                  data-pencil-name="低风险标签"
+                  style='box-sizing: border-box; color: #123B6D; font-family: "Noto Sans SC", system-ui, sans-serif; font-size: 14px; font-style: normal; font-weight: 600; letter-spacing: 0px; line-height: 19px; text-align: left; white-space: nowrap'
+                >
+                  低风险
+                </div>
+                <div
+                  data-pencil-name="低风险说明"
+                  style='box-sizing: border-box; color: #5B6B83; font-family: "Noto Sans SC", system-ui, sans-serif; font-size: 12px; font-style: normal; font-weight: 400; letter-spacing: 0px; line-height: 16px; text-align: left; white-space: nowrap'
+                >
+                  可按流程继续处理
+                </div>
+              </div>
+              <div
+                data-pencil-name="低风险数值"
+                style='box-sizing: border-box; color: #123B6D; font-family: "Noto Sans SC", system-ui, sans-serif; font-size: 24px; font-style: normal; font-weight: 600; letter-spacing: 0px; line-height: 32px; text-align: left; white-space: nowrap'
+              >
+                6
+              </div>
+            </div>
+            <div
+              data-pencil-name="风险提示"
+              style="align-items: flex-start; box-sizing: border-box; display: flex; flex-direction: column; flex-shrink: 0; gap: 6px; height: fit-content; justify-content: flex-start; padding: 14px 0px 0px 0px; width: 100%"
+            >
+              <div
+                data-pencil-name="风险提示标题"
+                style='box-sizing: border-box; color: #B54708; font-family: "Noto Sans SC", system-ui, sans-serif; font-size: 12px; font-style: normal; font-weight: 600; letter-spacing: 0px; line-height: 16px; text-align: left; white-space: nowrap'
+              >
+                重点提示
+              </div>
+              <div
+                data-pencil-name="风险提示内容"
+                style='box-sizing: border-box; color: #5B6B83; font-family: "Noto Sans SC", system-ui, sans-serif; font-size: 12px; font-style: normal; font-weight: 400; letter-spacing: 0px; line-height: 16px; text-align: left; width: 100%'
+              >
+                报销单-20260815 命中发票重复提交风险，已等待审批人员复核 1 天。
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div
+        data-pencil-name="费用报销单详情"
+        style="align-items: flex-start; background-color: #F4F7FB; box-sizing: border-box; display: flex; flex-direction: column; gap: 20px; height: 1000px; justify-content: flex-start; left: 0px; overflow: hidden; padding: 32px; position: absolute; top: 980px; width: 1440px"
+      >
+        <div
+          data-pencil-name="详情页导航"
+          style="align-items: center; box-sizing: border-box; display: flex; flex-direction: row; flex-shrink: 0; gap: 16px; height: 48px; justify-content: flex-start; width: 100%"
+        >
+          <div
+            data-pencil-name="详情返回"
+            style='box-sizing: border-box; color: #356AE6; font-family: "Noto Sans SC", system-ui, sans-serif; font-size: 14px; font-style: normal; font-weight: 400; letter-spacing: 0px; line-height: 19px; text-align: left; white-space: nowrap'
+          >
+            ← 返回待处理单据
+          </div>
+          <div
+            data-pencil-name="详情分隔"
+            style='box-sizing: border-box; color: #98A2B3; font-family: "Noto Sans SC", system-ui, sans-serif; font-size: 14px; font-style: normal; font-weight: 400; letter-spacing: 0px; line-height: 19px; text-align: left; white-space: nowrap'
+          >
+            /
+          </div>
+          <div
+            data-pencil-name="详情编号"
+            style='box-sizing: border-box; color: #475467; font-family: "Noto Sans SC", system-ui, sans-serif; font-size: 14px; font-style: normal; font-weight: 400; letter-spacing: 0px; line-height: 19px; text-align: left; white-space: nowrap'
+          >
+            报销单-20260815
+          </div>
+        </div>
+        <div
+          data-pencil-name="详情标题区"
+          style="align-items: center; box-sizing: border-box; display: flex; flex-direction: row; flex-shrink: 0; gap: 16px; height: fit-content; justify-content: flex-start; width: 100%"
+        >
+          <div
+            data-pencil-name="详情标题组"
+            style="align-items: flex-start; box-sizing: border-box; display: flex; flex-direction: column; flex: 1 1 0; gap: 6px; height: fit-content; justify-content: flex-start"
+          >
+            <div
+              data-pencil-name="详情标题"
+              style='box-sizing: border-box; color: #123B6D; font-family: "Noto Sans SC", system-ui, sans-serif; font-size: 28px; font-style: normal; font-weight: 600; letter-spacing: 0px; line-height: 38px; text-align: left; white-space: nowrap'
+            >
+              费用报销单 · 市场活动
+            </div>
+            <div
+              data-pencil-name="详情元信息"
+              style='box-sizing: border-box; color: #6B7280; font-family: "Noto Sans SC", system-ui, sans-serif; font-size: 13px; font-style: normal; font-weight: 400; letter-spacing: 0px; line-height: 18px; text-align: left; white-space: nowrap'
+            >
+              申请人：陈卓 · 市场部 · 提交于 2026-08-15 18:32
+            </div>
+          </div>
+          <div
+            data-pencil-name="高风险状态"
+            style="align-items: flex-start; background-color: #FEF3F2; border-radius: 6px; box-sizing: border-box; display: flex; flex-direction: row; flex-shrink: 0; gap: 0px; height: fit-content; justify-content: flex-start; padding: 8px 14px; width: fit-content"
+          >
+            <div
+              data-pencil-name="高风险状态文字"
+              style='box-sizing: border-box; color: #B42318; font-family: "Noto Sans SC", system-ui, sans-serif; font-size: 13px; font-style: normal; font-weight: 600; letter-spacing: 0px; line-height: 18px; text-align: left; white-space: nowrap'
+            >
+              高风险 · 待审批
+            </div>
+          </div>
+          <div
+            data-pencil-name="详情操作区"
+            style="align-items: flex-start; box-sizing: border-box; display: flex; flex-direction: row; flex-shrink: 0; gap: 10px; height: fit-content; justify-content: flex-start; width: fit-content"
+          >
+            <div
+              data-pencil-name="退回按钮"
+              style="align-items: flex-start; background-color: #FFFFFF; border-radius: 6px; box-sizing: border-box; display: flex; flex-direction: row; flex-shrink: 0; gap: 0px; height: fit-content; justify-content: flex-start; outline-offset: -0.5px; outline: 1px solid #D0D5DD; padding: 10px 16px; width: fit-content"
+            >
+              <div
+                data-pencil-name="退回文字"
+                style='box-sizing: border-box; color: #344054; font-family: "Noto Sans SC", system-ui, sans-serif; font-size: 13px; font-style: normal; font-weight: 400; letter-spacing: 0px; line-height: 18px; text-align: left; white-space: nowrap'
+              >
+                退回补充材料
+              </div>
+            </div>
+            <div
+              data-pencil-name="审批通过按钮"
+              style="align-items: flex-start; background-color: #185ABD; border-radius: 6px; box-sizing: border-box; display: flex; flex-direction: row; flex-shrink: 0; gap: 0px; height: fit-content; justify-content: flex-start; padding: 11px 18px; width: fit-content"
+            >
+              <div
+                data-pencil-name="通过文字"
+                style='box-sizing: border-box; color: #FFFFFF; font-family: "Noto Sans SC", system-ui, sans-serif; font-size: 13px; font-style: normal; font-weight: 600; letter-spacing: 0px; line-height: 18px; text-align: left; white-space: nowrap'
+              >
+                通过
+              </div>
+            </div>
+          </div>
+        </div>
+        <div
+          data-pencil-name="详情主体"
+          style="align-items: flex-start; box-sizing: border-box; display: flex; flex-direction: row; flex: 1 1 0; gap: 20px; justify-content: flex-start; width: 100%"
+        >
+          <div
+            data-pencil-name="单据与证据区"
+            style="align-items: flex-start; box-sizing: border-box; display: flex; flex-direction: column; flex: 1 1 0; gap: 16px; height: fit-content; justify-content: flex-start"
+          >
+            <div
+              data-pencil-name="单据摘要"
+              style="align-items: flex-start; background-color: #FFFFFF; border-radius: 8px; box-sizing: border-box; display: flex; flex-direction: column; flex-shrink: 0; gap: 14px; height: fit-content; justify-content: flex-start; padding: 20px; width: 100%"
+            >
+              <div
+                data-pencil-name="摘要标题"
+                style='box-sizing: border-box; color: #1A1A1A; font-family: "Noto Sans SC", system-ui, sans-serif; font-size: 17px; font-style: normal; font-weight: 600; letter-spacing: 0px; line-height: 23px; text-align: left; white-space: nowrap'
+              >
+                单据摘要
+              </div>
+              <div
+                data-pencil-name="费用类型摘要行"
+                style="align-items: flex-start; box-sizing: border-box; display: flex; flex-direction: row; flex-shrink: 0; gap: 16px; height: fit-content; justify-content: flex-start; width: 100%"
+              >
+                <div
+                  data-pencil-name="费用类型摘要标签"
+                  style='box-sizing: border-box; color: #6B7280; font-family: "Noto Sans SC", system-ui, sans-serif; font-size: 13px; font-style: normal; font-weight: 400; letter-spacing: 0px; line-height: 18px; text-align: left; white-space: nowrap'
+                >
+                  费用类型
+                </div>
+                <div
+                  data-pencil-name="费用类型摘要值"
+                  style='box-sizing: border-box; color: #1A1A1A; font-family: "Noto Sans SC", system-ui, sans-serif; font-size: 13px; font-style: normal; font-weight: 400; letter-spacing: 0px; line-height: 18px; text-align: left; white-space: nowrap'
+                >
+                  市场推广费
+                </div>
+              </div>
+              <div
+                data-pencil-name="报销金额摘要行"
+                style="align-items: flex-start; box-sizing: border-box; display: flex; flex-direction: row; flex-shrink: 0; gap: 16px; height: fit-content; justify-content: flex-start; width: 100%"
+              >
+                <div
+                  data-pencil-name="报销金额摘要标签"
+                  style='box-sizing: border-box; color: #6B7280; font-family: "Noto Sans SC", system-ui, sans-serif; font-size: 13px; font-style: normal; font-weight: 400; letter-spacing: 0px; line-height: 18px; text-align: left; white-space: nowrap'
+                >
+                  报销金额
+                </div>
+                <div
+                  data-pencil-name="报销金额摘要值"
+                  style='box-sizing: border-box; color: #1A1A1A; font-family: "Noto Sans SC", system-ui, sans-serif; font-size: 13px; font-style: normal; font-weight: 400; letter-spacing: 0px; line-height: 18px; text-align: left; white-space: nowrap'
+                >
+                  ¥ 12,600.00 CNY
+                </div>
+              </div>
+              <div
+                data-pencil-name="费用发生日期摘要行"
+                style="align-items: flex-start; box-sizing: border-box; display: flex; flex-direction: row; flex-shrink: 0; gap: 16px; height: fit-content; justify-content: flex-start; width: 100%"
+              >
+                <div
+                  data-pencil-name="费用发生日期摘要标签"
+                  style='box-sizing: border-box; color: #6B7280; font-family: "Noto Sans SC", system-ui, sans-serif; font-size: 13px; font-style: normal; font-weight: 400; letter-spacing: 0px; line-height: 18px; text-align: left; white-space: nowrap'
+                >
+                  费用发生日期
+                </div>
+                <div
+                  data-pencil-name="费用发生日期摘要值"
+                  style='box-sizing: border-box; color: #1A1A1A; font-family: "Noto Sans SC", system-ui, sans-serif; font-size: 13px; font-style: normal; font-weight: 400; letter-spacing: 0px; line-height: 18px; text-align: left; white-space: nowrap'
+                >
+                  2026-08-12
+                </div>
+              </div>
+              <div
+                data-pencil-name="所属组织摘要行"
+                style="align-items: flex-start; box-sizing: border-box; display: flex; flex-direction: row; flex-shrink: 0; gap: 16px; height: fit-content; justify-content: flex-start; width: 100%"
+              >
+                <div
+                  data-pencil-name="所属组织摘要标签"
+                  style='box-sizing: border-box; color: #6B7280; font-family: "Noto Sans SC", system-ui, sans-serif; font-size: 13px; font-style: normal; font-weight: 400; letter-spacing: 0px; line-height: 18px; text-align: left; white-space: nowrap'
+                >
+                  所属组织
+                </div>
+                <div
+                  data-pencil-name="所属组织摘要值"
+                  style='box-sizing: border-box; color: #1A1A1A; font-family: "Noto Sans SC", system-ui, sans-serif; font-size: 13px; font-style: normal; font-weight: 400; letter-spacing: 0px; line-height: 18px; text-align: left; white-space: nowrap'
+                >
+                  市场部 / 华东区域
+                </div>
+              </div>
+            </div>
+            <div
+              data-pencil-name="附件证据"
+              style="align-items: flex-start; background-color: #FFFFFF; border-radius: 8px; box-sizing: border-box; display: flex; flex-direction: column; flex-shrink: 0; gap: 14px; height: fit-content; justify-content: flex-start; padding: 20px; width: 100%"
+            >
+              <div
+                data-pencil-name="证据标题"
+                style='box-sizing: border-box; color: #1A1A1A; font-family: "Noto Sans SC", system-ui, sans-serif; font-size: 17px; font-style: normal; font-weight: 600; letter-spacing: 0px; line-height: 23px; text-align: left; white-space: nowrap'
+              >
+                附件与证据
+              </div>
+              <div
+                data-pencil-name="发票_20260812.pdf"
+                style="align-items: flex-start; background-color: #F8FAFC; border-radius: 6px; box-sizing: border-box; display: flex; flex-direction: row; flex-shrink: 0; gap: 12px; height: fit-content; justify-content: flex-start; padding: 12px 14px; width: 100%"
+              >
+                <div
+                  data-pencil-name="发票_20260812.pdf文件名"
+                  style='box-sizing: border-box; color: #344054; font-family: "Noto Sans SC", system-ui, sans-serif; font-size: 13px; font-style: normal; font-weight: 600; letter-spacing: 0px; line-height: 18px; text-align: left; white-space: nowrap'
+                >
+                  发票_20260812.pdf
+                </div>
+                <div
+                  data-pencil-name="发票_20260812.pdf文件信息"
+                  style='box-sizing: border-box; color: #667085; font-family: "Noto Sans SC", system-ui, sans-serif; font-size: 12px; font-style: normal; font-weight: 400; letter-spacing: 0px; line-height: 16px; text-align: left; white-space: nowrap'
+                >
+                  第 1 页 · 金额 ¥ 12,600.00 · 置信度 98%
+                </div>
+              </div>
+              <div
+                data-pencil-name="市场活动合同.pdf"
+                style="align-items: flex-start; background-color: #F8FAFC; border-radius: 6px; box-sizing: border-box; display: flex; flex-direction: row; flex-shrink: 0; gap: 12px; height: fit-content; justify-content: flex-start; padding: 12px 14px; width: 100%"
+              >
+                <div
+                  data-pencil-name="市场活动合同.pdf文件名"
+                  style='box-sizing: border-box; color: #344054; font-family: "Noto Sans SC", system-ui, sans-serif; font-size: 13px; font-style: normal; font-weight: 600; letter-spacing: 0px; line-height: 18px; text-align: left; white-space: nowrap'
+                >
+                  市场活动合同.pdf
+                </div>
+                <div
+                  data-pencil-name="市场活动合同.pdf文件信息"
+                  style='box-sizing: border-box; color: #667085; font-family: "Noto Sans SC", system-ui, sans-serif; font-size: 12px; font-style: normal; font-weight: 400; letter-spacing: 0px; line-height: 16px; text-align: left; white-space: nowrap'
+                >
+                  第 3 页 · 活动主体与金额 · 置信度 94%
+                </div>
+              </div>
+              <div
+                data-pencil-name="费用明细.xlsx"
+                style="align-items: flex-start; background-color: #F8FAFC; border-radius: 6px; box-sizing: border-box; display: flex; flex-direction: row; flex-shrink: 0; gap: 12px; height: fit-content; justify-content: flex-start; padding: 12px 14px; width: 100%"
+              >
+                <div
+                  data-pencil-name="费用明细.xlsx文件名"
+                  style='box-sizing: border-box; color: #344054; font-family: "Noto Sans SC", system-ui, sans-serif; font-size: 13px; font-style: normal; font-weight: 600; letter-spacing: 0px; line-height: 18px; text-align: left; white-space: nowrap'
+                >
+                  费用明细.xlsx
+                </div>
+                <div
+                  data-pencil-name="费用明细.xlsx文件信息"
+                  style='box-sizing: border-box; color: #667085; font-family: "Noto Sans SC", system-ui, sans-serif; font-size: 12px; font-style: normal; font-weight: 400; letter-spacing: 0px; line-height: 16px; text-align: left; white-space: nowrap'
+                >
+                  共 12 条明细 · 已完成解析
+                </div>
+              </div>
+            </div>
+          </div>
+          <div
+            data-pencil-name="风险复核区"
+            style="align-items: flex-start; background-color: #EAF2FF; border-radius: 8px; box-sizing: border-box; display: flex; flex-direction: column; flex-shrink: 0; gap: 16px; height: fit-content; justify-content: flex-start; padding: 20px; width: 500px"
+          >
+            <div
+              data-pencil-name="复核标题"
+              style='box-sizing: border-box; color: #123B6D; font-family: "Noto Sans SC", system-ui, sans-serif; font-size: 18px; font-style: normal; font-weight: 600; letter-spacing: 0px; line-height: 24px; text-align: left; white-space: nowrap'
+            >
+              风险复核
+            </div>
+            <div
+              data-pencil-name="复核说明"
+              style='box-sizing: border-box; color: #5B6B83; font-family: "Noto Sans SC", system-ui, sans-serif; font-size: 12px; font-style: normal; font-weight: 400; letter-spacing: 0px; line-height: 16px; text-align: left; white-space: nowrap'
+            >
+              规则引擎已完成 10 类检查 · 3 项命中
+            </div>
+            <div
+              data-pencil-name="发票重复提交风险"
+              style="align-items: flex-start; background-color: #FFFFFF; border-radius: 6px; box-sizing: border-box; display: flex; flex-direction: column; flex-shrink: 0; gap: 8px; height: fit-content; justify-content: flex-start; outline-offset: -0.5px; outline: 1px solid #D9E4F2; padding: 14px; width: 100%"
+            >
+              <div
+                data-pencil-name="发票重复提交风险标题行"
+                style="align-items: center; box-sizing: border-box; display: flex; flex-direction: row; flex-shrink: 0; gap: 0px; height: fit-content; justify-content: flex-start; width: 100%"
+              >
+                <div
+                  data-pencil-name="发票重复提交风险标题"
+                  style='box-sizing: border-box; color: #123B6D; font-family: "Noto Sans SC", system-ui, sans-serif; font-size: 14px; font-style: normal; font-weight: 600; letter-spacing: 0px; line-height: 19px; text-align: left; white-space: nowrap'
+                >
+                  发票重复提交风险
+                </div>
+                <div
+                  data-pencil-name="发票重复提交风险标签"
+                  style='box-sizing: border-box; color: #F04438; font-family: "Noto Sans SC", system-ui, sans-serif; font-size: 12px; font-style: normal; font-weight: 600; letter-spacing: 0px; line-height: 16px; text-align: left; white-space: nowrap'
+                >
+                  高风险
+                </div>
+              </div>
+              <div
+                data-pencil-name="发票重复提交风险描述"
+                style='box-sizing: border-box; color: #5B6B83; font-family: "Noto Sans SC", system-ui, sans-serif; font-size: 12px; font-style: normal; font-weight: 400; letter-spacing: 0px; line-height: 16px; text-align: left; width: 100%'
+              >
+                发票代码 0310021 与历史单据 20260728 命中
+              </div>
+              <div
+                data-pencil-name="发票重复提交风险证据"
+                style='box-sizing: border-box; color: #98A2B3; font-family: "Noto Sans SC", system-ui, sans-serif; font-size: 12px; font-style: normal; font-weight: 400; letter-spacing: 0px; line-height: 16px; text-align: left; white-space: nowrap'
+              >
+                查看证据位置 →
+              </div>
+            </div>
+            <div
+              data-pencil-name="合同金额一致性"
+              style="align-items: flex-start; background-color: #FFFFFF; border-radius: 6px; box-sizing: border-box; display: flex; flex-direction: column; flex-shrink: 0; gap: 8px; height: fit-content; justify-content: flex-start; outline-offset: -0.5px; outline: 1px solid #D9E4F2; padding: 14px; width: 100%"
+            >
+              <div
+                data-pencil-name="合同金额一致性标题行"
+                style="align-items: center; box-sizing: border-box; display: flex; flex-direction: row; flex-shrink: 0; gap: 0px; height: fit-content; justify-content: flex-start; width: 100%"
+              >
+                <div
+                  data-pencil-name="合同金额一致性标题"
+                  style='box-sizing: border-box; color: #123B6D; font-family: "Noto Sans SC", system-ui, sans-serif; font-size: 14px; font-style: normal; font-weight: 600; letter-spacing: 0px; line-height: 19px; text-align: left; white-space: nowrap'
+                >
+                  合同金额一致性
+                </div>
+                <div
+                  data-pencil-name="合同金额一致性标签"
+                  style='box-sizing: border-box; color: #F79009; font-family: "Noto Sans SC", system-ui, sans-serif; font-size: 12px; font-style: normal; font-weight: 600; letter-spacing: 0px; line-height: 16px; text-align: left; white-space: nowrap'
+                >
+                  中风险
+                </div>
+              </div>
+              <div
+                data-pencil-name="合同金额一致性描述"
+                style='box-sizing: border-box; color: #5B6B83; font-family: "Noto Sans SC", system-ui, sans-serif; font-size: 12px; font-style: normal; font-weight: 400; letter-spacing: 0px; line-height: 16px; text-align: left; width: 100%'
+              >
+                合同金额与报销金额差异 8.4%，超过 5% 容差
+              </div>
+              <div
+                data-pencil-name="合同金额一致性证据"
+                style='box-sizing: border-box; color: #98A2B3; font-family: "Noto Sans SC", system-ui, sans-serif; font-size: 12px; font-style: normal; font-weight: 400; letter-spacing: 0px; line-height: 16px; text-align: left; white-space: nowrap'
+              >
+                查看证据位置 →
+              </div>
+            </div>
+            <div
+              data-pencil-name="附件完整性"
+              style="align-items: flex-start; background-color: #FFFFFF; border-radius: 6px; box-sizing: border-box; display: flex; flex-direction: column; flex-shrink: 0; gap: 8px; height: fit-content; justify-content: flex-start; outline-offset: -0.5px; outline: 1px solid #D9E4F2; padding: 14px; width: 100%"
+            >
+              <div
+                data-pencil-name="附件完整性标题行"
+                style="align-items: center; box-sizing: border-box; display: flex; flex-direction: row; flex-shrink: 0; gap: 0px; height: fit-content; justify-content: flex-start; width: 100%"
+              >
+                <div
+                  data-pencil-name="附件完整性标题"
+                  style='box-sizing: border-box; color: #123B6D; font-family: "Noto Sans SC", system-ui, sans-serif; font-size: 14px; font-style: normal; font-weight: 600; letter-spacing: 0px; line-height: 19px; text-align: left; white-space: nowrap'
+                >
+                  附件完整性
+                </div>
+                <div
+                  data-pencil-name="附件完整性标签"
+                  style='box-sizing: border-box; color: #32D583; font-family: "Noto Sans SC", system-ui, sans-serif; font-size: 12px; font-style: normal; font-weight: 600; letter-spacing: 0px; line-height: 16px; text-align: left; white-space: nowrap'
+                >
+                  已通过
+                </div>
+              </div>
+              <div
+                data-pencil-name="附件完整性描述"
+                style='box-sizing: border-box; color: #5B6B83; font-family: "Noto Sans SC", system-ui, sans-serif; font-size: 12px; font-style: normal; font-weight: 400; letter-spacing: 0px; line-height: 16px; text-align: left; width: 100%'
+              >
+                已上传发票、合同和费用明细，证据链完整
+              </div>
+              <div
+                data-pencil-name="附件完整性证据"
+                style='box-sizing: border-box; color: #98A2B3; font-family: "Noto Sans SC", system-ui, sans-serif; font-size: 12px; font-style: normal; font-weight: 400; letter-spacing: 0px; line-height: 16px; text-align: left; white-space: nowrap'
+              >
+                查看证据位置 →
+              </div>
+            </div>
+            <div
+              data-pencil-name="人工复核意见"
+              style="align-items: flex-start; box-sizing: border-box; display: flex; flex-direction: column; flex-shrink: 0; gap: 8px; height: fit-content; justify-content: flex-start; padding: 14px 0px 0px 0px; width: 100%"
+            >
+              <div
+                data-pencil-name="复核意见标题"
+                style='box-sizing: border-box; color: #B54708; font-family: "Noto Sans SC", system-ui, sans-serif; font-size: 12px; font-style: normal; font-weight: 600; letter-spacing: 0px; line-height: 16px; text-align: left; white-space: nowrap'
+              >
+                人工复核意见
+              </div>
+              <div
+                data-pencil-name="复核意见内容"
+                style='box-sizing: border-box; color: #5B6B83; font-family: "Noto Sans SC", system-ui, sans-serif; font-size: 12px; font-style: normal; font-weight: 400; letter-spacing: 0px; line-height: 16px; text-align: left; width: 100%'
+              >
+                审批人员需确认历史单据是否为同一活动，必要时退回补充活动结算证明。
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div
+        data-pencil-name="我的单据"
+        style="align-items: flex-start; background-color: #F4F7FB; box-sizing: border-box; display: flex; flex-direction: column; gap: 24px; height: 900px; justify-content: flex-start; left: 1520px; overflow: hidden; padding: 32px; position: absolute; top: 980px; width: 1440px"
+      >
+        <div
+          data-pencil-name="我的单据导航"
+          style="align-items: center; box-sizing: border-box; display: flex; flex-direction: row; flex-shrink: 0; gap: 26px; height: 52px; justify-content: flex-start; width: 100%"
+        >
+          <div
+            data-pencil-name="我的单据系统名"
+            style='box-sizing: border-box; color: #123B6D; font-family: "Noto Sans SC", system-ui, sans-serif; font-size: 20px; font-style: normal; font-weight: 600; letter-spacing: 0px; line-height: 27px; text-align: left; white-space: nowrap'
+          >
+            财务风险审核
+          </div>
+          <div
+            data-pencil-name="工作台导航"
+            style='box-sizing: border-box; color: #6B7280; font-family: "Noto Sans SC", system-ui, sans-serif; font-size: 14px; font-style: normal; font-weight: 400; letter-spacing: 0px; line-height: 19px; text-align: left; white-space: nowrap'
+          >
+            工作台
+          </div>
+          <div
+            data-pencil-name="我的单据导航"
+            style='box-sizing: border-box; color: #185ABD; font-family: "Noto Sans SC", system-ui, sans-serif; font-size: 14px; font-style: normal; font-weight: 600; letter-spacing: 0px; line-height: 19px; text-align: left; white-space: nowrap'
+          >
+            我的单据
+          </div>
+          <div
+            data-pencil-name="审批任务导航"
+            style='box-sizing: border-box; color: #6B7280; font-family: "Noto Sans SC", system-ui, sans-serif; font-size: 14px; font-style: normal; font-weight: 400; letter-spacing: 0px; line-height: 19px; text-align: left; white-space: nowrap'
+          >
+            审批任务
+          </div>
+          <div
+            data-pencil-name="规则中心导航"
+            style='box-sizing: border-box; color: #6B7280; font-family: "Noto Sans SC", system-ui, sans-serif; font-size: 14px; font-style: normal; font-weight: 400; letter-spacing: 0px; line-height: 19px; text-align: left; white-space: nowrap'
+          >
+            规则中心
+          </div>
+          <div
+            data-pencil-name="我的单据导航占位"
+            style="align-items: flex-start; box-sizing: border-box; display: flex; flex-direction: row; flex: 1 1 0; gap: 0px; height: 1px; justify-content: flex-start"
+          ></div>
+          <div
+            data-pencil-name="我的单据用户"
+            style='box-sizing: border-box; color: #475467; font-family: "Noto Sans SC", system-ui, sans-serif; font-size: 14px; font-style: normal; font-weight: 400; letter-spacing: 0px; line-height: 19px; text-align: left; white-space: nowrap'
+          >
+            李财务 · 财务部
+          </div>
+        </div>
+        <div
+          data-pencil-name="我的单据标题区"
+          style="align-items: center; box-sizing: border-box; display: flex; flex-direction: row; flex-shrink: 0; gap: 0px; height: fit-content; justify-content: flex-start; width: 100%"
+        >
+          <div
+            data-pencil-name="我的单据标题组"
+            style="align-items: flex-start; box-sizing: border-box; display: flex; flex-direction: column; flex: 1 1 0; gap: 6px; height: fit-content; justify-content: flex-start"
+          >
+            <div
+              data-pencil-name="我的单据标题"
+              style='box-sizing: border-box; color: #123B6D; font-family: "Noto Sans SC", system-ui, sans-serif; font-size: 30px; font-style: normal; font-weight: 600; letter-spacing: 0px; line-height: 41px; text-align: left; white-space: nowrap'
+            >
+              我的单据
+            </div>
+            <div
+              data-pencil-name="我的单据说明"
+              style='box-sizing: border-box; color: #6B7280; font-family: "Noto Sans SC", system-ui, sans-serif; font-size: 14px; font-style: normal; font-weight: 400; letter-spacing: 0px; line-height: 19px; text-align: left; white-space: nowrap'
+            >
+              查看本人提交的费用报销单及处理进度。
+            </div>
+          </div>
+          <div
+            data-pencil-name="新建单据"
+            style="align-items: flex-start; background-color: #185ABD; border-radius: 6px; box-sizing: border-box; display: flex; flex-direction: row; flex-shrink: 0; gap: 0px; height: fit-content; justify-content: flex-start; padding: 11px 18px; width: fit-content"
+          >
+            <div
+              data-pencil-name="新建单据文字"
+              style='box-sizing: border-box; color: #FFFFFF; font-family: "Noto Sans SC", system-ui, sans-serif; font-size: 14px; font-style: normal; font-weight: 600; letter-spacing: 0px; line-height: 19px; text-align: left; white-space: nowrap'
+            >
+              + 新建费用报销单
+            </div>
+          </div>
+        </div>
+        <div
+          data-pencil-name="单据筛选栏"
+          style="align-items: flex-start; background-color: #FFFFFF; border-radius: 8px; box-sizing: border-box; display: flex; flex-direction: row; flex-shrink: 0; gap: 12px; height: fit-content; justify-content: flex-start; padding: 10px 14px; width: 100%"
+        >
+          <div
+            data-pencil-name="单据类型筛选"
+            style="align-items: flex-start; background-color: #F8FAFC; border-radius: 5px; box-sizing: border-box; display: flex; flex-direction: row; flex-shrink: 0; gap: 0px; height: fit-content; justify-content: flex-start; outline-offset: -0.5px; outline: 1px solid #D0D5DD; padding: 10px 12px; width: 180px"
+          >
+            <div
+              data-pencil-name="单据类型筛选文字"
+              style='box-sizing: border-box; color: #667085; font-family: "Noto Sans SC", system-ui, sans-serif; font-size: 13px; font-style: normal; font-weight: 400; letter-spacing: 0px; line-height: 18px; text-align: left; white-space: nowrap'
+            >
+              全部单据⌄
+            </div>
+          </div>
+          <div
+            data-pencil-name="状态筛选"
+            style="align-items: flex-start; background-color: #F8FAFC; border-radius: 5px; box-sizing: border-box; display: flex; flex-direction: row; flex-shrink: 0; gap: 0px; height: fit-content; justify-content: flex-start; outline-offset: -0.5px; outline: 1px solid #D0D5DD; padding: 10px 12px; width: 180px"
+          >
+            <div
+              data-pencil-name="状态筛选文字"
+              style='box-sizing: border-box; color: #667085; font-family: "Noto Sans SC", system-ui, sans-serif; font-size: 13px; font-style: normal; font-weight: 400; letter-spacing: 0px; line-height: 18px; text-align: left; white-space: nowrap'
+            >
+              全部状态⌄
+            </div>
+          </div>
+          <div
+            data-pencil-name="时间筛选"
+            style="align-items: flex-start; background-color: #F8FAFC; border-radius: 5px; box-sizing: border-box; display: flex; flex-direction: row; flex-shrink: 0; gap: 0px; height: fit-content; justify-content: flex-start; outline-offset: -0.5px; outline: 1px solid #D0D5DD; padding: 10px 12px; width: 180px"
+          >
+            <div
+              data-pencil-name="时间筛选文字"
+              style='box-sizing: border-box; color: #667085; font-family: "Noto Sans SC", system-ui, sans-serif; font-size: 13px; font-style: normal; font-weight: 400; letter-spacing: 0px; line-height: 18px; text-align: left; white-space: nowrap'
+            >
+              近 30 天⌄
+            </div>
+          </div>
+          <div
+            data-pencil-name="搜索框"
+            style="align-items: flex-start; background-color: #F8FAFC; border-radius: 5px; box-sizing: border-box; display: flex; flex-direction: row; flex: 1 1 0; gap: 0px; height: fit-content; justify-content: flex-start; outline-offset: -0.5px; outline: 1px solid #D0D5DD; padding: 10px 12px"
+          >
+            <div
+              data-pencil-name="搜索框文字"
+              style='box-sizing: border-box; color: #667085; font-family: "Noto Sans SC", system-ui, sans-serif; font-size: 13px; font-style: normal; font-weight: 400; letter-spacing: 0px; line-height: 18px; text-align: left; white-space: nowrap'
+            >
+              搜索单据编号、申请事项
+            </div>
+          </div>
+        </div>
+        <div
+          data-pencil-name="我的单据列表"
+          style="align-items: flex-start; background-color: #FFFFFF; border-radius: 8px; box-sizing: border-box; display: flex; flex-direction: column; flex: 1 1 0; gap: 14px; justify-content: flex-start; padding: 20px; width: 100%"
+        >
+          <div
+            data-pencil-name="我的单据列表标题"
+            style='box-sizing: border-box; color: #123B6D; font-family: "Noto Sans SC", system-ui, sans-serif; font-size: 18px; font-style: normal; font-weight: 600; letter-spacing: 0px; line-height: 24px; text-align: left; white-space: nowrap'
+          >
+            单据列表 · 24 条
+          </div>
+          <div
+            data-pencil-name="我的单据表格"
+            style="align-items: flex-start; box-sizing: border-box; display: flex; flex-direction: column; flex-shrink: 0; gap: 0px; height: fit-content; justify-content: flex-start; width: 100%"
+          >
+            <div
+              data-pencil-name="表头我的单据行"
+              style="align-items: center; box-sizing: border-box; display: flex; flex-direction: row; flex-shrink: 0; gap: 12px; height: fit-content; justify-content: flex-start; padding: 15px 4px; width: 100%"
+            >
+              <div
+                data-pencil-name="表头单元格0"
+                style="align-items: flex-start; box-sizing: border-box; display: flex; flex-direction: row; flex: 1 1 0; gap: 0px; height: fit-content; justify-content: flex-start; padding: 6px 12px"
+              >
+                <div
+                  data-pencil-name="表头单元格文字0"
+                  style='box-sizing: border-box; color: #667085; font-family: "Noto Sans SC", system-ui, sans-serif; font-size: 12px; font-style: normal; font-weight: 600; letter-spacing: 0px; line-height: 16px; text-align: left; white-space: nowrap'
+                >
+                  单据编号 / 事项
+                </div>
+              </div>
+              <div
+                data-pencil-name="表头单元格1"
+                style="align-items: flex-start; box-sizing: border-box; display: flex; flex-direction: row; flex: 1 1 0; gap: 0px; height: fit-content; justify-content: flex-start; padding: 6px 12px"
+              >
+                <div
+                  data-pencil-name="表头单元格文字1"
+                  style='box-sizing: border-box; color: #667085; font-family: "Noto Sans SC", system-ui, sans-serif; font-size: 12px; font-style: normal; font-weight: 600; letter-spacing: 0px; line-height: 16px; text-align: left; white-space: nowrap'
+                >
+                  金额
+                </div>
+              </div>
+              <div
+                data-pencil-name="表头单元格2"
+                style="align-items: flex-start; box-sizing: border-box; display: flex; flex-direction: row; flex: 1 1 0; gap: 0px; height: fit-content; justify-content: flex-start; padding: 6px 12px"
+              >
+                <div
+                  data-pencil-name="表头单元格文字2"
+                  style='box-sizing: border-box; color: #667085; font-family: "Noto Sans SC", system-ui, sans-serif; font-size: 12px; font-style: normal; font-weight: 600; letter-spacing: 0px; line-height: 16px; text-align: left; white-space: nowrap'
+                >
+                  当前状态
+                </div>
+              </div>
+              <div
+                data-pencil-name="表头单元格3"
+                style="align-items: flex-start; box-sizing: border-box; display: flex; flex-direction: row; flex: 1 1 0; gap: 0px; height: fit-content; justify-content: flex-start; padding: 6px 12px"
+              >
+                <div
+                  data-pencil-name="表头单元格文字3"
+                  style='box-sizing: border-box; color: #667085; font-family: "Noto Sans SC", system-ui, sans-serif; font-size: 12px; font-style: normal; font-weight: 600; letter-spacing: 0px; line-height: 16px; text-align: left; white-space: nowrap'
+                >
+                  提交时间
+                </div>
+              </div>
+              <div
+                data-pencil-name="表头单元格4"
+                style="align-items: flex-start; box-sizing: border-box; display: flex; flex-direction: row; flex: 1 1 0; gap: 0px; height: fit-content; justify-content: flex-start; padding: 6px 12px"
+              >
+                <div
+                  data-pencil-name="表头单元格文字4"
+                  style='box-sizing: border-box; color: #667085; font-family: "Noto Sans SC", system-ui, sans-serif; font-size: 12px; font-style: normal; font-weight: 600; letter-spacing: 0px; line-height: 16px; text-align: left; white-space: nowrap'
+                >
+                  操作
+                </div>
+              </div>
+            </div>
+            <div
+              data-pencil-name="报销单-20260816我的单据行"
+              style="align-items: center; box-sizing: border-box; display: flex; flex-direction: row; flex-shrink: 0; gap: 12px; height: fit-content; justify-content: flex-start; padding: 15px 4px; width: 100%"
+            >
+              <div
+                data-pencil-name="报销单-20260816单元格0"
+                style="align-items: flex-start; box-sizing: border-box; display: flex; flex-direction: row; flex: 1 1 0; gap: 0px; height: fit-content; justify-content: flex-start; padding: 6px 12px"
+              >
+                <div
+                  data-pencil-name="报销单-20260816单元格文字0"
+                  style='box-sizing: border-box; color: #344054; font-family: "Noto Sans SC", system-ui, sans-serif; font-size: 13px; font-style: normal; font-weight: 400; letter-spacing: 0px; line-height: 18px; text-align: left; white-space: nowrap'
+                >
+                  差旅报销 · 上海客户拜访
+                </div>
+              </div>
+              <div
+                data-pencil-name="报销单-20260816单元格1"
+                style="align-items: flex-start; box-sizing: border-box; display: flex; flex-direction: row; flex: 1 1 0; gap: 0px; height: fit-content; justify-content: flex-start; padding: 6px 12px"
+              >
+                <div
+                  data-pencil-name="报销单-20260816单元格文字1"
+                  style='box-sizing: border-box; color: #344054; font-family: "Noto Sans SC", system-ui, sans-serif; font-size: 13px; font-style: normal; font-weight: 400; letter-spacing: 0px; line-height: 18px; text-align: left; white-space: nowrap'
+                >
+                  ¥ 3,280.00
+                </div>
+              </div>
+              <div
+                data-pencil-name="报销单-20260816单元格2"
+                style="align-items: flex-start; box-sizing: border-box; display: flex; flex-direction: row; flex: 1 1 0; gap: 0px; height: fit-content; justify-content: flex-start; padding: 6px 12px"
+              >
+                <div
+                  data-pencil-name="报销单-20260816单元格文字2"
+                  style='box-sizing: border-box; color: #344054; font-family: "Noto Sans SC", system-ui, sans-serif; font-size: 13px; font-style: normal; font-weight: 400; letter-spacing: 0px; line-height: 18px; text-align: left; white-space: nowrap'
+                >
+                  审批中
+                </div>
+              </div>
+              <div
+                data-pencil-name="报销单-20260816单元格3"
+                style="align-items: flex-start; box-sizing: border-box; display: flex; flex-direction: row; flex: 1 1 0; gap: 0px; height: fit-content; justify-content: flex-start; padding: 6px 12px"
+              >
+                <div
+                  data-pencil-name="报销单-20260816单元格文字3"
+                  style='box-sizing: border-box; color: #344054; font-family: "Noto Sans SC", system-ui, sans-serif; font-size: 13px; font-style: normal; font-weight: 400; letter-spacing: 0px; line-height: 18px; text-align: left; white-space: nowrap'
+                >
+                  今天 09:20
+                </div>
+              </div>
+              <div
+                data-pencil-name="报销单-20260816单元格4"
+                style="align-items: flex-start; box-sizing: border-box; display: flex; flex-direction: row; flex: 1 1 0; gap: 0px; height: fit-content; justify-content: flex-start; padding: 6px 12px"
+              >
+                <div
+                  data-pencil-name="报销单-20260816单元格文字4"
+                  style='box-sizing: border-box; color: #185ABD; font-family: "Noto Sans SC", system-ui, sans-serif; font-size: 13px; font-style: normal; font-weight: 400; letter-spacing: 0px; line-height: 18px; text-align: left; white-space: nowrap'
+                >
+                  查看详情
+                </div>
+              </div>
+            </div>
+            <div
+              data-pencil-name="报销单-20260815我的单据行"
+              style="align-items: center; box-sizing: border-box; display: flex; flex-direction: row; flex-shrink: 0; gap: 12px; height: fit-content; justify-content: flex-start; padding: 15px 4px; width: 100%"
+            >
+              <div
+                data-pencil-name="报销单-20260815单元格0"
+                style="align-items: flex-start; box-sizing: border-box; display: flex; flex-direction: row; flex: 1 1 0; gap: 0px; height: fit-content; justify-content: flex-start; padding: 6px 12px"
+              >
+                <div
+                  data-pencil-name="报销单-20260815单元格文字0"
+                  style='box-sizing: border-box; color: #344054; font-family: "Noto Sans SC", system-ui, sans-serif; font-size: 13px; font-style: normal; font-weight: 400; letter-spacing: 0px; line-height: 18px; text-align: left; white-space: nowrap'
+                >
+                  市场活动费用
+                </div>
+              </div>
+              <div
+                data-pencil-name="报销单-20260815单元格1"
+                style="align-items: flex-start; box-sizing: border-box; display: flex; flex-direction: row; flex: 1 1 0; gap: 0px; height: fit-content; justify-content: flex-start; padding: 6px 12px"
+              >
+                <div
+                  data-pencil-name="报销单-20260815单元格文字1"
+                  style='box-sizing: border-box; color: #344054; font-family: "Noto Sans SC", system-ui, sans-serif; font-size: 13px; font-style: normal; font-weight: 400; letter-spacing: 0px; line-height: 18px; text-align: left; white-space: nowrap'
+                >
+                  ¥ 12,600.00
+                </div>
+              </div>
+              <div
+                data-pencil-name="报销单-20260815单元格2"
+                style="align-items: flex-start; box-sizing: border-box; display: flex; flex-direction: row; flex: 1 1 0; gap: 0px; height: fit-content; justify-content: flex-start; padding: 6px 12px"
+              >
+                <div
+                  data-pencil-name="报销单-20260815单元格文字2"
+                  style='box-sizing: border-box; color: #344054; font-family: "Noto Sans SC", system-ui, sans-serif; font-size: 13px; font-style: normal; font-weight: 400; letter-spacing: 0px; line-height: 18px; text-align: left; white-space: nowrap'
+                >
+                  已退回
+                </div>
+              </div>
+              <div
+                data-pencil-name="报销单-20260815单元格3"
+                style="align-items: flex-start; box-sizing: border-box; display: flex; flex-direction: row; flex: 1 1 0; gap: 0px; height: fit-content; justify-content: flex-start; padding: 6px 12px"
+              >
+                <div
+                  data-pencil-name="报销单-20260815单元格文字3"
+                  style='box-sizing: border-box; color: #344054; font-family: "Noto Sans SC", system-ui, sans-serif; font-size: 13px; font-style: normal; font-weight: 400; letter-spacing: 0px; line-height: 18px; text-align: left; white-space: nowrap'
+                >
+                  昨天 18:32
+                </div>
+              </div>
+              <div
+                data-pencil-name="报销单-20260815单元格4"
+                style="align-items: flex-start; box-sizing: border-box; display: flex; flex-direction: row; flex: 1 1 0; gap: 0px; height: fit-content; justify-content: flex-start; padding: 6px 12px"
+              >
+                <div
+                  data-pencil-name="报销单-20260815单元格文字4"
+                  style='box-sizing: border-box; color: #185ABD; font-family: "Noto Sans SC", system-ui, sans-serif; font-size: 13px; font-style: normal; font-weight: 400; letter-spacing: 0px; line-height: 18px; text-align: left; white-space: nowrap'
+                >
+                  修改并重提
+                </div>
+              </div>
+            </div>
+            <div
+              data-pencil-name="报销单-20260812我的单据行"
+              style="align-items: center; box-sizing: border-box; display: flex; flex-direction: row; flex-shrink: 0; gap: 12px; height: fit-content; justify-content: flex-start; padding: 15px 4px; width: 100%"
+            >
+              <div
+                data-pencil-name="报销单-20260812单元格0"
+                style="align-items: flex-start; box-sizing: border-box; display: flex; flex-direction: row; flex: 1 1 0; gap: 0px; height: fit-content; justify-content: flex-start; padding: 6px 12px"
+              >
+                <div
+                  data-pencil-name="报销单-20260812单元格文字0"
+                  style='box-sizing: border-box; color: #344054; font-family: "Noto Sans SC", system-ui, sans-serif; font-size: 13px; font-style: normal; font-weight: 400; letter-spacing: 0px; line-height: 18px; text-align: left; white-space: nowrap'
+                >
+                  办公用品采购
+                </div>
+              </div>
+              <div
+                data-pencil-name="报销单-20260812单元格1"
+                style="align-items: flex-start; box-sizing: border-box; display: flex; flex-direction: row; flex: 1 1 0; gap: 0px; height: fit-content; justify-content: flex-start; padding: 6px 12px"
+              >
+                <div
+                  data-pencil-name="报销单-20260812单元格文字1"
+                  style='box-sizing: border-box; color: #344054; font-family: "Noto Sans SC", system-ui, sans-serif; font-size: 13px; font-style: normal; font-weight: 400; letter-spacing: 0px; line-height: 18px; text-align: left; white-space: nowrap'
+                >
+                  ¥ 860.00
+                </div>
+              </div>
+              <div
+                data-pencil-name="报销单-20260812单元格2"
+                style="align-items: flex-start; box-sizing: border-box; display: flex; flex-direction: row; flex: 1 1 0; gap: 0px; height: fit-content; justify-content: flex-start; padding: 6px 12px"
+              >
+                <div
+                  data-pencil-name="报销单-20260812单元格文字2"
+                  style='box-sizing: border-box; color: #344054; font-family: "Noto Sans SC", system-ui, sans-serif; font-size: 13px; font-style: normal; font-weight: 400; letter-spacing: 0px; line-height: 18px; text-align: left; white-space: nowrap'
+                >
+                  已通过
+                </div>
+              </div>
+              <div
+                data-pencil-name="报销单-20260812单元格3"
+                style="align-items: flex-start; box-sizing: border-box; display: flex; flex-direction: row; flex: 1 1 0; gap: 0px; height: fit-content; justify-content: flex-start; padding: 6px 12px"
+              >
+                <div
+                  data-pencil-name="报销单-20260812单元格文字3"
+                  style='box-sizing: border-box; color: #344054; font-family: "Noto Sans SC", system-ui, sans-serif; font-size: 13px; font-style: normal; font-weight: 400; letter-spacing: 0px; line-height: 18px; text-align: left; white-space: nowrap'
+                >
+                  08-12 14:10
+                </div>
+              </div>
+              <div
+                data-pencil-name="报销单-20260812单元格4"
+                style="align-items: flex-start; box-sizing: border-box; display: flex; flex-direction: row; flex: 1 1 0; gap: 0px; height: fit-content; justify-content: flex-start; padding: 6px 12px"
+              >
+                <div
+                  data-pencil-name="报销单-20260812单元格文字4"
+                  style='box-sizing: border-box; color: #185ABD; font-family: "Noto Sans SC", system-ui, sans-serif; font-size: 13px; font-style: normal; font-weight: 400; letter-spacing: 0px; line-height: 18px; text-align: left; white-space: nowrap'
+                >
+                  查看报告
+                </div>
+              </div>
+            </div>
+            <div
+              data-pencil-name="报销单-20260808我的单据行"
+              style="align-items: center; box-sizing: border-box; display: flex; flex-direction: row; flex-shrink: 0; gap: 12px; height: fit-content; justify-content: flex-start; padding: 15px 4px; width: 100%"
+            >
+              <div
+                data-pencil-name="报销单-20260808单元格0"
+                style="align-items: flex-start; box-sizing: border-box; display: flex; flex-direction: row; flex: 1 1 0; gap: 0px; height: fit-content; justify-content: flex-start; padding: 6px 12px"
+              >
+                <div
+                  data-pencil-name="报销单-20260808单元格文字0"
+                  style='box-sizing: border-box; color: #344054; font-family: "Noto Sans SC", system-ui, sans-serif; font-size: 13px; font-style: normal; font-weight: 400; letter-spacing: 0px; line-height: 18px; text-align: left; white-space: nowrap'
+                >
+                  团队建设活动
+                </div>
+              </div>
+              <div
+                data-pencil-name="报销单-20260808单元格1"
+                style="align-items: flex-start; box-sizing: border-box; display: flex; flex-direction: row; flex: 1 1 0; gap: 0px; height: fit-content; justify-content: flex-start; padding: 6px 12px"
+              >
+                <div
+                  data-pencil-name="报销单-20260808单元格文字1"
+                  style='box-sizing: border-box; color: #344054; font-family: "Noto Sans SC", system-ui, sans-serif; font-size: 13px; font-style: normal; font-weight: 400; letter-spacing: 0px; line-height: 18px; text-align: left; white-space: nowrap'
+                >
+                  ¥ 5,420.00
+                </div>
+              </div>
+              <div
+                data-pencil-name="报销单-20260808单元格2"
+                style="align-items: flex-start; box-sizing: border-box; display: flex; flex-direction: row; flex: 1 1 0; gap: 0px; height: fit-content; justify-content: flex-start; padding: 6px 12px"
+              >
+                <div
+                  data-pencil-name="报销单-20260808单元格文字2"
+                  style='box-sizing: border-box; color: #344054; font-family: "Noto Sans SC", system-ui, sans-serif; font-size: 13px; font-style: normal; font-weight: 400; letter-spacing: 0px; line-height: 18px; text-align: left; white-space: nowrap'
+                >
+                  草稿
+                </div>
+              </div>
+              <div
+                data-pencil-name="报销单-20260808单元格3"
+                style="align-items: flex-start; box-sizing: border-box; display: flex; flex-direction: row; flex: 1 1 0; gap: 0px; height: fit-content; justify-content: flex-start; padding: 6px 12px"
+              >
+                <div
+                  data-pencil-name="报销单-20260808单元格文字3"
+                  style='box-sizing: border-box; color: #344054; font-family: "Noto Sans SC", system-ui, sans-serif; font-size: 13px; font-style: normal; font-weight: 400; letter-spacing: 0px; line-height: 18px; text-align: left; white-space: nowrap'
+                >
+                  08-08 11:24
+                </div>
+              </div>
+              <div
+                data-pencil-name="报销单-20260808单元格4"
+                style="align-items: flex-start; box-sizing: border-box; display: flex; flex-direction: row; flex: 1 1 0; gap: 0px; height: fit-content; justify-content: flex-start; padding: 6px 12px"
+              >
+                <div
+                  data-pencil-name="报销单-20260808单元格文字4"
+                  style='box-sizing: border-box; color: #185ABD; font-family: "Noto Sans SC", system-ui, sans-serif; font-size: 13px; font-style: normal; font-weight: 400; letter-spacing: 0px; line-height: 18px; text-align: left; white-space: nowrap'
+                >
+                  继续编辑
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div
+        data-pencil-name="审批任务"
+        style="align-items: flex-start; background-color: #F4F7FB; box-sizing: border-box; display: flex; flex-direction: column; gap: 24px; height: 900px; justify-content: flex-start; left: 3040px; overflow: hidden; padding: 32px; position: absolute; top: 980px; width: 1440px"
+      >
+        <div
+          data-pencil-name="审批任务导航"
+          style="align-items: center; box-sizing: border-box; display: flex; flex-direction: row; flex-shrink: 0; gap: 26px; height: 52px; justify-content: flex-start; width: 100%"
+        >
+          <div
+            data-pencil-name="审批任务系统名"
+            style='box-sizing: border-box; color: #123B6D; font-family: "Noto Sans SC", system-ui, sans-serif; font-size: 20px; font-style: normal; font-weight: 600; letter-spacing: 0px; line-height: 27px; text-align: left; white-space: nowrap'
+          >
+            财务风险审核
+          </div>
+          <div
+            data-pencil-name="工作台审批导航"
+            style='box-sizing: border-box; color: #6B7280; font-family: "Noto Sans SC", system-ui, sans-serif; font-size: 14px; font-style: normal; font-weight: 400; letter-spacing: 0px; line-height: 19px; text-align: left; white-space: nowrap'
+          >
+            工作台
+          </div>
+          <div
+            data-pencil-name="我的单据审批导航"
+            style='box-sizing: border-box; color: #6B7280; font-family: "Noto Sans SC", system-ui, sans-serif; font-size: 14px; font-style: normal; font-weight: 400; letter-spacing: 0px; line-height: 19px; text-align: left; white-space: nowrap'
+          >
+            我的单据
+          </div>
+          <div
+            data-pencil-name="审批任务审批导航"
+            style='box-sizing: border-box; color: #185ABD; font-family: "Noto Sans SC", system-ui, sans-serif; font-size: 14px; font-style: normal; font-weight: 600; letter-spacing: 0px; line-height: 19px; text-align: left; white-space: nowrap'
+          >
+            审批任务
+          </div>
+          <div
+            data-pencil-name="规则中心审批导航"
+            style='box-sizing: border-box; color: #6B7280; font-family: "Noto Sans SC", system-ui, sans-serif; font-size: 14px; font-style: normal; font-weight: 400; letter-spacing: 0px; line-height: 19px; text-align: left; white-space: nowrap'
+          >
+            规则中心
+          </div>
+          <div
+            data-pencil-name="审批任务导航占位"
+            style="align-items: flex-start; box-sizing: border-box; display: flex; flex-direction: row; flex: 1 1 0; gap: 0px; height: 1px; justify-content: flex-start"
+          ></div>
+          <div
+            data-pencil-name="审批任务用户"
+            style='box-sizing: border-box; color: #475467; font-family: "Noto Sans SC", system-ui, sans-serif; font-size: 14px; font-style: normal; font-weight: 400; letter-spacing: 0px; line-height: 19px; text-align: left; white-space: nowrap'
+          >
+            李审批 · 财务部
+          </div>
+        </div>
+        <div
+          data-pencil-name="审批任务标题区"
+          style="align-items: center; box-sizing: border-box; display: flex; flex-direction: row; flex-shrink: 0; gap: 0px; height: fit-content; justify-content: flex-start; width: 100%"
+        >
+          <div
+            data-pencil-name="审批任务标题组"
+            style="align-items: flex-start; box-sizing: border-box; display: flex; flex-direction: column; flex: 1 1 0; gap: 6px; height: fit-content; justify-content: flex-start"
+          >
+            <div
+              data-pencil-name="审批任务标题"
+              style='box-sizing: border-box; color: #123B6D; font-family: "Noto Sans SC", system-ui, sans-serif; font-size: 30px; font-style: normal; font-weight: 600; letter-spacing: 0px; line-height: 41px; text-align: left; white-space: nowrap'
+            >
+              审批任务
+            </div>
+            <div
+              data-pencil-name="审批任务说明"
+              style='box-sizing: border-box; color: #6B7280; font-family: "Noto Sans SC", system-ui, sans-serif; font-size: 14px; font-style: normal; font-weight: 400; letter-spacing: 0px; line-height: 19px; text-align: left; white-space: nowrap'
+            >
+              只显示分配给你的审批任务，最终决定由审批人员完成。
+            </div>
+          </div>
+        </div>
+        <div
+          data-pencil-name="审批任务状态摘要"
+          style="align-items: flex-start; box-sizing: border-box; display: flex; flex-direction: row; flex-shrink: 0; gap: 16px; height: fit-content; justify-content: flex-start; width: 100%"
+        >
+          <div
+            data-pencil-name="待处理审批摘要"
+            style="align-items: flex-start; background-color: #FFFFFF; border-radius: 8px; box-sizing: border-box; display: flex; flex-direction: column; flex: 1 1 0; gap: 8px; height: fit-content; justify-content: flex-start; padding: 18px"
+          >
+            <div
+              data-pencil-name="待处理审批摘要标签"
+              style='box-sizing: border-box; color: #667085; font-family: "Noto Sans SC", system-ui, sans-serif; font-size: 13px; font-style: normal; font-weight: 400; letter-spacing: 0px; line-height: 18px; text-align: left; white-space: nowrap'
+            >
+              待处理
+            </div>
+            <div
+              data-pencil-name="待处理审批摘要数值"
+              style='box-sizing: border-box; color: #B42318; font-family: "Noto Sans SC", system-ui, sans-serif; font-size: 26px; font-style: normal; font-weight: 600; letter-spacing: 0px; line-height: 35px; text-align: left; white-space: nowrap'
+            >
+              12
+            </div>
+          </div>
+          <div
+            data-pencil-name="高风险审批摘要"
+            style="align-items: flex-start; background-color: #FFFFFF; border-radius: 8px; box-sizing: border-box; display: flex; flex-direction: column; flex: 1 1 0; gap: 8px; height: fit-content; justify-content: flex-start; padding: 18px"
+          >
+            <div
+              data-pencil-name="高风险审批摘要标签"
+              style='box-sizing: border-box; color: #667085; font-family: "Noto Sans SC", system-ui, sans-serif; font-size: 13px; font-style: normal; font-weight: 400; letter-spacing: 0px; line-height: 18px; text-align: left; white-space: nowrap'
+            >
+              高风险
+            </div>
+            <div
+              data-pencil-name="高风险审批摘要数值"
+              style='box-sizing: border-box; color: #B42318; font-family: "Noto Sans SC", system-ui, sans-serif; font-size: 26px; font-style: normal; font-weight: 600; letter-spacing: 0px; line-height: 35px; text-align: left; white-space: nowrap'
+            >
+              3
+            </div>
+          </div>
+          <div
+            data-pencil-name="已处理审批摘要"
+            style="align-items: flex-start; background-color: #FFFFFF; border-radius: 8px; box-sizing: border-box; display: flex; flex-direction: column; flex: 1 1 0; gap: 8px; height: fit-content; justify-content: flex-start; padding: 18px"
+          >
+            <div
+              data-pencil-name="已处理审批摘要标签"
+              style='box-sizing: border-box; color: #667085; font-family: "Noto Sans SC", system-ui, sans-serif; font-size: 13px; font-style: normal; font-weight: 400; letter-spacing: 0px; line-height: 18px; text-align: left; white-space: nowrap'
+            >
+              已处理
+            </div>
+            <div
+              data-pencil-name="已处理审批摘要数值"
+              style='box-sizing: border-box; color: #087443; font-family: "Noto Sans SC", system-ui, sans-serif; font-size: 26px; font-style: normal; font-weight: 600; letter-spacing: 0px; line-height: 35px; text-align: left; white-space: nowrap'
+            >
+              48
+            </div>
+          </div>
+        </div>
+        <div
+          data-pencil-name="审批任务列表"
+          style="align-items: flex-start; background-color: #FFFFFF; border-radius: 8px; box-sizing: border-box; display: flex; flex-direction: column; flex: 1 1 0; gap: 14px; justify-content: flex-start; padding: 20px; width: 100%"
+        >
+          <div
+            data-pencil-name="审批任务列表标题"
+            style='box-sizing: border-box; color: #123B6D; font-family: "Noto Sans SC", system-ui, sans-serif; font-size: 18px; font-style: normal; font-weight: 600; letter-spacing: 0px; line-height: 24px; text-align: left; white-space: nowrap'
+          >
+            待我处理 · 12 条
+          </div>
+          <div
+            data-pencil-name="审批任务表格"
+            style="align-items: flex-start; box-sizing: border-box; display: flex; flex-direction: column; flex-shrink: 0; gap: 0px; height: fit-content; justify-content: flex-start; width: 100%"
+          >
+            <div
+              data-pencil-name="表头审批任务行"
+              style="align-items: center; box-sizing: border-box; display: flex; flex-direction: row; flex-shrink: 0; gap: 12px; height: fit-content; justify-content: flex-start; padding: 15px 4px; width: 100%"
+            >
+              <div
+                data-pencil-name="表头审批单元格0"
+                style="align-items: flex-start; box-sizing: border-box; display: flex; flex-direction: row; flex: 1 1 0; gap: 0px; height: fit-content; justify-content: flex-start; padding: 6px 12px"
+              >
+                <div
+                  data-pencil-name="表头审批文字0"
+                  style='box-sizing: border-box; color: #667085; font-family: "Noto Sans SC", system-ui, sans-serif; font-size: 12px; font-style: normal; font-weight: 600; letter-spacing: 0px; line-height: 16px; text-align: left; white-space: nowrap'
+                >
+                  单据 / 申请人
+                </div>
+              </div>
+              <div
+                data-pencil-name="表头审批单元格1"
+                style="align-items: flex-start; box-sizing: border-box; display: flex; flex-direction: row; flex: 1 1 0; gap: 0px; height: fit-content; justify-content: flex-start; padding: 6px 12px"
+              >
+                <div
+                  data-pencil-name="表头审批文字1"
+                  style='box-sizing: border-box; color: #667085; font-family: "Noto Sans SC", system-ui, sans-serif; font-size: 12px; font-style: normal; font-weight: 600; letter-spacing: 0px; line-height: 16px; text-align: left; white-space: nowrap'
+                >
+                  风险等级
+                </div>
+              </div>
+              <div
+                data-pencil-name="表头审批单元格2"
+                style="align-items: flex-start; box-sizing: border-box; display: flex; flex-direction: row; flex: 1 1 0; gap: 0px; height: fit-content; justify-content: flex-start; padding: 6px 12px"
+              >
+                <div
+                  data-pencil-name="表头审批文字2"
+                  style='box-sizing: border-box; color: #667085; font-family: "Noto Sans SC", system-ui, sans-serif; font-size: 12px; font-style: normal; font-weight: 600; letter-spacing: 0px; line-height: 16px; text-align: left; white-space: nowrap'
+                >
+                  金额
+                </div>
+              </div>
+              <div
+                data-pencil-name="表头审批单元格3"
+                style="align-items: flex-start; box-sizing: border-box; display: flex; flex-direction: row; flex: 1 1 0; gap: 0px; height: fit-content; justify-content: flex-start; padding: 6px 12px"
+              >
+                <div
+                  data-pencil-name="表头审批文字3"
+                  style='box-sizing: border-box; color: #667085; font-family: "Noto Sans SC", system-ui, sans-serif; font-size: 12px; font-style: normal; font-weight: 600; letter-spacing: 0px; line-height: 16px; text-align: left; white-space: nowrap'
+                >
+                  停留时间
+                </div>
+              </div>
+              <div
+                data-pencil-name="表头审批单元格4"
+                style="align-items: flex-start; box-sizing: border-box; display: flex; flex-direction: row; flex: 1 1 0; gap: 0px; height: fit-content; justify-content: flex-start; padding: 6px 12px"
+              >
+                <div
+                  data-pencil-name="表头审批文字4"
+                  style='box-sizing: border-box; color: #667085; font-family: "Noto Sans SC", system-ui, sans-serif; font-size: 12px; font-style: normal; font-weight: 600; letter-spacing: 0px; line-height: 16px; text-align: left; white-space: nowrap'
+                >
+                  操作
+                </div>
+              </div>
+            </div>
+            <div
+              data-pencil-name="报销单-20260815审批任务行"
+              style="align-items: center; box-sizing: border-box; display: flex; flex-direction: row; flex-shrink: 0; gap: 12px; height: fit-content; justify-content: flex-start; padding: 15px 4px; width: 100%"
+            >
+              <div
+                data-pencil-name="报销单-20260815审批单元格0"
+                style="align-items: flex-start; box-sizing: border-box; display: flex; flex-direction: row; flex: 1 1 0; gap: 0px; height: fit-content; justify-content: flex-start; padding: 6px 12px"
+              >
+                <div
+                  data-pencil-name="报销单-20260815审批文字0"
+                  style='box-sizing: border-box; color: #344054; font-family: "Noto Sans SC", system-ui, sans-serif; font-size: 13px; font-style: normal; font-weight: 400; letter-spacing: 0px; line-height: 18px; text-align: left; white-space: nowrap'
+                >
+                  市场活动 · 陈卓
+                </div>
+              </div>
+              <div
+                data-pencil-name="报销单-20260815审批单元格1"
+                style="align-items: flex-start; box-sizing: border-box; display: flex; flex-direction: row; flex: 1 1 0; gap: 0px; height: fit-content; justify-content: flex-start; padding: 6px 12px"
+              >
+                <div
+                  data-pencil-name="报销单-20260815审批文字1"
+                  style='box-sizing: border-box; color: #344054; font-family: "Noto Sans SC", system-ui, sans-serif; font-size: 13px; font-style: normal; font-weight: 400; letter-spacing: 0px; line-height: 18px; text-align: left; white-space: nowrap'
+                >
+                  高风险
+                </div>
+              </div>
+              <div
+                data-pencil-name="报销单-20260815审批单元格2"
+                style="align-items: flex-start; box-sizing: border-box; display: flex; flex-direction: row; flex: 1 1 0; gap: 0px; height: fit-content; justify-content: flex-start; padding: 6px 12px"
+              >
+                <div
+                  data-pencil-name="报销单-20260815审批文字2"
+                  style='box-sizing: border-box; color: #344054; font-family: "Noto Sans SC", system-ui, sans-serif; font-size: 13px; font-style: normal; font-weight: 400; letter-spacing: 0px; line-height: 18px; text-align: left; white-space: nowrap'
+                >
+                  ¥ 12,600.00
+                </div>
+              </div>
+              <div
+                data-pencil-name="报销单-20260815审批单元格3"
+                style="align-items: flex-start; box-sizing: border-box; display: flex; flex-direction: row; flex: 1 1 0; gap: 0px; height: fit-content; justify-content: flex-start; padding: 6px 12px"
+              >
+                <div
+                  data-pencil-name="报销单-20260815审批文字3"
+                  style='box-sizing: border-box; color: #344054; font-family: "Noto Sans SC", system-ui, sans-serif; font-size: 13px; font-style: normal; font-weight: 400; letter-spacing: 0px; line-height: 18px; text-align: left; white-space: nowrap'
+                >
+                  1 天
+                </div>
+              </div>
+              <div
+                data-pencil-name="报销单-20260815审批单元格4"
+                style="align-items: flex-start; box-sizing: border-box; display: flex; flex-direction: row; flex: 1 1 0; gap: 0px; height: fit-content; justify-content: flex-start; padding: 6px 12px"
+              >
+                <div
+                  data-pencil-name="报销单-20260815审批文字4"
+                  style='box-sizing: border-box; color: #185ABD; font-family: "Noto Sans SC", system-ui, sans-serif; font-size: 13px; font-style: normal; font-weight: 400; letter-spacing: 0px; line-height: 18px; text-align: left; white-space: nowrap'
+                >
+                  进入审批
+                </div>
+              </div>
+            </div>
+            <div
+              data-pencil-name="报销单-20260816审批任务行"
+              style="align-items: center; box-sizing: border-box; display: flex; flex-direction: row; flex-shrink: 0; gap: 12px; height: fit-content; justify-content: flex-start; padding: 15px 4px; width: 100%"
+            >
+              <div
+                data-pencil-name="报销单-20260816审批单元格0"
+                style="align-items: flex-start; box-sizing: border-box; display: flex; flex-direction: row; flex: 1 1 0; gap: 0px; height: fit-content; justify-content: flex-start; padding: 6px 12px"
+              >
+                <div
+                  data-pencil-name="报销单-20260816审批文字0"
+                  style='box-sizing: border-box; color: #344054; font-family: "Noto Sans SC", system-ui, sans-serif; font-size: 13px; font-style: normal; font-weight: 400; letter-spacing: 0px; line-height: 18px; text-align: left; white-space: nowrap'
+                >
+                  差旅报销 · 王敏
+                </div>
+              </div>
+              <div
+                data-pencil-name="报销单-20260816审批单元格1"
+                style="align-items: flex-start; box-sizing: border-box; display: flex; flex-direction: row; flex: 1 1 0; gap: 0px; height: fit-content; justify-content: flex-start; padding: 6px 12px"
+              >
+                <div
+                  data-pencil-name="报销单-20260816审批文字1"
+                  style='box-sizing: border-box; color: #344054; font-family: "Noto Sans SC", system-ui, sans-serif; font-size: 13px; font-style: normal; font-weight: 400; letter-spacing: 0px; line-height: 18px; text-align: left; white-space: nowrap'
+                >
+                  中风险
+                </div>
+              </div>
+              <div
+                data-pencil-name="报销单-20260816审批单元格2"
+                style="align-items: flex-start; box-sizing: border-box; display: flex; flex-direction: row; flex: 1 1 0; gap: 0px; height: fit-content; justify-content: flex-start; padding: 6px 12px"
+              >
+                <div
+                  data-pencil-name="报销单-20260816审批文字2"
+                  style='box-sizing: border-box; color: #344054; font-family: "Noto Sans SC", system-ui, sans-serif; font-size: 13px; font-style: normal; font-weight: 400; letter-spacing: 0px; line-height: 18px; text-align: left; white-space: nowrap'
+                >
+                  ¥ 3,280.00
+                </div>
+              </div>
+              <div
+                data-pencil-name="报销单-20260816审批单元格3"
+                style="align-items: flex-start; box-sizing: border-box; display: flex; flex-direction: row; flex: 1 1 0; gap: 0px; height: fit-content; justify-content: flex-start; padding: 6px 12px"
+              >
+                <div
+                  data-pencil-name="报销单-20260816审批文字3"
+                  style='box-sizing: border-box; color: #344054; font-family: "Noto Sans SC", system-ui, sans-serif; font-size: 13px; font-style: normal; font-weight: 400; letter-spacing: 0px; line-height: 18px; text-align: left; white-space: nowrap'
+                >
+                  10 分钟
+                </div>
+              </div>
+              <div
+                data-pencil-name="报销单-20260816审批单元格4"
+                style="align-items: flex-start; box-sizing: border-box; display: flex; flex-direction: row; flex: 1 1 0; gap: 0px; height: fit-content; justify-content: flex-start; padding: 6px 12px"
+              >
+                <div
+                  data-pencil-name="报销单-20260816审批文字4"
+                  style='box-sizing: border-box; color: #185ABD; font-family: "Noto Sans SC", system-ui, sans-serif; font-size: 13px; font-style: normal; font-weight: 400; letter-spacing: 0px; line-height: 18px; text-align: left; white-space: nowrap'
+                >
+                  进入审批
+                </div>
+              </div>
+            </div>
+            <div
+              data-pencil-name="报销单-20260814审批任务行"
+              style="align-items: center; box-sizing: border-box; display: flex; flex-direction: row; flex-shrink: 0; gap: 12px; height: fit-content; justify-content: flex-start; padding: 15px 4px; width: 100%"
+            >
+              <div
+                data-pencil-name="报销单-20260814审批单元格0"
+                style="align-items: flex-start; box-sizing: border-box; display: flex; flex-direction: row; flex: 1 1 0; gap: 0px; height: fit-content; justify-content: flex-start; padding: 6px 12px"
+              >
+                <div
+                  data-pencil-name="报销单-20260814审批文字0"
+                  style='box-sizing: border-box; color: #344054; font-family: "Noto Sans SC", system-ui, sans-serif; font-size: 13px; font-style: normal; font-weight: 400; letter-spacing: 0px; line-height: 18px; text-align: left; white-space: nowrap'
+                >
+                  办公采购 · 刘洋
+                </div>
+              </div>
+              <div
+                data-pencil-name="报销单-20260814审批单元格1"
+                style="align-items: flex-start; box-sizing: border-box; display: flex; flex-direction: row; flex: 1 1 0; gap: 0px; height: fit-content; justify-content: flex-start; padding: 6px 12px"
+              >
+                <div
+                  data-pencil-name="报销单-20260814审批文字1"
+                  style='box-sizing: border-box; color: #344054; font-family: "Noto Sans SC", system-ui, sans-serif; font-size: 13px; font-style: normal; font-weight: 400; letter-spacing: 0px; line-height: 18px; text-align: left; white-space: nowrap'
+                >
+                  低风险
+                </div>
+              </div>
+              <div
+                data-pencil-name="报销单-20260814审批单元格2"
+                style="align-items: flex-start; box-sizing: border-box; display: flex; flex-direction: row; flex: 1 1 0; gap: 0px; height: fit-content; justify-content: flex-start; padding: 6px 12px"
+              >
+                <div
+                  data-pencil-name="报销单-20260814审批文字2"
+                  style='box-sizing: border-box; color: #344054; font-family: "Noto Sans SC", system-ui, sans-serif; font-size: 13px; font-style: normal; font-weight: 400; letter-spacing: 0px; line-height: 18px; text-align: left; white-space: nowrap'
+                >
+                  ¥ 860.00
+                </div>
+              </div>
+              <div
+                data-pencil-name="报销单-20260814审批单元格3"
+                style="align-items: flex-start; box-sizing: border-box; display: flex; flex-direction: row; flex: 1 1 0; gap: 0px; height: fit-content; justify-content: flex-start; padding: 6px 12px"
+              >
+                <div
+                  data-pencil-name="报销单-20260814审批文字3"
+                  style='box-sizing: border-box; color: #344054; font-family: "Noto Sans SC", system-ui, sans-serif; font-size: 13px; font-style: normal; font-weight: 400; letter-spacing: 0px; line-height: 18px; text-align: left; white-space: nowrap'
+                >
+                  2 小时
+                </div>
+              </div>
+              <div
+                data-pencil-name="报销单-20260814审批单元格4"
+                style="align-items: flex-start; box-sizing: border-box; display: flex; flex-direction: row; flex: 1 1 0; gap: 0px; height: fit-content; justify-content: flex-start; padding: 6px 12px"
+              >
+                <div
+                  data-pencil-name="报销单-20260814审批文字4"
+                  style='box-sizing: border-box; color: #185ABD; font-family: "Noto Sans SC", system-ui, sans-serif; font-size: 13px; font-style: normal; font-weight: 400; letter-spacing: 0px; line-height: 18px; text-align: left; white-space: nowrap'
+                >
+                  进入审批
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div
+        data-pencil-name="规则中心"
+        style="align-items: flex-start; background-color: #F4F7FB; box-sizing: border-box; display: flex; flex-direction: column; gap: 24px; height: 900px; justify-content: flex-start; left: 4560px; overflow: hidden; padding: 32px; position: absolute; top: 980px; width: 1440px"
+      >
+        <div
+          data-pencil-name="规则中心导航"
+          style="align-items: center; box-sizing: border-box; display: flex; flex-direction: row; flex-shrink: 0; gap: 26px; height: 52px; justify-content: flex-start; width: 100%"
+        >
+          <div
+            data-pencil-name="规则中心系统名"
+            style='box-sizing: border-box; color: #123B6D; font-family: "Noto Sans SC", system-ui, sans-serif; font-size: 20px; font-style: normal; font-weight: 600; letter-spacing: 0px; line-height: 27px; text-align: left; white-space: nowrap'
+          >
+            财务风险审核
+          </div>
+          <div
+            data-pencil-name="工作台规则导航"
+            style='box-sizing: border-box; color: #6B7280; font-family: "Noto Sans SC", system-ui, sans-serif; font-size: 14px; font-style: normal; font-weight: 400; letter-spacing: 0px; line-height: 19px; text-align: left; white-space: nowrap'
+          >
+            工作台
+          </div>
+          <div
+            data-pencil-name="我的单据规则导航"
+            style='box-sizing: border-box; color: #6B7280; font-family: "Noto Sans SC", system-ui, sans-serif; font-size: 14px; font-style: normal; font-weight: 400; letter-spacing: 0px; line-height: 19px; text-align: left; white-space: nowrap'
+          >
+            我的单据
+          </div>
+          <div
+            data-pencil-name="审批任务规则导航"
+            style='box-sizing: border-box; color: #6B7280; font-family: "Noto Sans SC", system-ui, sans-serif; font-size: 14px; font-style: normal; font-weight: 400; letter-spacing: 0px; line-height: 19px; text-align: left; white-space: nowrap'
+          >
+            审批任务
+          </div>
+          <div
+            data-pencil-name="规则中心规则导航"
+            style='box-sizing: border-box; color: #185ABD; font-family: "Noto Sans SC", system-ui, sans-serif; font-size: 14px; font-style: normal; font-weight: 600; letter-spacing: 0px; line-height: 19px; text-align: left; white-space: nowrap'
+          >
+            规则中心
+          </div>
+          <div
+            data-pencil-name="规则中心导航占位"
+            style="align-items: flex-start; box-sizing: border-box; display: flex; flex-direction: row; flex: 1 1 0; gap: 0px; height: 1px; justify-content: flex-start"
+          ></div>
+          <div
+            data-pencil-name="规则中心用户"
+            style='box-sizing: border-box; color: #475467; font-family: "Noto Sans SC", system-ui, sans-serif; font-size: 14px; font-style: normal; font-weight: 400; letter-spacing: 0px; line-height: 19px; text-align: left; white-space: nowrap'
+          >
+            李财务 · 财务部
+          </div>
+        </div>
+        <div
+          data-pencil-name="规则中心标题区"
+          style="align-items: center; box-sizing: border-box; display: flex; flex-direction: row; flex-shrink: 0; gap: 0px; height: fit-content; justify-content: flex-start; width: 100%"
+        >
+          <div
+            data-pencil-name="规则中心标题组"
+            style="align-items: flex-start; box-sizing: border-box; display: flex; flex-direction: column; flex: 1 1 0; gap: 6px; height: fit-content; justify-content: flex-start"
+          >
+            <div
+              data-pencil-name="规则中心标题"
+              style='box-sizing: border-box; color: #123B6D; font-family: "Noto Sans SC", system-ui, sans-serif; font-size: 30px; font-style: normal; font-weight: 600; letter-spacing: 0px; line-height: 41px; text-align: left; white-space: nowrap'
+            >
+              规则中心
+            </div>
+            <div
+              data-pencil-name="规则中心说明"
+              style='box-sizing: border-box; color: #6B7280; font-family: "Noto Sans SC", system-ui, sans-serif; font-size: 14px; font-style: normal; font-weight: 400; letter-spacing: 0px; line-height: 19px; text-align: left; white-space: nowrap'
+            >
+              维护风险规则、阈值和版本；规则变更将进入审计记录。
+            </div>
+          </div>
+          <div
+            data-pencil-name="新建规则"
+            style="align-items: flex-start; background-color: #185ABD; border-radius: 6px; box-sizing: border-box; display: flex; flex-direction: row; flex-shrink: 0; gap: 0px; height: fit-content; justify-content: flex-start; padding: 11px 18px; width: fit-content"
+          >
+            <div
+              data-pencil-name="新建规则文字"
+              style='box-sizing: border-box; color: #FFFFFF; font-family: "Noto Sans SC", system-ui, sans-serif; font-size: 14px; font-style: normal; font-weight: 600; letter-spacing: 0px; line-height: 19px; text-align: left; white-space: nowrap'
+            >
+              + 新建规则
+            </div>
+          </div>
+        </div>
+        <div
+          data-pencil-name="规则版本提示"
+          style="align-items: flex-start; background-color: #EAF2FF; border-radius: 8px; box-sizing: border-box; display: flex; flex-direction: row; flex-shrink: 0; gap: 12px; height: fit-content; justify-content: flex-start; padding: 14px; width: 100%"
+        >
+          <div
+            data-pencil-name="规则提示标题"
+            style='box-sizing: border-box; color: #185ABD; font-family: "Noto Sans SC", system-ui, sans-serif; font-size: 13px; font-style: normal; font-weight: 600; letter-spacing: 0px; line-height: 18px; text-align: left; white-space: nowrap'
+          >
+            当前生效版本：expense-rules-v1.4
+          </div>
+          <div
+            data-pencil-name="规则提示内容"
+            style='box-sizing: border-box; color: #4B6B96; font-family: "Noto Sans SC", system-ui, sans-serif; font-size: 13px; font-style: normal; font-weight: 400; letter-spacing: 0px; line-height: 18px; text-align: left; white-space: nowrap'
+          >
+            共 10 类风险规则 · 最近发布：2026-08-12 · 历史分析结果不可改写
+          </div>
+        </div>
+        <div
+          data-pencil-name="规则列表"
+          style="align-items: flex-start; background-color: #FFFFFF; border-radius: 8px; box-sizing: border-box; display: flex; flex-direction: column; flex: 1 1 0; gap: 14px; justify-content: flex-start; padding: 20px; width: 100%"
+        >
+          <div
+            data-pencil-name="规则列表标题"
+            style='box-sizing: border-box; color: #123B6D; font-family: "Noto Sans SC", system-ui, sans-serif; font-size: 18px; font-style: normal; font-weight: 600; letter-spacing: 0px; line-height: 24px; text-align: left; white-space: nowrap'
+          >
+            风险规则
+          </div>
+          <div
+            data-pencil-name="规则表格"
+            style="align-items: flex-start; box-sizing: border-box; display: flex; flex-direction: column; flex-shrink: 0; gap: 0px; height: fit-content; justify-content: flex-start; width: 100%"
+          >
+            <div
+              data-pencil-name="表头规则行"
+              style="align-items: center; box-sizing: border-box; display: flex; flex-direction: row; flex-shrink: 0; gap: 10px; height: fit-content; justify-content: flex-start; padding: 15px 4px; width: 100%"
+            >
+              <div
+                data-pencil-name="表头规则单元格0"
+                style="align-items: flex-start; box-sizing: border-box; display: flex; flex-direction: row; flex: 1 1 0; gap: 0px; height: fit-content; justify-content: flex-start; padding: 6px 12px"
+              >
+                <div
+                  data-pencil-name="表头规则文字0"
+                  style='box-sizing: border-box; color: #667085; font-family: "Noto Sans SC", system-ui, sans-serif; font-size: 12px; font-style: normal; font-weight: 600; letter-spacing: 0px; line-height: 16px; text-align: left; white-space: nowrap'
+                >
+                  规则名称
+                </div>
+              </div>
+              <div
+                data-pencil-name="表头规则单元格1"
+                style="align-items: flex-start; box-sizing: border-box; display: flex; flex-direction: row; flex: 1 1 0; gap: 0px; height: fit-content; justify-content: flex-start; padding: 6px 12px"
+              >
+                <div
+                  data-pencil-name="表头规则文字1"
+                  style='box-sizing: border-box; color: #667085; font-family: "Noto Sans SC", system-ui, sans-serif; font-size: 12px; font-style: normal; font-weight: 600; letter-spacing: 0px; line-height: 16px; text-align: left; white-space: nowrap'
+                >
+                  风险类型
+                </div>
+              </div>
+              <div
+                data-pencil-name="表头规则单元格2"
+                style="align-items: flex-start; box-sizing: border-box; display: flex; flex-direction: row; flex: 1 1 0; gap: 0px; height: fit-content; justify-content: flex-start; padding: 6px 12px"
+              >
+                <div
+                  data-pencil-name="表头规则文字2"
+                  style='box-sizing: border-box; color: #667085; font-family: "Noto Sans SC", system-ui, sans-serif; font-size: 12px; font-style: normal; font-weight: 600; letter-spacing: 0px; line-height: 16px; text-align: left; white-space: nowrap'
+                >
+                  阈值
+                </div>
+              </div>
+              <div
+                data-pencil-name="表头规则单元格3"
+                style="align-items: flex-start; box-sizing: border-box; display: flex; flex-direction: row; flex: 1 1 0; gap: 0px; height: fit-content; justify-content: flex-start; padding: 6px 12px"
+              >
+                <div
+                  data-pencil-name="表头规则文字3"
+                  style='box-sizing: border-box; color: #667085; font-family: "Noto Sans SC", system-ui, sans-serif; font-size: 12px; font-style: normal; font-weight: 600; letter-spacing: 0px; line-height: 16px; text-align: left; white-space: nowrap'
+                >
+                  状态
+                </div>
+              </div>
+              <div
+                data-pencil-name="表头规则单元格4"
+                style="align-items: flex-start; box-sizing: border-box; display: flex; flex-direction: row; flex: 1 1 0; gap: 0px; height: fit-content; justify-content: flex-start; padding: 6px 12px"
+              >
+                <div
+                  data-pencil-name="表头规则文字4"
+                  style='box-sizing: border-box; color: #667085; font-family: "Noto Sans SC", system-ui, sans-serif; font-size: 12px; font-style: normal; font-weight: 600; letter-spacing: 0px; line-height: 16px; text-align: left; white-space: nowrap'
+                >
+                  版本
+                </div>
+              </div>
+              <div
+                data-pencil-name="表头规则单元格5"
+                style="align-items: flex-start; box-sizing: border-box; display: flex; flex-direction: row; flex: 1 1 0; gap: 0px; height: fit-content; justify-content: flex-start; padding: 6px 12px"
+              >
+                <div
+                  data-pencil-name="表头规则文字5"
+                  style='box-sizing: border-box; color: #667085; font-family: "Noto Sans SC", system-ui, sans-serif; font-size: 12px; font-style: normal; font-weight: 600; letter-spacing: 0px; line-height: 16px; text-align: left; white-space: nowrap'
+                >
+                  操作
+                </div>
+              </div>
+            </div>
+            <div
+              data-pencil-name="单据与发票金额一致性规则行"
+              style="align-items: center; box-sizing: border-box; display: flex; flex-direction: row; flex-shrink: 0; gap: 10px; height: fit-content; justify-content: flex-start; padding: 15px 4px; width: 100%"
+            >
+              <div
+                data-pencil-name="单据与发票金额一致性规则单元格0"
+                style="align-items: flex-start; box-sizing: border-box; display: flex; flex-direction: row; flex: 1 1 0; gap: 0px; height: fit-content; justify-content: flex-start; padding: 6px 12px"
+              >
+                <div
+                  data-pencil-name="单据与发票金额一致性规则文字0"
+                  style='box-sizing: border-box; color: #344054; font-family: "Noto Sans SC", system-ui, sans-serif; font-size: 13px; font-style: normal; font-weight: 400; letter-spacing: 0px; line-height: 18px; text-align: left; white-space: nowrap'
+                >
+                  金额核对
+                </div>
+              </div>
+              <div
+                data-pencil-name="单据与发票金额一致性规则单元格1"
+                style="align-items: flex-start; box-sizing: border-box; display: flex; flex-direction: row; flex: 1 1 0; gap: 0px; height: fit-content; justify-content: flex-start; padding: 6px 12px"
+              >
+                <div
+                  data-pencil-name="单据与发票金额一致性规则文字1"
+                  style='box-sizing: border-box; color: #344054; font-family: "Noto Sans SC", system-ui, sans-serif; font-size: 13px; font-style: normal; font-weight: 400; letter-spacing: 0px; line-height: 18px; text-align: left; white-space: nowrap'
+                >
+                  差异 &gt; 5%
+                </div>
+              </div>
+              <div
+                data-pencil-name="单据与发票金额一致性规则单元格2"
+                style="align-items: flex-start; box-sizing: border-box; display: flex; flex-direction: row; flex: 1 1 0; gap: 0px; height: fit-content; justify-content: flex-start; padding: 6px 12px"
+              >
+                <div
+                  data-pencil-name="单据与发票金额一致性规则文字2"
+                  style='box-sizing: border-box; color: #344054; font-family: "Noto Sans SC", system-ui, sans-serif; font-size: 13px; font-style: normal; font-weight: 400; letter-spacing: 0px; line-height: 18px; text-align: left; white-space: nowrap'
+                >
+                  已启用
+                </div>
+              </div>
+              <div
+                data-pencil-name="单据与发票金额一致性规则单元格3"
+                style="align-items: flex-start; box-sizing: border-box; display: flex; flex-direction: row; flex: 1 1 0; gap: 0px; height: fit-content; justify-content: flex-start; padding: 6px 12px"
+              >
+                <div
+                  data-pencil-name="单据与发票金额一致性规则文字3"
+                  style='box-sizing: border-box; color: #344054; font-family: "Noto Sans SC", system-ui, sans-serif; font-size: 13px; font-style: normal; font-weight: 400; letter-spacing: 0px; line-height: 18px; text-align: left; white-space: nowrap'
+                >
+                  v1.4
+                </div>
+              </div>
+              <div
+                data-pencil-name="单据与发票金额一致性规则单元格4"
+                style="align-items: flex-start; box-sizing: border-box; display: flex; flex-direction: row; flex: 1 1 0; gap: 0px; height: fit-content; justify-content: flex-start; padding: 6px 12px"
+              >
+                <div
+                  data-pencil-name="单据与发票金额一致性规则文字4"
+                  style='box-sizing: border-box; color: #344054; font-family: "Noto Sans SC", system-ui, sans-serif; font-size: 13px; font-style: normal; font-weight: 400; letter-spacing: 0px; line-height: 18px; text-align: left; white-space: nowrap'
+                >
+                  查看 / 编辑
+                </div>
+              </div>
+            </div>
+            <div
+              data-pencil-name="重复票据风险规则行"
+              style="align-items: center; box-sizing: border-box; display: flex; flex-direction: row; flex-shrink: 0; gap: 10px; height: fit-content; justify-content: flex-start; padding: 15px 4px; width: 100%"
+            >
+              <div
+                data-pencil-name="重复票据风险规则单元格0"
+                style="align-items: flex-start; box-sizing: border-box; display: flex; flex-direction: row; flex: 1 1 0; gap: 0px; height: fit-content; justify-content: flex-start; padding: 6px 12px"
+              >
+                <div
+                  data-pencil-name="重复票据风险规则文字0"
+                  style='box-sizing: border-box; color: #344054; font-family: "Noto Sans SC", system-ui, sans-serif; font-size: 13px; font-style: normal; font-weight: 400; letter-spacing: 0px; line-height: 18px; text-align: left; white-space: nowrap'
+                >
+                  票据核验
+                </div>
+              </div>
+              <div
+                data-pencil-name="重复票据风险规则单元格1"
+                style="align-items: flex-start; box-sizing: border-box; display: flex; flex-direction: row; flex: 1 1 0; gap: 0px; height: fit-content; justify-content: flex-start; padding: 6px 12px"
+              >
+                <div
+                  data-pencil-name="重复票据风险规则文字1"
+                  style='box-sizing: border-box; color: #344054; font-family: "Noto Sans SC", system-ui, sans-serif; font-size: 13px; font-style: normal; font-weight: 400; letter-spacing: 0px; line-height: 18px; text-align: left; white-space: nowrap'
+                >
+                  代码+号码+金额
+                </div>
+              </div>
+              <div
+                data-pencil-name="重复票据风险规则单元格2"
+                style="align-items: flex-start; box-sizing: border-box; display: flex; flex-direction: row; flex: 1 1 0; gap: 0px; height: fit-content; justify-content: flex-start; padding: 6px 12px"
+              >
+                <div
+                  data-pencil-name="重复票据风险规则文字2"
+                  style='box-sizing: border-box; color: #344054; font-family: "Noto Sans SC", system-ui, sans-serif; font-size: 13px; font-style: normal; font-weight: 400; letter-spacing: 0px; line-height: 18px; text-align: left; white-space: nowrap'
+                >
+                  已启用
+                </div>
+              </div>
+              <div
+                data-pencil-name="重复票据风险规则单元格3"
+                style="align-items: flex-start; box-sizing: border-box; display: flex; flex-direction: row; flex: 1 1 0; gap: 0px; height: fit-content; justify-content: flex-start; padding: 6px 12px"
+              >
+                <div
+                  data-pencil-name="重复票据风险规则文字3"
+                  style='box-sizing: border-box; color: #344054; font-family: "Noto Sans SC", system-ui, sans-serif; font-size: 13px; font-style: normal; font-weight: 400; letter-spacing: 0px; line-height: 18px; text-align: left; white-space: nowrap'
+                >
+                  v1.4
+                </div>
+              </div>
+              <div
+                data-pencil-name="重复票据风险规则单元格4"
+                style="align-items: flex-start; box-sizing: border-box; display: flex; flex-direction: row; flex: 1 1 0; gap: 0px; height: fit-content; justify-content: flex-start; padding: 6px 12px"
+              >
+                <div
+                  data-pencil-name="重复票据风险规则文字4"
+                  style='box-sizing: border-box; color: #344054; font-family: "Noto Sans SC", system-ui, sans-serif; font-size: 13px; font-style: normal; font-weight: 400; letter-spacing: 0px; line-height: 18px; text-align: left; white-space: nowrap'
+                >
+                  查看 / 编辑
+                </div>
+              </div>
+            </div>
+            <div
+              data-pencil-name="费用标准合规性规则行"
+              style="align-items: center; box-sizing: border-box; display: flex; flex-direction: row; flex-shrink: 0; gap: 10px; height: fit-content; justify-content: flex-start; padding: 15px 4px; width: 100%"
+            >
+              <div
+                data-pencil-name="费用标准合规性规则单元格0"
+                style="align-items: flex-start; box-sizing: border-box; display: flex; flex-direction: row; flex: 1 1 0; gap: 0px; height: fit-content; justify-content: flex-start; padding: 6px 12px"
+              >
+                <div
+                  data-pencil-name="费用标准合规性规则文字0"
+                  style='box-sizing: border-box; color: #344054; font-family: "Noto Sans SC", system-ui, sans-serif; font-size: 13px; font-style: normal; font-weight: 400; letter-spacing: 0px; line-height: 18px; text-align: left; white-space: nowrap'
+                >
+                  费用合规
+                </div>
+              </div>
+              <div
+                data-pencil-name="费用标准合规性规则单元格1"
+                style="align-items: flex-start; box-sizing: border-box; display: flex; flex-direction: row; flex: 1 1 0; gap: 0px; height: fit-content; justify-content: flex-start; padding: 6px 12px"
+              >
+                <div
+                  data-pencil-name="费用标准合规性规则文字1"
+                  style='box-sizing: border-box; color: #344054; font-family: "Noto Sans SC", system-ui, sans-serif; font-size: 13px; font-style: normal; font-weight: 400; letter-spacing: 0px; line-height: 18px; text-align: left; white-space: nowrap'
+                >
+                  按组织/职级配置
+                </div>
+              </div>
+              <div
+                data-pencil-name="费用标准合规性规则单元格2"
+                style="align-items: flex-start; box-sizing: border-box; display: flex; flex-direction: row; flex: 1 1 0; gap: 0px; height: fit-content; justify-content: flex-start; padding: 6px 12px"
+              >
+                <div
+                  data-pencil-name="费用标准合规性规则文字2"
+                  style='box-sizing: border-box; color: #344054; font-family: "Noto Sans SC", system-ui, sans-serif; font-size: 13px; font-style: normal; font-weight: 400; letter-spacing: 0px; line-height: 18px; text-align: left; white-space: nowrap'
+                >
+                  已启用
+                </div>
+              </div>
+              <div
+                data-pencil-name="费用标准合规性规则单元格3"
+                style="align-items: flex-start; box-sizing: border-box; display: flex; flex-direction: row; flex: 1 1 0; gap: 0px; height: fit-content; justify-content: flex-start; padding: 6px 12px"
+              >
+                <div
+                  data-pencil-name="费用标准合规性规则文字3"
+                  style='box-sizing: border-box; color: #344054; font-family: "Noto Sans SC", system-ui, sans-serif; font-size: 13px; font-style: normal; font-weight: 400; letter-spacing: 0px; line-height: 18px; text-align: left; white-space: nowrap'
+                >
+                  v1.3
+                </div>
+              </div>
+              <div
+                data-pencil-name="费用标准合规性规则单元格4"
+                style="align-items: flex-start; box-sizing: border-box; display: flex; flex-direction: row; flex: 1 1 0; gap: 0px; height: fit-content; justify-content: flex-start; padding: 6px 12px"
+              >
+                <div
+                  data-pencil-name="费用标准合规性规则文字4"
+                  style='box-sizing: border-box; color: #344054; font-family: "Noto Sans SC", system-ui, sans-serif; font-size: 13px; font-style: normal; font-weight: 400; letter-spacing: 0px; line-height: 18px; text-align: left; white-space: nowrap'
+                >
+                  查看 / 编辑
+                </div>
+              </div>
+            </div>
+            <div
+              data-pencil-name="市场价格合理性规则行"
+              style="align-items: center; box-sizing: border-box; display: flex; flex-direction: row; flex-shrink: 0; gap: 10px; height: fit-content; justify-content: flex-start; padding: 15px 4px; width: 100%"
+            >
+              <div
+                data-pencil-name="市场价格合理性规则单元格0"
+                style="align-items: flex-start; box-sizing: border-box; display: flex; flex-direction: row; flex: 1 1 0; gap: 0px; height: fit-content; justify-content: flex-start; padding: 6px 12px"
+              >
+                <div
+                  data-pencil-name="市场价格合理性规则文字0"
+                  style='box-sizing: border-box; color: #344054; font-family: "Noto Sans SC", system-ui, sans-serif; font-size: 13px; font-style: normal; font-weight: 400; letter-spacing: 0px; line-height: 18px; text-align: left; white-space: nowrap'
+                >
+                  价格偏离
+                </div>
+              </div>
+              <div
+                data-pencil-name="市场价格合理性规则单元格1"
+                style="align-items: flex-start; box-sizing: border-box; display: flex; flex-direction: row; flex: 1 1 0; gap: 0px; height: fit-content; justify-content: flex-start; padding: 6px 12px"
+              >
+                <div
+                  data-pencil-name="市场价格合理性规则文字1"
+                  style='box-sizing: border-box; color: #344054; font-family: "Noto Sans SC", system-ui, sans-serif; font-size: 13px; font-style: normal; font-weight: 400; letter-spacing: 0px; line-height: 18px; text-align: left; white-space: nowrap'
+                >
+                  偏离区间 10%
+                </div>
+              </div>
+              <div
+                data-pencil-name="市场价格合理性规则单元格2"
+                style="align-items: flex-start; box-sizing: border-box; display: flex; flex-direction: row; flex: 1 1 0; gap: 0px; height: fit-content; justify-content: flex-start; padding: 6px 12px"
+              >
+                <div
+                  data-pencil-name="市场价格合理性规则文字2"
+                  style='box-sizing: border-box; color: #344054; font-family: "Noto Sans SC", system-ui, sans-serif; font-size: 13px; font-style: normal; font-weight: 400; letter-spacing: 0px; line-height: 18px; text-align: left; white-space: nowrap'
+                >
+                  草稿
+                </div>
+              </div>
+              <div
+                data-pencil-name="市场价格合理性规则单元格3"
+                style="align-items: flex-start; box-sizing: border-box; display: flex; flex-direction: row; flex: 1 1 0; gap: 0px; height: fit-content; justify-content: flex-start; padding: 6px 12px"
+              >
+                <div
+                  data-pencil-name="市场价格合理性规则文字3"
+                  style='box-sizing: border-box; color: #344054; font-family: "Noto Sans SC", system-ui, sans-serif; font-size: 13px; font-style: normal; font-weight: 400; letter-spacing: 0px; line-height: 18px; text-align: left; white-space: nowrap'
+                >
+                  v1.5-draft
+                </div>
+              </div>
+              <div
+                data-pencil-name="市场价格合理性规则单元格4"
+                style="align-items: flex-start; box-sizing: border-box; display: flex; flex-direction: row; flex: 1 1 0; gap: 0px; height: fit-content; justify-content: flex-start; padding: 6px 12px"
+              >
+                <div
+                  data-pencil-name="市场价格合理性规则文字4"
+                  style='box-sizing: border-box; color: #344054; font-family: "Noto Sans SC", system-ui, sans-serif; font-size: 13px; font-style: normal; font-weight: 400; letter-spacing: 0px; line-height: 18px; text-align: left; white-space: nowrap'
+                >
+                  继续编辑
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div
+        data-pencil-name="报告中心"
+        style="align-items: flex-start; background-color: #F4F7FB; box-sizing: border-box; display: flex; flex-direction: column; gap: 24px; height: 900px; justify-content: flex-start; left: 6080px; overflow: hidden; padding: 32px; position: absolute; top: 980px; width: 1440px"
+      >
+        <div
+          data-pencil-name="报告中心导航"
+          style="align-items: center; box-sizing: border-box; display: flex; flex-direction: row; flex-shrink: 0; gap: 26px; height: 52px; justify-content: flex-start; width: 100%"
+        >
+          <div
+            data-pencil-name="报告中心系统名"
+            style='box-sizing: border-box; color: #123B6D; font-family: "Noto Sans SC", system-ui, sans-serif; font-size: 20px; font-style: normal; font-weight: 600; letter-spacing: 0px; line-height: 27px; text-align: left; white-space: nowrap'
+          >
+            财务风险审核
+          </div>
+          <div
+            data-pencil-name="工作台报告导航"
+            style='box-sizing: border-box; color: #6B7280; font-family: "Noto Sans SC", system-ui, sans-serif; font-size: 14px; font-style: normal; font-weight: 400; letter-spacing: 0px; line-height: 19px; text-align: left; white-space: nowrap'
+          >
+            工作台
+          </div>
+          <div
+            data-pencil-name="我的单据报告导航"
+            style='box-sizing: border-box; color: #6B7280; font-family: "Noto Sans SC", system-ui, sans-serif; font-size: 14px; font-style: normal; font-weight: 400; letter-spacing: 0px; line-height: 19px; text-align: left; white-space: nowrap'
+          >
+            我的单据
+          </div>
+          <div
+            data-pencil-name="审批任务报告导航"
+            style='box-sizing: border-box; color: #6B7280; font-family: "Noto Sans SC", system-ui, sans-serif; font-size: 14px; font-style: normal; font-weight: 400; letter-spacing: 0px; line-height: 19px; text-align: left; white-space: nowrap'
+          >
+            审批任务
+          </div>
+          <div
+            data-pencil-name="报告中心报告导航"
+            style='box-sizing: border-box; color: #185ABD; font-family: "Noto Sans SC", system-ui, sans-serif; font-size: 14px; font-style: normal; font-weight: 600; letter-spacing: 0px; line-height: 19px; text-align: left; white-space: nowrap'
+          >
+            报告中心
+          </div>
+          <div
+            data-pencil-name="报告中心导航占位"
+            style="align-items: flex-start; box-sizing: border-box; display: flex; flex-direction: row; flex: 1 1 0; gap: 0px; height: 1px; justify-content: flex-start"
+          ></div>
+          <div
+            data-pencil-name="报告中心用户"
+            style='box-sizing: border-box; color: #475467; font-family: "Noto Sans SC", system-ui, sans-serif; font-size: 14px; font-style: normal; font-weight: 400; letter-spacing: 0px; line-height: 19px; text-align: left; white-space: nowrap'
+          >
+            李财务 · 财务部
+          </div>
+        </div>
+        <div
+          data-pencil-name="报告中心标题区"
+          style="align-items: center; box-sizing: border-box; display: flex; flex-direction: row; flex-shrink: 0; gap: 0px; height: fit-content; justify-content: flex-start; width: 100%"
+        >
+          <div
+            data-pencil-name="报告中心标题组"
+            style="align-items: flex-start; box-sizing: border-box; display: flex; flex-direction: column; flex: 1 1 0; gap: 6px; height: fit-content; justify-content: flex-start"
+          >
+            <div
+              data-pencil-name="报告中心标题"
+              style='box-sizing: border-box; color: #123B6D; font-family: "Noto Sans SC", system-ui, sans-serif; font-size: 30px; font-style: normal; font-weight: 600; letter-spacing: 0px; line-height: 41px; text-align: left; white-space: nowrap'
+            >
+              风险报告
+            </div>
+            <div
+              data-pencil-name="报告中心说明"
+              style='box-sizing: border-box; color: #6B7280; font-family: "Noto Sans SC", system-ui, sans-serif; font-size: 14px; font-style: normal; font-weight: 400; letter-spacing: 0px; line-height: 19px; text-align: left; white-space: nowrap'
+            >
+              查看已完成分析的风险报告，并导出与单据版本一致的结果。
+            </div>
+          </div>
+        </div>
+        <div
+          data-pencil-name="报告筛选栏"
+          style="align-items: flex-start; background-color: #FFFFFF; border-radius: 8px; box-sizing: border-box; display: flex; flex-direction: row; flex-shrink: 0; gap: 12px; height: fit-content; justify-content: flex-start; padding: 10px 14px; width: 100%"
+        >
+          <div
+            data-pencil-name="报告状态筛选"
+            style="align-items: flex-start; background-color: #F8FAFC; border-radius: 5px; box-sizing: border-box; display: flex; flex-direction: row; flex-shrink: 0; gap: 0px; height: fit-content; justify-content: flex-start; outline-offset: -0.5px; outline: 1px solid #D0D5DD; padding: 10px 12px; width: 200px"
+          >
+            <div
+              data-pencil-name="报告状态筛选文字"
+              style='box-sizing: border-box; color: #667085; font-family: "Noto Sans SC", system-ui, sans-serif; font-size: 13px; font-style: normal; font-weight: 400; letter-spacing: 0px; line-height: 18px; text-align: left; white-space: nowrap'
+            >
+              全部状态⌄
+            </div>
+          </div>
+          <div
+            data-pencil-name="报告时间筛选"
+            style="align-items: flex-start; background-color: #F8FAFC; border-radius: 5px; box-sizing: border-box; display: flex; flex-direction: row; flex-shrink: 0; gap: 0px; height: fit-content; justify-content: flex-start; outline-offset: -0.5px; outline: 1px solid #D0D5DD; padding: 10px 12px; width: 200px"
+          >
+            <div
+              data-pencil-name="报告时间筛选文字"
+              style='box-sizing: border-box; color: #667085; font-family: "Noto Sans SC", system-ui, sans-serif; font-size: 13px; font-style: normal; font-weight: 400; letter-spacing: 0px; line-height: 18px; text-align: left; white-space: nowrap'
+            >
+              近 30 天⌄
+            </div>
+          </div>
+          <div
+            data-pencil-name="报告搜索框"
+            style="align-items: flex-start; background-color: #F8FAFC; border-radius: 5px; box-sizing: border-box; display: flex; flex-direction: row; flex: 1 1 0; gap: 0px; height: fit-content; justify-content: flex-start; outline-offset: -0.5px; outline: 1px solid #D0D5DD; padding: 10px 12px"
+          >
+            <div
+              data-pencil-name="报告搜索框文字"
+              style='box-sizing: border-box; color: #667085; font-family: "Noto Sans SC", system-ui, sans-serif; font-size: 13px; font-style: normal; font-weight: 400; letter-spacing: 0px; line-height: 18px; text-align: left; white-space: nowrap'
+            >
+              搜索单据编号或申请人
+            </div>
+          </div>
+        </div>
+        <div
+          data-pencil-name="报告列表"
+          style="align-items: flex-start; background-color: #FFFFFF; border-radius: 8px; box-sizing: border-box; display: flex; flex-direction: column; flex: 1 1 0; gap: 14px; justify-content: flex-start; padding: 20px; width: 100%"
+        >
+          <div
+            data-pencil-name="报告列表标题"
+            style='box-sizing: border-box; color: #123B6D; font-family: "Noto Sans SC", system-ui, sans-serif; font-size: 18px; font-style: normal; font-weight: 600; letter-spacing: 0px; line-height: 24px; text-align: left; white-space: nowrap'
+          >
+            报告列表 · 86 份
+          </div>
+          <div
+            data-pencil-name="报告表格"
+            style="align-items: flex-start; box-sizing: border-box; display: flex; flex-direction: column; flex-shrink: 0; gap: 0px; height: fit-content; justify-content: flex-start; width: 100%"
+          >
+            <div
+              data-pencil-name="表头报告行"
+              style="align-items: center; box-sizing: border-box; display: flex; flex-direction: row; flex-shrink: 0; gap: 12px; height: fit-content; justify-content: flex-start; padding: 15px 4px; width: 100%"
+            >
+              <div
+                data-pencil-name="表头报告单元格0"
+                style="align-items: flex-start; box-sizing: border-box; display: flex; flex-direction: row; flex: 1 1 0; gap: 0px; height: fit-content; justify-content: flex-start; padding: 6px 12px"
+              >
+                <div
+                  data-pencil-name="表头报告文字0"
+                  style='box-sizing: border-box; color: #667085; font-family: "Noto Sans SC", system-ui, sans-serif; font-size: 12px; font-style: normal; font-weight: 600; letter-spacing: 0px; line-height: 16px; text-align: left; white-space: nowrap'
+                >
+                  报告 / 单据版本
+                </div>
+              </div>
+              <div
+                data-pencil-name="表头报告单元格1"
+                style="align-items: flex-start; box-sizing: border-box; display: flex; flex-direction: row; flex: 1 1 0; gap: 0px; height: fit-content; justify-content: flex-start; padding: 6px 12px"
+              >
+                <div
+                  data-pencil-name="表头报告文字1"
+                  style='box-sizing: border-box; color: #667085; font-family: "Noto Sans SC", system-ui, sans-serif; font-size: 12px; font-style: normal; font-weight: 600; letter-spacing: 0px; line-height: 16px; text-align: left; white-space: nowrap'
+                >
+                  整体风险
+                </div>
+              </div>
+              <div
+                data-pencil-name="表头报告单元格2"
+                style="align-items: flex-start; box-sizing: border-box; display: flex; flex-direction: row; flex: 1 1 0; gap: 0px; height: fit-content; justify-content: flex-start; padding: 6px 12px"
+              >
+                <div
+                  data-pencil-name="表头报告文字2"
+                  style='box-sizing: border-box; color: #667085; font-family: "Noto Sans SC", system-ui, sans-serif; font-size: 12px; font-style: normal; font-weight: 600; letter-spacing: 0px; line-height: 16px; text-align: left; white-space: nowrap'
+                >
+                  生成时间
+                </div>
+              </div>
+              <div
+                data-pencil-name="表头报告单元格3"
+                style="align-items: flex-start; box-sizing: border-box; display: flex; flex-direction: row; flex: 1 1 0; gap: 0px; height: fit-content; justify-content: flex-start; padding: 6px 12px"
+              >
+                <div
+                  data-pencil-name="表头报告文字3"
+                  style='box-sizing: border-box; color: #667085; font-family: "Noto Sans SC", system-ui, sans-serif; font-size: 12px; font-style: normal; font-weight: 600; letter-spacing: 0px; line-height: 16px; text-align: left; white-space: nowrap'
+                >
+                  生成状态
+                </div>
+              </div>
+              <div
+                data-pencil-name="表头报告单元格4"
+                style="align-items: flex-start; box-sizing: border-box; display: flex; flex-direction: row; flex: 1 1 0; gap: 0px; height: fit-content; justify-content: flex-start; padding: 6px 12px"
+              >
+                <div
+                  data-pencil-name="表头报告文字4"
+                  style='box-sizing: border-box; color: #667085; font-family: "Noto Sans SC", system-ui, sans-serif; font-size: 12px; font-style: normal; font-weight: 600; letter-spacing: 0px; line-height: 16px; text-align: left; white-space: nowrap'
+                >
+                  操作
+                </div>
+              </div>
+            </div>
+            <div
+              data-pencil-name="报销单-20260815 / v2报告行"
+              style="align-items: center; box-sizing: border-box; display: flex; flex-direction: row; flex-shrink: 0; gap: 12px; height: fit-content; justify-content: flex-start; padding: 15px 4px; width: 100%"
+            >
+              <div
+                data-pencil-name="报销单-20260815 / v2报告单元格0"
+                style="align-items: flex-start; box-sizing: border-box; display: flex; flex-direction: row; flex: 1 1 0; gap: 0px; height: fit-content; justify-content: flex-start; padding: 6px 12px"
+              >
+                <div
+                  data-pencil-name="报销单-20260815 / v2报告文字0"
+                  style='box-sizing: border-box; color: #344054; font-family: "Noto Sans SC", system-ui, sans-serif; font-size: 13px; font-style: normal; font-weight: 400; letter-spacing: 0px; line-height: 18px; text-align: left; white-space: nowrap'
+                >
+                  市场活动费用
+                </div>
+              </div>
+              <div
+                data-pencil-name="报销单-20260815 / v2报告单元格1"
+                style="align-items: flex-start; box-sizing: border-box; display: flex; flex-direction: row; flex: 1 1 0; gap: 0px; height: fit-content; justify-content: flex-start; padding: 6px 12px"
+              >
+                <div
+                  data-pencil-name="报销单-20260815 / v2报告文字1"
+                  style='box-sizing: border-box; color: #344054; font-family: "Noto Sans SC", system-ui, sans-serif; font-size: 13px; font-style: normal; font-weight: 400; letter-spacing: 0px; line-height: 18px; text-align: left; white-space: nowrap'
+                >
+                  高风险
+                </div>
+              </div>
+              <div
+                data-pencil-name="报销单-20260815 / v2报告单元格2"
+                style="align-items: flex-start; box-sizing: border-box; display: flex; flex-direction: row; flex: 1 1 0; gap: 0px; height: fit-content; justify-content: flex-start; padding: 6px 12px"
+              >
+                <div
+                  data-pencil-name="报销单-20260815 / v2报告文字2"
+                  style='box-sizing: border-box; color: #344054; font-family: "Noto Sans SC", system-ui, sans-serif; font-size: 13px; font-style: normal; font-weight: 400; letter-spacing: 0px; line-height: 18px; text-align: left; white-space: nowrap'
+                >
+                  今天 09:02
+                </div>
+              </div>
+              <div
+                data-pencil-name="报销单-20260815 / v2报告单元格3"
+                style="align-items: flex-start; box-sizing: border-box; display: flex; flex-direction: row; flex: 1 1 0; gap: 0px; height: fit-content; justify-content: flex-start; padding: 6px 12px"
+              >
+                <div
+                  data-pencil-name="报销单-20260815 / v2报告文字3"
+                  style='box-sizing: border-box; color: #344054; font-family: "Noto Sans SC", system-ui, sans-serif; font-size: 13px; font-style: normal; font-weight: 400; letter-spacing: 0px; line-height: 18px; text-align: left; white-space: nowrap'
+                >
+                  已完成
+                </div>
+              </div>
+              <div
+                data-pencil-name="报销单-20260815 / v2报告单元格4"
+                style="align-items: flex-start; box-sizing: border-box; display: flex; flex-direction: row; flex: 1 1 0; gap: 0px; height: fit-content; justify-content: flex-start; padding: 6px 12px"
+              >
+                <div
+                  data-pencil-name="报销单-20260815 / v2报告文字4"
+                  style='box-sizing: border-box; color: #185ABD; font-family: "Noto Sans SC", system-ui, sans-serif; font-size: 13px; font-style: normal; font-weight: 400; letter-spacing: 0px; line-height: 18px; text-align: left; white-space: nowrap'
+                >
+                  查看报告 · 导出
+                </div>
+              </div>
+            </div>
+            <div
+              data-pencil-name="报销单-20260812 / v1报告行"
+              style="align-items: center; box-sizing: border-box; display: flex; flex-direction: row; flex-shrink: 0; gap: 12px; height: fit-content; justify-content: flex-start; padding: 15px 4px; width: 100%"
+            >
+              <div
+                data-pencil-name="报销单-20260812 / v1报告单元格0"
+                style="align-items: flex-start; box-sizing: border-box; display: flex; flex-direction: row; flex: 1 1 0; gap: 0px; height: fit-content; justify-content: flex-start; padding: 6px 12px"
+              >
+                <div
+                  data-pencil-name="报销单-20260812 / v1报告文字0"
+                  style='box-sizing: border-box; color: #344054; font-family: "Noto Sans SC", system-ui, sans-serif; font-size: 13px; font-style: normal; font-weight: 400; letter-spacing: 0px; line-height: 18px; text-align: left; white-space: nowrap'
+                >
+                  办公用品采购
+                </div>
+              </div>
+              <div
+                data-pencil-name="报销单-20260812 / v1报告单元格1"
+                style="align-items: flex-start; box-sizing: border-box; display: flex; flex-direction: row; flex: 1 1 0; gap: 0px; height: fit-content; justify-content: flex-start; padding: 6px 12px"
+              >
+                <div
+                  data-pencil-name="报销单-20260812 / v1报告文字1"
+                  style='box-sizing: border-box; color: #344054; font-family: "Noto Sans SC", system-ui, sans-serif; font-size: 13px; font-style: normal; font-weight: 400; letter-spacing: 0px; line-height: 18px; text-align: left; white-space: nowrap'
+                >
+                  低风险
+                </div>
+              </div>
+              <div
+                data-pencil-name="报销单-20260812 / v1报告单元格2"
+                style="align-items: flex-start; box-sizing: border-box; display: flex; flex-direction: row; flex: 1 1 0; gap: 0px; height: fit-content; justify-content: flex-start; padding: 6px 12px"
+              >
+                <div
+                  data-pencil-name="报销单-20260812 / v1报告文字2"
+                  style='box-sizing: border-box; color: #344054; font-family: "Noto Sans SC", system-ui, sans-serif; font-size: 13px; font-style: normal; font-weight: 400; letter-spacing: 0px; line-height: 18px; text-align: left; white-space: nowrap'
+                >
+                  08-12 14:16
+                </div>
+              </div>
+              <div
+                data-pencil-name="报销单-20260812 / v1报告单元格3"
+                style="align-items: flex-start; box-sizing: border-box; display: flex; flex-direction: row; flex: 1 1 0; gap: 0px; height: fit-content; justify-content: flex-start; padding: 6px 12px"
+              >
+                <div
+                  data-pencil-name="报销单-20260812 / v1报告文字3"
+                  style='box-sizing: border-box; color: #344054; font-family: "Noto Sans SC", system-ui, sans-serif; font-size: 13px; font-style: normal; font-weight: 400; letter-spacing: 0px; line-height: 18px; text-align: left; white-space: nowrap'
+                >
+                  已完成
+                </div>
+              </div>
+              <div
+                data-pencil-name="报销单-20260812 / v1报告单元格4"
+                style="align-items: flex-start; box-sizing: border-box; display: flex; flex-direction: row; flex: 1 1 0; gap: 0px; height: fit-content; justify-content: flex-start; padding: 6px 12px"
+              >
+                <div
+                  data-pencil-name="报销单-20260812 / v1报告文字4"
+                  style='box-sizing: border-box; color: #185ABD; font-family: "Noto Sans SC", system-ui, sans-serif; font-size: 13px; font-style: normal; font-weight: 400; letter-spacing: 0px; line-height: 18px; text-align: left; white-space: nowrap'
+                >
+                  查看报告 · 导出
+                </div>
+              </div>
+            </div>
+            <div
+              data-pencil-name="报销单-20260810 / v1报告行"
+              style="align-items: center; box-sizing: border-box; display: flex; flex-direction: row; flex-shrink: 0; gap: 12px; height: fit-content; justify-content: flex-start; padding: 15px 4px; width: 100%"
+            >
+              <div
+                data-pencil-name="报销单-20260810 / v1报告单元格0"
+                style="align-items: flex-start; box-sizing: border-box; display: flex; flex-direction: row; flex: 1 1 0; gap: 0px; height: fit-content; justify-content: flex-start; padding: 6px 12px"
+              >
+                <div
+                  data-pencil-name="报销单-20260810 / v1报告文字0"
+                  style='box-sizing: border-box; color: #344054; font-family: "Noto Sans SC", system-ui, sans-serif; font-size: 13px; font-style: normal; font-weight: 400; letter-spacing: 0px; line-height: 18px; text-align: left; white-space: nowrap'
+                >
+                  团队建设活动
+                </div>
+              </div>
+              <div
+                data-pencil-name="报销单-20260810 / v1报告单元格1"
+                style="align-items: flex-start; box-sizing: border-box; display: flex; flex-direction: row; flex: 1 1 0; gap: 0px; height: fit-content; justify-content: flex-start; padding: 6px 12px"
+              >
+                <div
+                  data-pencil-name="报销单-20260810 / v1报告文字1"
+                  style='box-sizing: border-box; color: #344054; font-family: "Noto Sans SC", system-ui, sans-serif; font-size: 13px; font-style: normal; font-weight: 400; letter-spacing: 0px; line-height: 18px; text-align: left; white-space: nowrap'
+                >
+                  中风险
+                </div>
+              </div>
+              <div
+                data-pencil-name="报销单-20260810 / v1报告单元格2"
+                style="align-items: flex-start; box-sizing: border-box; display: flex; flex-direction: row; flex: 1 1 0; gap: 0px; height: fit-content; justify-content: flex-start; padding: 6px 12px"
+              >
+                <div
+                  data-pencil-name="报销单-20260810 / v1报告文字2"
+                  style='box-sizing: border-box; color: #344054; font-family: "Noto Sans SC", system-ui, sans-serif; font-size: 13px; font-style: normal; font-weight: 400; letter-spacing: 0px; line-height: 18px; text-align: left; white-space: nowrap'
+                >
+                  08-10 17:42
+                </div>
+              </div>
+              <div
+                data-pencil-name="报销单-20260810 / v1报告单元格3"
+                style="align-items: flex-start; box-sizing: border-box; display: flex; flex-direction: row; flex: 1 1 0; gap: 0px; height: fit-content; justify-content: flex-start; padding: 6px 12px"
+              >
+                <div
+                  data-pencil-name="报销单-20260810 / v1报告文字3"
+                  style='box-sizing: border-box; color: #344054; font-family: "Noto Sans SC", system-ui, sans-serif; font-size: 13px; font-style: normal; font-weight: 400; letter-spacing: 0px; line-height: 18px; text-align: left; white-space: nowrap'
+                >
+                  已完成
+                </div>
+              </div>
+              <div
+                data-pencil-name="报销单-20260810 / v1报告单元格4"
+                style="align-items: flex-start; box-sizing: border-box; display: flex; flex-direction: row; flex: 1 1 0; gap: 0px; height: fit-content; justify-content: flex-start; padding: 6px 12px"
+              >
+                <div
+                  data-pencil-name="报销单-20260810 / v1报告文字4"
+                  style='box-sizing: border-box; color: #185ABD; font-family: "Noto Sans SC", system-ui, sans-serif; font-size: 13px; font-style: normal; font-weight: 400; letter-spacing: 0px; line-height: 18px; text-align: left; white-space: nowrap'
+                >
+                  查看报告 · 导出
+                </div>
+              </div>
+            </div>
+            <div
+              data-pencil-name="报销单-20260809 / v1报告行"
+              style="align-items: center; box-sizing: border-box; display: flex; flex-direction: row; flex-shrink: 0; gap: 12px; height: fit-content; justify-content: flex-start; padding: 15px 4px; width: 100%"
+            >
+              <div
+                data-pencil-name="报销单-20260809 / v1报告单元格0"
+                style="align-items: flex-start; box-sizing: border-box; display: flex; flex-direction: row; flex: 1 1 0; gap: 0px; height: fit-content; justify-content: flex-start; padding: 6px 12px"
+              >
+                <div
+                  data-pencil-name="报销单-20260809 / v1报告文字0"
+                  style='box-sizing: border-box; color: #344054; font-family: "Noto Sans SC", system-ui, sans-serif; font-size: 13px; font-style: normal; font-weight: 400; letter-spacing: 0px; line-height: 18px; text-align: left; white-space: nowrap'
+                >
+                  差旅报销
+                </div>
+              </div>
+              <div
+                data-pencil-name="报销单-20260809 / v1报告单元格1"
+                style="align-items: flex-start; box-sizing: border-box; display: flex; flex-direction: row; flex: 1 1 0; gap: 0px; height: fit-content; justify-content: flex-start; padding: 6px 12px"
+              >
+                <div
+                  data-pencil-name="报销单-20260809 / v1报告文字1"
+                  style='box-sizing: border-box; color: #344054; font-family: "Noto Sans SC", system-ui, sans-serif; font-size: 13px; font-style: normal; font-weight: 400; letter-spacing: 0px; line-height: 18px; text-align: left; white-space: nowrap'
+                >
+                  —
+                </div>
+              </div>
+              <div
+                data-pencil-name="报销单-20260809 / v1报告单元格2"
+                style="align-items: flex-start; box-sizing: border-box; display: flex; flex-direction: row; flex: 1 1 0; gap: 0px; height: fit-content; justify-content: flex-start; padding: 6px 12px"
+              >
+                <div
+                  data-pencil-name="报销单-20260809 / v1报告文字2"
+                  style='box-sizing: border-box; color: #344054; font-family: "Noto Sans SC", system-ui, sans-serif; font-size: 13px; font-style: normal; font-weight: 400; letter-spacing: 0px; line-height: 18px; text-align: left; white-space: nowrap'
+                >
+                  08-09 10:03
+                </div>
+              </div>
+              <div
+                data-pencil-name="报销单-20260809 / v1报告单元格3"
+                style="align-items: flex-start; box-sizing: border-box; display: flex; flex-direction: row; flex: 1 1 0; gap: 0px; height: fit-content; justify-content: flex-start; padding: 6px 12px"
+              >
+                <div
+                  data-pencil-name="报销单-20260809 / v1报告文字3"
+                  style='box-sizing: border-box; color: #344054; font-family: "Noto Sans SC", system-ui, sans-serif; font-size: 13px; font-style: normal; font-weight: 400; letter-spacing: 0px; line-height: 18px; text-align: left; white-space: nowrap'
+                >
+                  生成失败 · 可重试
+                </div>
+              </div>
+              <div
+                data-pencil-name="报销单-20260809 / v1报告单元格4"
+                style="align-items: flex-start; box-sizing: border-box; display: flex; flex-direction: row; flex: 1 1 0; gap: 0px; height: fit-content; justify-content: flex-start; padding: 6px 12px"
+              >
+                <div
+                  data-pencil-name="报销单-20260809 / v1报告文字4"
+                  style='box-sizing: border-box; color: #185ABD; font-family: "Noto Sans SC", system-ui, sans-serif; font-size: 13px; font-style: normal; font-weight: 400; letter-spacing: 0px; line-height: 18px; text-align: left; white-space: nowrap'
+                >
+                  重试
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </body>
+</html>
