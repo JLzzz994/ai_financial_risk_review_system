@@ -11,6 +11,8 @@ from app.routers.attachments import router as attachment_router
 from app.routers.sessions import router as session_router
 from app.routers.risk import router as risk_router
 from app.routers.approval import router as approval_router
+from app.routers.reports import router as reports_router
+from app.routers.audit import router as audit_router
 
 configure_logging()
 logger = get_logger(__name__)
@@ -23,6 +25,8 @@ app.include_router(attachment_router)
 app.include_router(session_router)
 app.include_router(risk_router)
 app.include_router(approval_router)
+app.include_router(reports_router)
+app.include_router(audit_router)
 
 
 @app.get("/health/live")
