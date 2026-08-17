@@ -40,6 +40,14 @@ class LocalFileStorage:
         if target.exists():
             target.unlink()
 
+    def exists(self, object_key: str) -> bool:
+        """检查对象是否存在，不暴露物理路径。"""
+        key = validate_object_key(object_key)
+        target = (self.root / key).resolve()
+        if self.root not in target.parents:
+            raise ValueError("对象键超出存储根目录")
+        return target.is_file()
+
     def create_presigned_url(self, object_key: str, expires_seconds: int = 300) -> str:
         """开发环境返回受限的内部对象地址，不泄露绝对路径。"""
         if not 1 <= expires_seconds <= 300:
