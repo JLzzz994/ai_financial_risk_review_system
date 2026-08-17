@@ -5,7 +5,19 @@ from decimal import Decimal
 from typing import Any
 from uuid import UUID
 
-from sqlalchemy import CheckConstraint, Date, ForeignKey, Integer, JSON, Numeric, String, Text, UniqueConstraint
+from sqlalchemy import (
+    JSON,
+    CheckConstraint,
+    Date,
+    DateTime,
+    ForeignKey,
+    Integer,
+    Numeric,
+    String,
+    Text,
+    UniqueConstraint,
+    func,
+)
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 from app.models.base import Base, TimestampMixin, UuidPrimaryKeyMixin
@@ -16,8 +28,13 @@ class FinancialDocument(UuidPrimaryKeyMixin, TimestampMixin, Base):
 
     __tablename__ = "financial_documents"
     __table_args__ = (
-        CheckConstraint("total_amount >= 0", name="ck_financial_documents_total_amount_nonnegative"),
-        CheckConstraint("current_version >= 0", name="ck_financial_documents_current_version_nonnegative"),
+        CheckConstraint(
+            "total_amount >= 0", name="ck_financial_documents_total_amount_nonnegative"
+        ),
+        CheckConstraint(
+            "current_version >= 0", name="ck_financial_documents_current_version_nonnegative"
+        ),
+        UniqueConstraint("document_type", "document_no", name="uq_financial_documents_type_no"),
     )
 
     document_type: Mapped[str] = mapped_column(String(32), nullable=False)
@@ -44,13 +61,15 @@ class DocumentVersion(UuidPrimaryKeyMixin, Base):
     """不可变的单据提交快照，所有审核产物都应绑定此版本。"""
 
     __tablename__ = "document_versions"
-    __table_args__ = (UniqueConstraint("document_id", "version_no", name="uq_document_versions_document_version"),)
+    __table_args__ = (
+        UniqueConstraint("document_id", "version_no", name="uq_document_versions_document_version"),
+    )
 
     document_id: Mapped[UUID] = mapped_column(ForeignKey("financial_documents.id"), nullable=False)
     version_no: Mapped[int] = mapped_column(Integer, nullable=False)
     document_snapshot_json: Mapped[dict[str, Any]] = mapped_column(JSON, nullable=False)
     created_by: Mapped[UUID] = mapped_column(ForeignKey("users.id"), nullable=False)
-    created_at: Mapped[datetime] = mapped_column(nullable=False)
+    created_at: Mapped[datetime] = mapped_column(nullable=False, server_default=func.now())
 
     document: Mapped[FinancialDocument] = relationship(back_populates="versions")
 
@@ -75,11 +94,29 @@ class ReviewReport(UuidPrimaryKeyMixin, Base):
 
     __tablename__ = "review_reports"
 
+    task_id: Mapped[UUID | None] = mapped_column(ForeignKey("analysis_tasks.id"))
     document_id: Mapped[UUID] = mapped_column(ForeignKey("financial_documents.id"), nullable=False)
-    document_version_id: Mapped[UUID] = mapped_column(ForeignKey("document_versions.id"), nullable=False)
-    report_status: Mapped[str] = mapped_column(String(32), nullable=False, default="draft")
+    document_version_id: Mapped[UUID] = mapped_column(
+        ForeignKey("document_versions.id"), nullable=False
+    )
+    report_status: Mapped[str] = mapped_column(String(16), nullable=False, default="draft")
     overall_risk_level: Mapped[str | None] = mapped_column(String(16))
+    risk_summary_json: Mapped[dict[str, Any]] = mapped_column(JSON, nullable=False, default=dict)
+    amount_comparison_json: Mapped[dict[str, Any]] = mapped_column(
+        JSON, nullable=False, default=dict
+    )
+    recommendation: Mapped[str | None] = mapped_column(String(32))
+    report_markdown: Mapped[str | None] = mapped_column(Text)
+    generated_by: Mapped[str | None] = mapped_column(String(128))
+    finalized_by: Mapped[UUID | None] = mapped_column(ForeignKey("users.id"))
+    finalized_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True))
+    report_version: Mapped[int] = mapped_column(Integer, nullable=False, default=1)
+    # 兼容现有服务的结构化报告字段，新接口以 report_markdown 为正文快照。
     report_content: Mapped[dict[str, Any]] = mapped_column(JSON, nullable=False, default=dict)
-    generated_at: Mapped[datetime | None] = mapped_column()
-    created_at: Mapped[datetime] = mapped_column(nullable=False)
-    updated_at: Mapped[datetime] = mapped_column(nullable=False)
+    generated_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True))
+    created_at: Mapped[datetime] = mapped_column(
+        DateTime(timezone=True), nullable=False, server_default=func.now()
+    )
+    updated_at: Mapped[datetime] = mapped_column(
+        DateTime(timezone=True), nullable=False, server_default=func.now(), onupdate=func.now()
+    )
