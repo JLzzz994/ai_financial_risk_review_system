@@ -10,12 +10,19 @@ from fastapi.responses import JSONResponse
 class AppError(Exception):
     """应用层可预期异常。"""
 
-    def __init__(self, code: str, message: str, status_code: int = 400) -> None:
+    def __init__(
+        self,
+        code: str,
+        message: str,
+        status_code: int = 400,
+        details: dict[str, Any] | None = None,
+    ) -> None:
         """保存错误码、非敏感提示和 HTTP 状态码。"""
         super().__init__(message)
         self.code = code
         self.message = message
         self.status_code = status_code
+        self.details = details or {}
 
 
 class AuthorizationError(AppError):
@@ -32,7 +39,14 @@ async def app_error_handler(request: Request, exc: Exception) -> JSONResponse:
     request_id = getattr(request.state, "request_id", "unknown")
     return JSONResponse(
         status_code=error.status_code,
-        content={"error": {"code": error.code, "message": error.message}, "request_id": request_id},
+        content={
+            "code": error.code,
+            "message": error.message,
+            "request_id": request_id,
+            "details": error.details,
+            # 保留旧客户端读取的嵌套错误结构，迁移期间不破坏已有契约。
+            "error": {"code": error.code, "message": error.message},
+        },
     )
 
 
