@@ -6,8 +6,8 @@ from app.config import settings
 from app.errors import AppError, app_error_handler, unhandled_error_handler
 from app.logging_config import configure_logging, get_logger, log_boundary
 from app.middleware.request_context import RequestContextMiddleware
-from app.routers.approval import router as approval_router
 from app.routers.analysis import router as analysis_router
+from app.routers.approval import router as approval_router
 from app.routers.attachments import router as attachment_router
 from app.routers.audit import router as audit_router
 from app.routers.auth import router as auth_router
