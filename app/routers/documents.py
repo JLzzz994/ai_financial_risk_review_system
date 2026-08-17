@@ -39,7 +39,9 @@ async def create_document(command: CreateDocumentCommand) -> DocumentResponse:
 
 
 @router.post("/{document_id}/submit", response_model=DocumentVersionResponse)
-async def submit_document(document_id: UUID, actor_id: UUID, expected_state_version: int = 1) -> DocumentVersionResponse:
+async def submit_document(
+    document_id: UUID, actor_id: UUID, expected_state_version: int = 1
+) -> DocumentVersionResponse:
     """提交单据并创建不可变版本。"""
     try:
         return service.submit(document_id, actor_id, expected_state_version)

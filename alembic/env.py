@@ -3,25 +3,28 @@
 import asyncio
 from logging.config import fileConfig
 
-from alembic import context
 from sqlalchemy import pool
 from sqlalchemy.ext.asyncio import async_engine_from_config
 
-from app.config import get_settings
+from alembic import context
+from app.config import settings
 from app.models import Base
 
 if context.config.config_file_name is not None:
     fileConfig(context.config.config_file_name)
 
 config = context.config
-settings = get_settings()
 config.set_main_option("sqlalchemy.url", settings.database_url)
 target_metadata = Base.metadata
 
 
 def run_migrations_offline() -> None:
     """生成不连接数据库的迁移 SQL。"""
-    context.configure(url=settings.database_url, target_metadata=target_metadata, literal_binds=True)
+    context.configure(
+        url=settings.database_url,
+        target_metadata=target_metadata,
+        literal_binds=True,
+    )
     with context.begin_transaction():
         context.run_migrations()
 
@@ -36,7 +39,9 @@ def do_run_migrations(connection: object) -> None:
 async def run_async_migrations() -> None:
     """创建异步引擎并执行在线迁移。"""
     connectable = async_engine_from_config(
-        config.get_section(config.config_ini_section, {}), prefix="sqlalchemy.", poolclass=pool.NullPool
+        config.get_section(config.config_ini_section, {}),
+        prefix="sqlalchemy.",
+        poolclass=pool.NullPool,
     )
     async with connectable.connect() as connection:
         await connection.run_sync(do_run_migrations)

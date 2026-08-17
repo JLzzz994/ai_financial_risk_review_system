@@ -38,4 +38,3 @@ class DocumentVersionResponse(BaseModel):
     document_id: UUID
     version_no: int
     created_by: UUID
-

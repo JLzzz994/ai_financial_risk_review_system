@@ -21,6 +21,41 @@
 - 单 Agent 编排、多专业引擎协作；Agent 只能调用白名单工具，不能直接改变审批状态
 - 审批流程和分析流水线采用固定状态机，不使用 Agent、YAML 或 LangGraph 动态改变审批节点
 
+## 统一技术基线与术语
+
+以下术语在项目文档、代码、接口和测试中保持统一含义：
+
+- `ProviderRegistry`：外部能力适配器注册中心，负责登记和选择 OCR、LLM、RAG、`FileStorage` 等外部能力适配器。
+- `ActionRegistry`：Agent 可调用的业务动作注册中心，只登记经过授权的业务动作；不登记审批状态变更动作。
+- `ReviewSession` / `ReviewTurn`：审核交互上下文及其中的一轮交互记录；会话用于交互和任务关联，不替代单据版本事实。
+- `Settings`：环境配置统一出口；业务代码不得自行读取环境变量或维护第二套配置对象。
+- `Unit of Work`：事务边界，负责在一个业务用例中协调独立的 `AsyncSession`、Repository 和提交/回滚。
+
+以下边界不可替换：
+
+- 禁止使用动态 YAML 或 `eval` 改写审批节点。
+- 禁止 LLM 或 Agent 直接改变审批状态；审批决定只能通过统一 `decision` 服务进入固定顺序状态机。
+- 禁止将 Redis 作为业务事实源；Redis 只用于 broker、短期缓存、撤销、限流和锁。
+- 禁止用会话状态覆盖 `document_version` 历史。
+- 禁止由同步 API 执行 OCR、分析和报告等长任务。
+
+## 分层契约与事实源
+
+统一遵循以下调用链和依赖边界：
+
+```text
+Router -> Service/UoW -> Repository/Adapter
+```
+
+- API Schema 与 ORM 模型分离；Service 不拼接 SQL。
+- 业务代码不直接导入 MinIO、OpenAI 或 OCR SDK，外部能力必须经 Adapter 和 `ProviderRegistry` 接入。
+- Agent 只能通过 `ActionRegistry` 调用白名单动作。
+- 每个请求或任务使用独立 `AsyncSession`；事务由 `Unit of Work` 管理。
+- 配置只从 `app.config.settings` 获取。
+- PostgreSQL 保存业务事实、版本、审计和阶段状态；Redis 不保存需要长期追溯的业务事实。
+- `document_version_id` 是附件、风险、审批和报告的绑定主线。
+- 审批只通过统一 `decision` 服务进入固定顺序状态机。
+
 ## 业务边界
 
 - R-01：先完整打通费用报销单，其他 4 类单据复用通用框架。
@@ -208,9 +243,11 @@ docker compose logs -f api worker
 ```powershell
 git status --short
 git add <明确文件路径>
-git commit -m "docs(范围): 简要说明"
+git commit -m "文档(范围)：用中文清楚说明本次功能点"
 git push origin main
 ```
+
+每个功能块单独提交；提交信息必须使用中文，明确写出功能范围、关键行为和验证结果。子 Agent 提交同样遵守此约定。
 
 不要提交 `.env`、密钥、真实附件、`var/uploads` 业务文件、日志或构建产物。推送前确认 `git diff --cached` 和目标分支；外部推送必须获得用户明确授权。
 

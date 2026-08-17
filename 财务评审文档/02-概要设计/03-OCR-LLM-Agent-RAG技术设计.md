@@ -45,10 +45,30 @@ flowchart LR
 
 ## 4. OCR 与结构化抽取
 
-### 4.1 OCR 适配器接口
+### 4.1 ProviderRegistry 与 Provider 契约
+
+所有 OCR、LLM、Embedding 和 RAG 实现必须通过 `ProviderRegistry` 注册和解析；业务模块只依赖协议，不导入具体供应商 SDK。每个 Provider 必须声明以下契约：
+
+```text
+name
+version
+capabilities
+input_model
+output_model
+required_permission
+timeout_policy
+retry_policy
+idempotency_policy
+health_check
+data_egress_policy
+```
+
+Provider 类型至少包括：`OcrProvider`、`LlmProvider`、`EmbeddingProvider`、`RagProvider`。`ProviderRegistry` 负责按能力和配置选择已启用 Provider，并在调用审计中记录实际 `name/version`；未注册、未启用、权限不足或数据出域策略不满足时必须拒绝调用。
+
+### 4.2 OCR 适配器接口
 
 ```python
-class OCRProvider(Protocol):
+class OcrProvider(Protocol):
     async def recognize(
         self,
         file_ref: FileRef,
@@ -57,9 +77,9 @@ class OCRProvider(Protocol):
     ) -> OCRResult: ...
 ```
 
-`OCRResult` 至少包含：`provider`、`provider_version`、`pages`、`raw_text`、`blocks`、`confidence`、`error`。
+`OCRResult` 至少包含：`provider`、`provider_version`、`pages`、`raw_text`、`blocks`、`confidence`、`error`。OCR 结果只属于当前不可变 `document_version_id`，不覆盖历史解析结果。
 
-### 4.2 字段抽取要求
+### 4.3 字段抽取要求
 
 每个字段保存：
 
@@ -103,7 +123,20 @@ class OCRProvider(Protocol):
 
 ## 6. LLM 适配器
 
-### 6.1 允许的任务
+### 6.1 OpenAI-compatible 协议
+
+`LlmProvider` 的默认实现为 OpenAI-compatible 适配器，配置项为 `base_url`、`api_key`、`model`。适配器至少支持 chat completion 或等价调用、JSON/schema 输出、streaming、tool calling、timeout/retry、错误码映射和模型能力探测；能力探测结果必须缓存并记录版本，不能把不支持的能力透传给业务。
+
+业务模块只依赖以下协议，不得直接导入具体供应商 SDK：
+
+```python
+class LlmAdapter(Protocol):
+    async def generate(self, request: LlmRequest) -> LlmResponse: ...
+```
+
+Provider 的超时、重试和幂等策略由注册契约统一控制；不可重试的业务错误、非法请求和策略拒绝必须映射为稳定错误码。外部调用默认关闭或必须经过字段级脱敏授权。
+
+### 6.2 允许的任务
 
 - 将 OCR 字段和上下文补全为候选结构化字段；
 - 解释规则命中原因；
@@ -117,9 +150,11 @@ class OCRProvider(Protocol):
 - 覆盖规则引擎结果；
 - 访问未授权单据或调用未登记工具。
 
-### 6.3 调用记录
+### 6.4 Prompt 模板契约
 
-每次调用记录模型名称、模型版本、提示版本、输入数据范围、脱敏状态、输出摘要、置信度、耗时、错误和操作者/任务 ID。
+统一模板目录为 `engines/model/prompts/`，至少包含：`expense_field_completion`、`risk_explanation`、`review_suggestion`、`policy_qa`、`clarification`。模板必须有唯一 `prompt_version`，发布后不可变；调用时记录 `provider/model/model_version/prompt_version`、`input_scope/redaction_status`、`agent_run_id/task_id`、`latency/output_summary/error_code`。
+
+渲染失败、结构化解析失败或业务校验失败时，返回模板化澄清或人工接管状态，不伪造成功结果，也不得进入审批链路。
 
 ## 7. Agent 编排
 
@@ -187,3 +222,13 @@ LLM 生成建议时只能引用检索结果和当前风险证据；没有匹配�
 - 任务成功率和重试成功率；
 - LLM 建议引用证据的合规率；
 - OCR、分析和报告生成耗时。
+
+## 12. 验收标准
+
+- [ ] 四类 Provider 均通过 `ProviderRegistry` 注册，契约字段完整，未注册或未授权调用被拒绝。
+- [ ] LLM 适配器支持 OpenAI-compatible 配置、JSON/schema、streaming、tool calling、timeout/retry、错误码映射和能力探测；业务代码无具体供应商 SDK 依赖。
+- [ ] 无证据或证据不足只能返回 `manual_review`，不得自动形成确定性风险结论。
+- [ ] Prompt 版本和输入脱敏状态写入审计；模板/JSON/业务校验失败均进入澄清或人工接管。
+- [ ] 执行顺序固定为 OCR/抽取 → Evidence 校验 → 确定性规则 → 风险汇总 → LLM 解释/建议。
+- [ ] LLM 不能决定最终风险等级、修改 evidence、改变审批状态或创建/跳过审批节点。
+- [ ] 外部调用默认关闭，或经过脱敏授权和 `data_egress_policy` 校验。

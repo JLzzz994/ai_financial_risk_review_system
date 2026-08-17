@@ -1,45 +1,77 @@
 """应用配置。"""
 
-import os
-from functools import lru_cache
+from pathlib import Path
 
-from pydantic import BaseModel, ConfigDict
+from pydantic_settings import BaseSettings, SettingsConfigDict
 
-
-class Settings(BaseModel):
-    """从环境变量读取的应用配置。"""
-
-    app_name: str = "财务单据智能风险审核系统"
-    environment: str = "development"
-    log_level: str = "INFO"
-    log_dir: str = "var/logs"
-    database_url: str = "postgresql+asyncpg://app:app@postgres:5432/financial_review"
-    redis_url: str = "redis://redis:6379/0"
-    jwt_secret: str = "development-only-change-me"
-    jwt_issuer: str = "financial-review"
-
-    model_config = ConfigDict(extra="ignore")
-
-    @classmethod
-    def from_environment(cls) -> "Settings":
-        """从环境变量读取配置，未设置时使用安全开发默认值。"""
-        values = {
-            field: os.getenv(field.upper(), default)
-            for field, default in {
-                "app_name": "财务单据智能风险审核系统",
-                "environment": "development",
-                "log_level": "INFO",
-                "log_dir": "var/logs",
-                "database_url": "postgresql+asyncpg://app:app@postgres:5432/financial_review",
-                "redis_url": "redis://redis:6379/0",
-                "jwt_secret": "development-only-change-me",
-                "jwt_issuer": "financial-review",
-            }.items()
-        }
-        return cls(**values)
+PROJECT_PATH = Path(__file__).resolve().parents[1]
+env_file_path = PROJECT_PATH / ".env"
 
 
-@lru_cache(maxsize=1)
-def get_settings() -> Settings:
-    """构造并缓存全局应用配置。"""
-    return Settings.from_environment()
+class Settings(BaseSettings):
+    """
+    接收 .env 文件中的环境变量。
+    """
+
+    app_name: str
+    environment: str
+    log_level: str
+    log_dir: str
+    app_host: str
+    app_port: int
+
+    database_url: str
+    redis_url: str
+    celery_broker_url: str
+    celery_result_backend: str
+    celery_task_max_retries: int
+    celery_task_timeout_seconds: int
+
+    minio_endpoint: str
+    minio_access_key: str
+    minio_secret_key: str
+    minio_bucket: str
+    minio_secure: bool
+    minio_presigned_url_ttl_seconds: int
+    local_storage_path: str
+
+    jwt_secret: str
+    jwt_issuer: str
+    jwt_algorithm: str
+    jwt_expire_minutes: int
+    auth_revocation_key_prefix: str
+    auth_rate_limit_window_seconds: int
+    auth_rate_limit_max_attempts: int
+
+    llm_model_provider: str
+    llm_model: str
+    llm_base_url: str
+    llm_api_key: str
+    llm_timeout_seconds: int
+    llm_temperature: float
+    llm_prompt_version: str
+
+    embedding_model_provider: str
+    embedding_model: str
+    embedding_base_url: str
+    embedding_api_key: str
+    embedding_timeout_seconds: int
+
+    ocr_provider: str
+    ocr_base_url: str
+    ocr_api_key: str
+    ocr_model: str
+    ocr_timeout_seconds: int
+
+    rag_top_k: int
+    rag_rule_version: str
+    external_model_calls_enabled: bool
+
+    model_config = SettingsConfigDict(
+        env_file=env_file_path,
+        env_file_encoding="utf-8",
+        extra="ignore",
+    )
+
+
+settings = Settings()

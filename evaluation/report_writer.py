@@ -5,7 +5,17 @@ from pathlib import Path
 
 from evaluation.schemas import EvaluationRow
 
-HEADERS = ["question", "reference_answer", "generated_answer", "context_evidence", "answer_correctness", "faithfulness", "context_relevance", "context_recall", "context_precision"]
+HEADERS = [
+    "question",
+    "reference_answer",
+    "generated_answer",
+    "context_evidence",
+    "answer_correctness",
+    "faithfulness",
+    "context_relevance",
+    "context_recall",
+    "context_precision",
+]
 
 
 def write_report(rows: list[EvaluationRow], output_path: Path) -> Path:
@@ -15,5 +25,17 @@ def write_report(rows: list[EvaluationRow], output_path: Path) -> Path:
         writer = csv.writer(stream)
         writer.writerow(HEADERS)
         for row in rows:
-            writer.writerow([row.question, row.reference_answer, row.generated_answer, row.context_evidence, row.scores.answer_correctness, row.scores.faithfulness, row.scores.context_relevance, row.scores.context_recall, row.scores.context_precision])
+            writer.writerow(
+                [
+                    row.question,
+                    row.reference_answer,
+                    row.generated_answer,
+                    row.context_evidence,
+                    row.scores.answer_correctness,
+                    row.scores.faithfulness,
+                    row.scores.context_relevance,
+                    row.scores.context_recall,
+                    row.scores.context_precision,
+                ]
+            )
     return output_path

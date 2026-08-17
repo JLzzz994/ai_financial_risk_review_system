@@ -4,7 +4,7 @@ import logging
 from pathlib import Path
 from typing import Literal
 
-from app.config import get_settings
+from app.config import settings
 
 _SENSITIVE_WORDS = (
     "password",
@@ -20,7 +20,6 @@ _SENSITIVE_WORDS = (
 
 def configure_logging() -> None:
     """配置控制台和 var/logs/app.log 文件日志，并确保目录存在。"""
-    settings = get_settings()
     log_dir = Path(settings.log_dir)
     log_dir.mkdir(parents=True, exist_ok=True)
     formatter = logging.Formatter("%(asctime)s %(levelname)s %(name)s %(message)s")

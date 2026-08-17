@@ -1,8 +1,9 @@
 """创建任务 2 的核心单据、版本、审批任务和报告表。"""
 
-from alembic import op
 import sqlalchemy as sa
 from sqlalchemy.dialects import postgresql
+
+from alembic import op
 
 revision = "0001_core_tables"
 down_revision = None
@@ -33,14 +34,24 @@ def upgrade() -> None:
         sa.Column("currency", sa.String(3), nullable=False, server_default="CNY"),
         sa.Column("apply_date", sa.Date, nullable=False),
         sa.Column("reason_text", sa.Text, nullable=False),
-        sa.Column("document_payload", json_type, nullable=False, server_default=sa.text("'{}'::jsonb")),
+        sa.Column(
+            "document_payload", json_type, nullable=False, server_default=sa.text("'{}'::jsonb")
+        ),
         sa.Column("document_status", sa.String(32), nullable=False, server_default="draft"),
         sa.Column("current_version", sa.Integer, nullable=False, server_default="0"),
         sa.Column("document_state_version", sa.Integer, nullable=False, server_default="1"),
-        sa.Column("created_at", sa.DateTime(timezone=True), nullable=False, server_default=sa.func.now()),
-        sa.Column("updated_at", sa.DateTime(timezone=True), nullable=False, server_default=sa.func.now()),
-        sa.CheckConstraint("total_amount >= 0", name="ck_financial_documents_total_amount_nonnegative"),
-        sa.CheckConstraint("current_version >= 0", name="ck_financial_documents_current_version_nonnegative"),
+        sa.Column(
+            "created_at", sa.DateTime(timezone=True), nullable=False, server_default=sa.func.now()
+        ),
+        sa.Column(
+            "updated_at", sa.DateTime(timezone=True), nullable=False, server_default=sa.func.now()
+        ),
+        sa.CheckConstraint(
+            "total_amount >= 0", name="ck_financial_documents_total_amount_nonnegative"
+        ),
+        sa.CheckConstraint(
+            "current_version >= 0", name="ck_financial_documents_current_version_nonnegative"
+        ),
     )
     op.create_index("ix_financial_documents_document_no", "financial_documents", ["document_no"])
     op.create_table(
@@ -50,8 +61,12 @@ def upgrade() -> None:
         sa.Column("version_no", sa.Integer, nullable=False),
         sa.Column("document_snapshot_json", json_type, nullable=False),
         sa.Column("created_by", uuid, sa.ForeignKey("users.id"), nullable=False),
-        sa.Column("created_at", sa.DateTime(timezone=True), nullable=False, server_default=sa.func.now()),
-        sa.UniqueConstraint("document_id", "version_no", name="uq_document_versions_document_version"),
+        sa.Column(
+            "created_at", sa.DateTime(timezone=True), nullable=False, server_default=sa.func.now()
+        ),
+        sa.UniqueConstraint(
+            "document_id", "version_no", name="uq_document_versions_document_version"
+        ),
     )
     op.create_table(
         "approval_tasks",
@@ -62,20 +77,30 @@ def upgrade() -> None:
         sa.Column("task_status", sa.String(32), nullable=False, server_default="pending"),
         sa.Column("decision", sa.String(16)),
         sa.Column("review_comment", sa.Text),
-        sa.Column("created_at", sa.DateTime(timezone=True), nullable=False, server_default=sa.func.now()),
+        sa.Column(
+            "created_at", sa.DateTime(timezone=True), nullable=False, server_default=sa.func.now()
+        ),
         sa.Column("processed_at", sa.DateTime(timezone=True)),
     )
     op.create_table(
         "review_reports",
         sa.Column("id", uuid, primary_key=True),
         sa.Column("document_id", uuid, sa.ForeignKey("financial_documents.id"), nullable=False),
-        sa.Column("document_version_id", uuid, sa.ForeignKey("document_versions.id"), nullable=False),
+        sa.Column(
+            "document_version_id", uuid, sa.ForeignKey("document_versions.id"), nullable=False
+        ),
         sa.Column("report_status", sa.String(32), nullable=False, server_default="draft"),
         sa.Column("overall_risk_level", sa.String(16)),
-        sa.Column("report_content", json_type, nullable=False, server_default=sa.text("'{}'::jsonb")),
+        sa.Column(
+            "report_content", json_type, nullable=False, server_default=sa.text("'{}'::jsonb")
+        ),
         sa.Column("generated_at", sa.DateTime(timezone=True)),
-        sa.Column("created_at", sa.DateTime(timezone=True), nullable=False, server_default=sa.func.now()),
-        sa.Column("updated_at", sa.DateTime(timezone=True), nullable=False, server_default=sa.func.now()),
+        sa.Column(
+            "created_at", sa.DateTime(timezone=True), nullable=False, server_default=sa.func.now()
+        ),
+        sa.Column(
+            "updated_at", sa.DateTime(timezone=True), nullable=False, server_default=sa.func.now()
+        ),
     )
 
 

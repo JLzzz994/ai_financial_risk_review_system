@@ -1,6 +1,6 @@
 """审核报告模型。"""
 
-from datetime import datetime, timezone
+from datetime import UTC, datetime
 from enum import StrEnum
 from uuid import UUID, uuid4
 
@@ -22,7 +22,7 @@ class ReviewReport(BaseModel):
     document_version_id: UUID
     status: ReportStatus
     content: str
-    created_at: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
+    created_at: datetime = Field(default_factory=lambda: datetime.now(UTC))
 
 
 class ReportListItem(BaseModel):

@@ -23,5 +23,13 @@ def evaluate_dataset(dataset_path: Path, output_path: Path, tools: EvaluationToo
         if not sample.enabled:
             continue
         trace = run_rag(sample, tools)
-        rows.append(EvaluationRow(question=sample.question, reference_answer=sample.reference_answer, generated_answer=trace.generated_answer, context_evidence=trace.context_evidence, scores=score_trace(trace, tools)))
+        rows.append(
+            EvaluationRow(
+                question=sample.question,
+                reference_answer=sample.reference_answer,
+                generated_answer=trace.generated_answer,
+                context_evidence=trace.context_evidence,
+                scores=score_trace(trace, tools),
+            )
+        )
     return write_report(rows, output_path)

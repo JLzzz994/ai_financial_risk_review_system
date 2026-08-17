@@ -71,7 +71,7 @@ class ExpenseReimbursementCreate(BaseModel):
     document_payload: dict[str, Any] = Field(default_factory=dict)
 ```
 
-金额校验使用 Python `Decimal`，精度固定为 2 位；`total_amount` 必须等于明细合计，数据库字段为 `NUMERIC(18,2)`。`document_type` 固定为 `EXPENSE_REIMBURSEMENT`，核心字段写入 `financial_documents`，扩展字段写入 `document_payload JSONB`。
+金额校验使用 Python `Decimal`，精度固定为 2 位；`total_amount` 必须等于明细合计，数据库字段为 `NUMERIC(18,2)`。`document_type` 固定为 `expense_reimbursement`，核心字段写入 `financial_documents`，扩展字段写入 `document_payload JSONB`。
 
 ### 2.2 提交、版本和幂等
 

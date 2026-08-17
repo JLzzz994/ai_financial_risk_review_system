@@ -1,7 +1,7 @@
 """费用报销单内存仓储，后续替换为 SQLAlchemy 实现。"""
 
 from dataclasses import dataclass, field
-from datetime import date, datetime, timezone
+from datetime import UTC, date, datetime
 from decimal import Decimal
 from uuid import UUID, uuid4
 
@@ -31,7 +31,7 @@ class StoredVersion:
     document_id: UUID
     version_no: int
     created_by: UUID
-    created_at: datetime = field(default_factory=lambda: datetime.now(timezone.utc))
+    created_at: datetime = field(default_factory=lambda: datetime.now(UTC))
 
 
 class InMemoryDocumentRepository:

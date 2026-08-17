@@ -1,6 +1,6 @@
 """审计事件仓储契约。"""
 
-from datetime import datetime, timezone
+from datetime import UTC, datetime
 from typing import Protocol
 from uuid import UUID
 
@@ -14,7 +14,7 @@ class AuditEvent(BaseModel):
     action: str
     resource_type: str
     resource_id: UUID | None = None
-    occurred_at: datetime = datetime.now(timezone.utc)
+    occurred_at: datetime = datetime.now(UTC)
 
 
 class AuditRepository(Protocol):

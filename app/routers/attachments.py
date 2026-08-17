@@ -36,7 +36,10 @@ async def upload_attachment(document_id: UUID, file: UploadFile = File(...)) -> 
     content = await file.read()
     try:
         result = get_attachment_service().upload(
-            f"attachments/{uuid4()}{extension}", content, file.content_type or "application/octet-stream", extension
+            f"attachments/{uuid4()}{extension}",
+            content,
+            file.content_type or "application/octet-stream",
+            extension,
         )
     except ValueError as exc:
         raise HTTPException(status_code=422, detail=str(exc)) from exc

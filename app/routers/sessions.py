@@ -18,6 +18,8 @@ async def create_session(document_version_id: UUID) -> SessionResponse:
 
 
 @router.post("/{session_id}/messages", response_model=SessionResponse)
-async def send_message(session_id: UUID, document_version_id: UUID, message: SessionMessage) -> SessionResponse:
+async def send_message(
+    session_id: UUID, document_version_id: UUID, message: SessionMessage
+) -> SessionResponse:
     """发送审核消息，返回人工确认态辅助结果。"""
     return service.handle_message(session_id, document_version_id, message)

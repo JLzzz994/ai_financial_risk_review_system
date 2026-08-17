@@ -13,7 +13,9 @@ class AnalysisTaskResult:
     attempts: int
 
 
-def run_analysis_task(document_version_id: UUID, idempotency_key: str, attempt: int = 1) -> AnalysisTaskResult:
+def run_analysis_task(
+    document_version_id: UUID, idempotency_key: str, attempt: int = 1
+) -> AnalysisTaskResult:
     """校验分析任务参数；Celery 接入前不伪造执行成功。"""
     if not idempotency_key.strip():
         raise ValueError("分析任务必须提供幂等键")
