@@ -11,6 +11,24 @@ router = APIRouter(prefix="/api/v1/documents", tags=["documents"])
 service = DocumentService()
 
 
+@router.get("/{document_id}", response_model=DocumentResponse)
+async def get_document(document_id: UUID) -> DocumentResponse:
+    """查询单据当前状态。"""
+    try:
+        return service.get(document_id)
+    except ValueError as exc:
+        raise HTTPException(status_code=404, detail=str(exc)) from exc
+
+
+@router.get("/{document_id}/versions", response_model=list[DocumentVersionResponse])
+async def list_document_versions(document_id: UUID) -> list[DocumentVersionResponse]:
+    """查询单据版本历史。"""
+    try:
+        return service.list_versions(document_id)
+    except ValueError as exc:
+        raise HTTPException(status_code=404, detail=str(exc)) from exc
+
+
 @router.post("", response_model=DocumentResponse, status_code=201)
 async def create_document(command: CreateDocumentCommand) -> DocumentResponse:
     """创建费用报销草稿。"""

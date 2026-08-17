@@ -41,6 +41,15 @@ class DocumentService:
         """退回重提从第一个审核节点重新开始，并保留旧版本。"""
         return self.submit(document_id, actor_id, expected_state_version)
 
+    def get(self, document_id: UUID) -> DocumentResponse:
+        """查询单据当前状态。"""
+        return self._response(self._get(document_id))
+
+    def list_versions(self, document_id: UUID) -> list[DocumentVersionResponse]:
+        """查询单据的不可变版本列表。"""
+        self._get(document_id)
+        return [DocumentVersionResponse(version_id=item.version_id, document_id=item.document_id, version_no=item.version_no, created_by=item.created_by) for item in self.repository.versions if item.document_id == document_id]
+
     def _get(self, document_id: UUID) -> StoredDocument:
         """按 ID 获取单据，不存在时抛出统一业务错误。"""
         if document_id not in self.repository.documents:
