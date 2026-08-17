@@ -46,6 +46,8 @@ class ManualReviewService:
             raise ValueError("人工复核必须填写处理意见")
         if status not in {"confirmed", "dismissed"}:
             raise ValueError("人工复核状态必须为 confirmed 或 dismissed")
+        if review_id not in self._records:
+            raise ValueError("人工复核记录不存在")
         record = self._records[review_id]
         record.status = status
         record.reviewer_id = reviewer_id

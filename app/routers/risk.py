@@ -2,7 +2,7 @@
 
 from uuid import UUID
 
-from fastapi import APIRouter
+from fastapi import APIRouter, HTTPException
 
 from app.schemas.risk import (
     ManualReviewRequest,
@@ -29,13 +29,12 @@ async def evaluate_risk(
 @router.post("/manual-reviews/{review_id}", response_model=ManualReviewResponse)
 async def update_manual_review(review_id: UUID, data: ManualReviewRequest) -> ManualReviewResponse:
     """由审核人员更新复核状态，不改变审批状态。"""
-    record = manual_review_service.update_review_status(
-        review_id,
-        data.reviewer_id,
-        data.status,
-        data.comment,
-        data.evidence,
-    )
+    try:
+        record = manual_review_service.update_review_status(
+            review_id, data.reviewer_id, data.status, data.comment, data.evidence
+        )
+    except ValueError as exc:
+        raise HTTPException(status_code=422, detail=str(exc)) from exc
     return ManualReviewResponse(
         review_id=record.review_id,
         document_version_id=record.document_version_id,
