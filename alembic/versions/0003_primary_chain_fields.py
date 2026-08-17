@@ -14,6 +14,7 @@ def upgrade() -> None:
     """为权限、附件、审批、风险、复核和审计表增加显式字段。"""
     uuid = postgresql.UUID(as_uuid=True)
     additions = {
+        "users": [("username", sa.String(128)), ("is_active", sa.Boolean), ("permission_version", sa.Integer)],
         "roles": [("role_code", sa.String(64)), ("role_name", sa.String(128))],
         "permissions": [("permission_code", sa.String(128)), ("permission_name", sa.String(128))],
         "review_sessions": [("document_version_id", uuid), ("session_status", sa.String(32))],
@@ -32,6 +33,7 @@ def upgrade() -> None:
 def downgrade() -> None:
     """删除本迁移增加的显式字段。"""
     additions = {
+        "users": ["username", "is_active", "permission_version"],
         "roles": ["role_code", "role_name"],
         "permissions": ["permission_code", "permission_name"],
         "review_sessions": ["document_version_id", "session_status"],

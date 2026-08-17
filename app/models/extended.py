@@ -14,7 +14,7 @@ def _common_columns() -> list[Column[object]]:
     ]
 
 EXTENDED_TABLE_NAMES = (
-    "roles", "permissions", "user_roles", "role_permissions", "review_sessions", "session_messages",
+    "users", "roles", "permissions", "user_roles", "role_permissions", "review_sessions", "session_messages",
     "document_line_items", "document_attachments", "attachment_parse_results", "invoice_records",
     "approval_workflows", "approval_instances", "approval_workflow_nodes", "document_status_logs", "analysis_tasks", "risk_findings", "market_price_references",
     "supplier_profiles", "manual_reviews", "audit_logs",
@@ -25,6 +25,7 @@ for _table_name in EXTENDED_TABLE_NAMES:
 
 # 主链路字段与数据对象文档保持同名；其余动态字段仍放在 payload。
 _TABLE_FIELDS = {
+    "users": (("username", String(128)), ("is_active", BOOLEAN), ("permission_version", Integer)),
     "roles": (("role_code", String(64)), ("role_name", String(128))),
     "permissions": (("permission_code", String(128)), ("permission_name", String(128))),
     "review_sessions": (("document_version_id", Uuid), ("session_status", String(32))),
