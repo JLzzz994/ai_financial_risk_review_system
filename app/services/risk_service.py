@@ -3,13 +3,15 @@
 from uuid import UUID
 
 from app.schemas.risk import RiskEvaluationInput, RiskEvaluationResponse
-from engines.risk.rule_engine import evaluate_rules
+from engines.risk.rule_engine import evaluate_ten_rules
 
 
 class RiskService:
     """编排确定性金额和供应商规则。"""
 
-    def evaluate(self, document_version_id: UUID, data: RiskEvaluationInput) -> RiskEvaluationResponse:
+    def evaluate(
+        self, document_version_id: UUID, data: RiskEvaluationInput
+    ) -> RiskEvaluationResponse:
         """执行规则并返回证据绑定结果。"""
-        findings = evaluate_rules(data.amount, data.supplier_name, data.evidence)
+        findings = evaluate_ten_rules(data.to_context())
         return RiskEvaluationResponse(document_version_id=document_version_id, findings=findings)

@@ -21,6 +21,31 @@ class Evidence(BaseModel):
     analyzed_at: datetime = Field(default_factory=lambda: datetime.now(UTC))
 
 
+class RiskContext(BaseModel):
+    """十类确定性规则共用的结构化输入，不使用无类型字典传递核心金额。"""
+
+    amount: Decimal
+    supplier_name: str
+    evidence: Evidence | None = None
+    invoice_total: Decimal | None = None
+    line_item_total: Decimal | None = None
+    contract_amount: Decimal | None = None
+    payment_amount: Decimal | None = None
+    batch_total: Decimal | None = None
+    payment_count: int | None = Field(default=None, ge=0)
+    duplicate_account_count: int = Field(default=0, ge=0)
+    expense_limit: Decimal | None = None
+    market_unit_price: Decimal | None = None
+    market_price_min: Decimal | None = None
+    market_price_max: Decimal | None = None
+    behavior_flags: list[str] = Field(default_factory=list)
+    supplier_risk_flags: list[str] = Field(default_factory=list)
+    required_attachment_count: int = Field(default=0, ge=0)
+    attachment_count: int = Field(default=0, ge=0)
+    attachment_fields_complete: bool = True
+    duplicate_invoice: bool = False
+
+
 class RiskFinding(BaseModel):
     """规则命中结果。"""
 
@@ -29,6 +54,10 @@ class RiskFinding(BaseModel):
     status: Literal["pending", "matched", "confirmed", "dismissed", "manual_review"]
     message: str
     evidence: Evidence | None = None
+    actual_value: dict[str, object] = Field(default_factory=dict)
+    reference_value: dict[str, object] = Field(default_factory=dict)
+    threshold: dict[str, object] = Field(default_factory=dict)
+    suggestion: str | None = None
 
     @property
     def finding_code(self) -> str:
