@@ -1,0 +1,81 @@
+/* 设计 token —— 全部取自 03-页面原型/原型预览.html 的实测值，勿随意改动 */
+:root {
+  /* 品牌 */
+  --color-primary: #185abd;
+  --color-primary-hover: #1f66d6;
+  --color-brand-deep: #123b6d;
+  --color-link: #356ae6;
+  --color-selected: #eaf2ff;
+
+  /* 背景与面板 */
+  --color-page-bg: #f4f7fb;
+  --color-card: #ffffff;
+  --color-panel: #f8fafc;
+
+  /* 文字 */
+  --color-text-title: #1a1a1a;
+  --color-text: #344054;
+  --color-text-secondary: #667085;
+  --color-text-weak: #98a2b3;
+
+  /* 边框 */
+  --color-border: #d9e4f2;
+  --color-border-strong: #d0d5dd;
+
+  /* 风险：高 / 中 / 低 */
+  --risk-high: #f04438;
+  --risk-high-bg: #fef3f2;
+  --risk-high-text: #b42318;
+  --risk-medium: #f79009;
+  --risk-medium-bg: #fef6e7;
+  --risk-medium-text: #b54708;
+  --risk-low: #32d583;
+  --risk-low-bg: #e9fbf1;
+  --risk-low-text: #087443;
+
+  /* 状态色 */
+  --status-blue: #185abd;
+  --status-blue-bg: #eaf2ff;
+  --status-green: #087443;
+  --status-green-bg: #e9fbf1;
+  --status-orange: #b54708;
+  --status-orange-bg: #fef6e7;
+  --status-red: #b42318;
+  --status-red-bg: #fef3f2;
+  --status-purple: #6941c6;
+  --status-purple-bg: #f4f0ff;
+  --status-gray: #475467;
+  --status-gray-bg: #f2f4f7;
+
+  /* 圆角 */
+  --radius-card: 8px;
+  --radius-btn: 6px;
+  --radius-input: 5px;
+  --radius-pill: 999px;
+
+  /* 布局 */
+  --nav-height: 56px;
+  --page-padding: 32px;
+  --card-padding: 24px;
+  --table-cell-x: 12px;
+  --table-cell-y: 6px;
+
+  /* 字体 */
+  --font-family: 'Noto Sans SC', 'PingFang SC', 'Microsoft YaHei', system-ui, sans-serif;
+  --font-mono: 'JetBrains Mono', 'SFMono-Regular', Consolas, monospace;
+
+  /* 字号 */
+  --fs-caption: 12px;
+  --fs-body: 13px;
+  --fs-text: 14px;
+  --fs-subtitle: 18px;
+  --fs-section: 20px;
+  --fs-title: 30px;
+
+  /* 阴影（克制） */
+  --shadow-card: 0 1px 2px rgba(18, 59, 109, 0.06);
+  --shadow-float: 0 8px 28px rgba(18, 59, 109, 0.14);
+
+  /* 动效 */
+  --transition: 160ms ease;
+}

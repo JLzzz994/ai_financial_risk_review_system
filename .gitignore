@@ -16,10 +16,7 @@
 # 前端和测试源码
 !/front/
 !/front/**
-!/test/
-!/test/**
-!/tests/
-!/tests/**
+
 
 # 必要的工程配置与锁文件
 !/*.py
@@ -75,3 +72,7 @@ skills/
 *.swp
 Thumbs.db
 ehthumbs.db
+test/
+test/**
+tests/
+tests/**
