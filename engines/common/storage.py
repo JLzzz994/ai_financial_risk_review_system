@@ -3,6 +3,7 @@
 from dataclasses import dataclass
 from pathlib import Path
 from typing import Protocol
+from uuid import UUID
 
 
 @dataclass(frozen=True, slots=True)
@@ -12,6 +13,7 @@ class StoredObject:
     object_key: str
     size: int
     content_type: str
+    sha256: str | None = None
 
 
 class FileStorage(Protocol):
@@ -36,3 +38,19 @@ def validate_object_key(object_key: str) -> str:
     if path.is_absolute() or ".." in path.parts or not object_key.strip():
         raise ValueError("对象键必须是相对路径")
     return object_key.replace("\\", "/")
+
+
+def build_object_key(
+    document_id: UUID, document_version_id: UUID, attachment_id: UUID, file_name: str
+) -> str:
+    """生成不含本地绝对路径的版本化对象键。"""
+    safe_name = Path(file_name).name.replace("\\", "_").replace("/", "_")
+    if not safe_name or safe_name in {".", ".."}:
+        raise ValueError("附件文件名无效")
+    return validate_object_key(
+        f"documents/{document_id}/versions/{document_version_id}/attachments/"
+        f"{attachment_id}/{safe_name}"
+    )
+
+
+__all__ = ["FileStorage", "StoredObject", "build_object_key", "validate_object_key"]
