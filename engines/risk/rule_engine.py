@@ -5,8 +5,12 @@
 
 from collections.abc import Iterable
 from decimal import Decimal
+from typing import Literal
 
 from engines.risk.contracts import AmountComparison, Evidence, RiskFinding, RiskSummary
+
+RiskLevel = Literal["high", "medium", "low", "none"]
+ComparisonStatus = Literal["matched", "out_of_range", "reference_unavailable", "manual_review"]
 
 
 def validate_evidence(evidence: Evidence | None) -> bool:
@@ -32,7 +36,7 @@ def evaluate_amount(amount: Decimal, evidence: Evidence | None) -> RiskFinding:
             status="manual_review",
             message="金额证据不足",
         )
-    level = "high" if amount >= Decimal("10000") else "low"
+    level: Literal["high", "low"] = "high" if amount >= Decimal("10000") else "low"
     return RiskFinding(
         rule_code="amount.threshold",
         level=level,
@@ -51,7 +55,7 @@ def evaluate_supplier(supplier_name: str, evidence: Evidence | None) -> RiskFind
             status="manual_review",
             message="供应商证据不足",
         )
-    level = "medium" if "异常" in supplier_name else "low"
+    level: Literal["medium", "low"] = "medium" if "异常" in supplier_name else "low"
     return RiskFinding(
         rule_code="supplier.screening",
         level=level,
@@ -75,15 +79,15 @@ def aggregate_risk_level(findings: Iterable[RiskFinding]) -> RiskSummary:
     ]
     manual_required = any(item.status == "manual_review" for item in findings)
     levels = {item.level for item in confirmed}
-    level = (
-        "high"
-        if "high" in levels
-        else "medium"
-        if "medium" in levels
-        else "low"
-        if "low" in levels
-        else "none"
-    )
+    level: RiskLevel
+    if "high" in levels:
+        level = "high"
+    elif "medium" in levels:
+        level = "medium"
+    elif "low" in levels:
+        level = "low"
+    else:
+        level = "none"
     return RiskSummary(level=level, manual_review_required=manual_required)
 
 
@@ -113,7 +117,9 @@ def compare_amount(
     )
     baseline = reference_max if actual_amount > reference_max else reference_min
     ratio = difference / baseline if baseline else None
-    status = "matched" if reference_min <= actual_amount <= reference_max else "out_of_range"
+    status: ComparisonStatus = (
+        "matched" if reference_min <= actual_amount <= reference_max else "out_of_range"
+    )
     return AmountComparison(
         actual_amount=actual_amount,
         currency=currency.upper(),
