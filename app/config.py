@@ -15,6 +15,8 @@ class Settings(BaseModel):
     log_dir: str = "var/logs"
     database_url: str = "postgresql+asyncpg://app:app@postgres:5432/financial_review"
     redis_url: str = "redis://redis:6379/0"
+    jwt_secret: str = "development-only-change-me"
+    jwt_issuer: str = "financial-review"
 
     model_config = ConfigDict(extra="ignore")
 
@@ -30,6 +32,8 @@ class Settings(BaseModel):
                 "log_dir": "var/logs",
                 "database_url": "postgresql+asyncpg://app:app@postgres:5432/financial_review",
                 "redis_url": "redis://redis:6379/0",
+                "jwt_secret": "development-only-change-me",
+                "jwt_issuer": "financial-review",
             }.items()
         }
         return cls(**values)

@@ -3,13 +3,16 @@
 from fastapi.testclient import TestClient
 
 from app.main import app
+from app.services.auth_service import auth_service
 
 
-def test_login_returns_service_unavailable_until_auth_is_configured() -> None:
-    """未接入真实认证时不能返回伪造令牌。"""
+def test_login_returns_jwt_for_registered_user() -> None:
+    """注册用户可以获得短期 JWT。"""
+    auth_service.register("demo", "secret")
     client = TestClient(app)
     response = client.post("/api/v1/auth/login", json={"username": "demo", "password": "secret"})
-    assert response.status_code == 503
+    assert response.status_code == 200
+    assert response.json()["token_type"] == "bearer"
 
 
 def test_me_requires_bearer_token() -> None:
