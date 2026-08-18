@@ -24,6 +24,9 @@ class AnalysisEventStore(Protocol):
     def append(self, task_id: UUID, event: AnalysisEvent) -> None:
         """追加事件。"""
 
+    def append_atomic(self, task_id: UUID, event: AnalysisEvent) -> AnalysisEvent:
+        """原子分配序号并追加事件。"""
+
     def list_after(self, task_id: UUID, last_event_id: int) -> list[AnalysisEvent]:
         """返回指定事件之后的历史。"""
 
@@ -191,15 +194,18 @@ class PersistentAnalysisService:
         self, task: AnalysisTaskResponse, event_type: AnalysisEventType, step: str, status: str
     ) -> None:
         """生成单调事件 ID 并写入事件存储。"""
-        events = self.event_store.list_after(task.task_id, 0)
         event = AnalysisEvent(
-            event_id=len(events) + 1,
+            event_id=1,
             type=event_type,
             task_id=task.task_id,
             step=step,
             status=status,
         )
-        self.event_store.append(task.task_id, event)
+        append_atomic = getattr(self.event_store, "append_atomic", None)
+        if append_atomic is not None:
+            append_atomic(task.task_id, event)
+        else:
+            self.event_store.append(task.task_id, event)
 
     @staticmethod
     def _enqueue(task: AnalysisTaskResponse, idempotency_key: str) -> None:

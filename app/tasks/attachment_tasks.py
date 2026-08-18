@@ -126,12 +126,34 @@ def run_attachment_parse(
     attachment_uuid = UUID(attachment_id)
     version_uuid = UUID(document_version_id)
     attempt = int(self.request.retries)
-    key = f"financial-review:attachment-parse:{attachment_uuid}"
-    client = _redis_client()
     port = _attachment_state_port
     if port is None:
         raise RuntimeError("附件状态仓储尚未配置")
-    cached = client.get(key)
+    key = f"financial-review:attachment-parse:{attachment_uuid}"
+    try:
+        client = _redis_client()
+        cached = client.get(key)
+    except Exception as exc:
+        if attempt >= 3:
+            failed = attachment_parse_state(
+                attachment_uuid, version_uuid, idempotency_key,
+                attempt=3, error=sanitize_error(str(exc)),
+            )
+            port.save(failed)
+            logger.error(
+                "attachment_parse_manual_review",
+                extra={
+                    "task_id": attachment_id,
+                    "document_version_id": document_version_id,
+                    "request_id": idempotency_key,
+                },
+            )
+            return {
+                "attachment_id": attachment_id,
+                "status": "manual_review",
+                "error_message": failed.error_message or "",
+            }
+        raise RuntimeError(sanitize_error(str(exc))) from exc
     if cached:
         try:
             cached_payload = cast(dict[str, str], json.loads(cached))
