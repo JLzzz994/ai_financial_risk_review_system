@@ -15,6 +15,7 @@ from app.routers.documents import router as documents_router
 from app.routers.reports import router as reports_router
 from app.routers.risk import router as risk_router
 from app.routers.sessions import router as session_router
+from app.services.health_service import get_readiness
 
 configure_logging()
 logger = get_logger(__name__)
@@ -44,8 +45,18 @@ async def health_live() -> dict[str, str]:
 
 @app.get("/health/ready")
 async def health_ready() -> dict[str, str]:
-    """返回服务就绪状态。"""
+    """仅在 PostgreSQL 与 Redis 均可用时返回服务就绪。"""
     log_boundary(logger, "health_ready", "enter")
-    result = {"status": "ready"}
+    readiness = await get_readiness()
+    if readiness.status != "ready":
+        from app.errors import AppError
+
+        raise AppError(
+            "service_not_ready",
+            "基础依赖尚未就绪",
+            503,
+            details={"dependencies": readiness.dependencies.model_dump()},
+        )
+    result: dict[str, str] = {"status": readiness.status}
     log_boundary(logger, "health_ready", "exit", status=result["status"])
     return result
