@@ -1,9 +1,15 @@
 """FastAPI 应用入口与健康检查。"""
 
 from fastapi import FastAPI
+from fastapi.exceptions import RequestValidationError
 
 from app.config import settings
-from app.errors import AppError, app_error_handler, unhandled_error_handler
+from app.errors import (
+    AppError,
+    app_error_handler,
+    request_validation_error_handler,
+    unhandled_error_handler,
+)
 from app.logging_config import configure_logging, get_logger, log_boundary
 from app.middleware.request_context import RequestContextMiddleware
 from app.routers.analysis import router as analysis_router
@@ -27,6 +33,7 @@ logger = get_logger(__name__)
 app = FastAPI(title=settings.app_name, version="0.1.0")
 app.add_middleware(RequestContextMiddleware)
 app.add_exception_handler(AppError, app_error_handler)
+app.add_exception_handler(RequestValidationError, request_validation_error_handler)
 app.add_exception_handler(Exception, unhandled_error_handler)
 app.include_router(auth_router)
 app.include_router(analysis_router)

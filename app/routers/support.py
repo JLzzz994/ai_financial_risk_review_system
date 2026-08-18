@@ -1,5 +1,6 @@
 """金额核对、供应商风险和规则中心接口。"""
 
+from copy import deepcopy
 from datetime import UTC, datetime
 from decimal import Decimal
 from uuid import UUID
@@ -93,6 +94,7 @@ _SYSTEM_PARAMETER_DESCRIPTIONS = {
 _CONFIG_IDEMPOTENCY: dict[
     tuple[str, str], RuleItemResponse | SupplierRuleResponse | SystemParameterResponse
 ] = {}
+_CONFIG_IDEMPOTENCY_FINGERPRINTS: dict[tuple[str, str], str] = {}
 
 
 async def _authorize_config(authorization: str | None) -> Principal:
@@ -102,11 +104,39 @@ async def _authorize_config(authorization: str | None) -> Principal:
     return principal
 
 
+async def _authorize_config_read(authorization: str | None) -> Principal:
+    """认证并校验配置读取权限。"""
+    principal = await get_current_principal(authorization)
+    authorize(principal, PermissionCode.CONFIG_READ, is_configuration_resource=True)
+    return principal
+
+
 def _require_idempotency(key: str | None) -> str:
     """校验配置写操作的幂等键。"""
     if not key or not key.strip():
         raise AppError("missing_idempotency_key", "配置变更必须提供 Idempotency-Key", 400)
     return key.strip()
+
+
+def _cached_config_response(
+    cache_key: tuple[str, str], fingerprint: str
+) -> RuleItemResponse | SupplierRuleResponse | SystemParameterResponse | None:
+    """返回不可变幂等快照，并拒绝同键不同请求体。"""
+    cached = _CONFIG_IDEMPOTENCY.get(cache_key)
+    if cached is None:
+        return None
+    if _CONFIG_IDEMPOTENCY_FINGERPRINTS[cache_key] != fingerprint:
+        raise AppError("conflict", "Idempotency-Key 已用于其他请求", 409)
+    return deepcopy(cached)
+
+
+def _store_config_response(
+    cache_key: tuple[str, str], fingerprint: str,
+    response: RuleItemResponse | SupplierRuleResponse | SystemParameterResponse,
+) -> None:
+    """保存配置写结果的深拷贝快照。"""
+    _CONFIG_IDEMPOTENCY_FINGERPRINTS[cache_key] = fingerprint
+    _CONFIG_IDEMPOTENCY[cache_key] = deepcopy(response)
 
 
 @router.get("/documents/{document_id}/amount-comparison", response_model=AmountComparisonResponse)
@@ -197,7 +227,7 @@ async def list_rules(
     authorization: str | None = Header(default=None),
 ) -> RulePage:
     """查询十类确定性风险规则目录。"""
-    await get_current_principal(authorization)
+    await _authorize_config_read(authorization)
     items = [
         rule
         for rule in _RULES
@@ -243,7 +273,8 @@ async def publish_rule(
     await _authorize_config(authorization)
     key = _require_idempotency(idempotency_key)
     cache_key = (f"rule.publish:{rule_id}", key)
-    cached = _CONFIG_IDEMPOTENCY.get(cache_key)
+    fingerprint = payload.model_dump_json()
+    cached = _cached_config_response(cache_key, fingerprint)
     if isinstance(cached, RuleItemResponse):
         return cached
     rule = next((item for item in _RULES if item.rule_id == rule_id), None)
@@ -256,8 +287,8 @@ async def publish_rule(
     except ValueError as exc:
         raise AppError("conflict", "规则版本格式不正确", 409) from exc
     rule.updated_at = datetime.now(UTC)
-    _CONFIG_IDEMPOTENCY[cache_key] = rule
-    return rule
+    _store_config_response(cache_key, fingerprint, rule)
+    return deepcopy(rule)
 
 
 @router.get("/supplier-risk-rules", response_model=list[SupplierRuleResponse])
@@ -266,7 +297,7 @@ async def list_supplier_rules(
     authorization: str | None = Header(default=None),
 ) -> list[SupplierRuleResponse]:
     """查询供应商规则目录。"""
-    await get_current_principal(authorization)
+    await _authorize_config_read(authorization)
     if not keyword:
         return _SUPPLIER_RULES
     normalized = keyword.strip().lower()
@@ -290,7 +321,8 @@ async def update_supplier_rule(
     await _authorize_config(authorization)
     key = _require_idempotency(idempotency_key)
     cache_key = (f"supplier-rule.patch:{rule_id}", key)
-    cached = _CONFIG_IDEMPOTENCY.get(cache_key)
+    fingerprint = payload.model_dump_json()
+    cached = _cached_config_response(cache_key, fingerprint)
     if isinstance(cached, SupplierRuleResponse):
         return cached
     item = next((rule for rule in _SUPPLIER_RULES if rule.id == rule_id), None)
@@ -302,8 +334,8 @@ async def update_supplier_rule(
         item.enabled = payload.enabled
     if payload.threshold is not None:
         item.threshold = payload.threshold
-    _CONFIG_IDEMPOTENCY[cache_key] = item
-    return item
+    _store_config_response(cache_key, fingerprint, item)
+    return deepcopy(item)
 
 
 @router.get("/system-parameters", response_model=list[SystemParameterResponse])
@@ -311,7 +343,7 @@ async def list_system_parameters(
     authorization: str | None = Header(default=None),
 ) -> list[SystemParameterResponse]:
     """查询系统参数目录。"""
-    await get_current_principal(authorization)
+    await _authorize_config_read(authorization)
     now = datetime.now(UTC)
     return [
         SystemParameterResponse(
@@ -335,7 +367,8 @@ async def update_system_parameter(
     await _authorize_config(authorization)
     key_value = _require_idempotency(idempotency_key)
     cache_key = (f"system-parameter.patch:{key}", key_value)
-    cached = _CONFIG_IDEMPOTENCY.get(cache_key)
+    fingerprint = payload.model_dump_json()
+    cached = _cached_config_response(cache_key, fingerprint)
     if isinstance(cached, SystemParameterResponse):
         return cached
     if key not in _SYSTEM_PARAMETERS:
@@ -349,5 +382,5 @@ async def update_system_parameter(
         description=_SYSTEM_PARAMETER_DESCRIPTIONS[key],
         updated_at=datetime.now(UTC),
     )
-    _CONFIG_IDEMPOTENCY[cache_key] = response
-    return response
+    _store_config_response(cache_key, fingerprint, response)
+    return deepcopy(response)

@@ -17,10 +17,13 @@ ROLE_PERMISSIONS: dict[RoleCode, frozenset[PermissionCode]] = {
     RoleCode.APPROVER: frozenset(
         {PermissionCode.APPROVAL_DECIDE, PermissionCode.APPROVAL_READ_ASSIGNED}
     ),
-    RoleCode.FINANCE: frozenset({PermissionCode.FINANCE_READ_SCOPED}),
+    RoleCode.FINANCE: frozenset(
+        {PermissionCode.FINANCE_READ_SCOPED, PermissionCode.CONFIG_READ}
+    ),
     RoleCode.ADMIN: frozenset(
         {
             PermissionCode.CONFIG_MANAGE,
+            PermissionCode.CONFIG_READ,
             PermissionCode.USER_READ,
             PermissionCode.USER_CREATE,
             PermissionCode.USER_UPDATE,

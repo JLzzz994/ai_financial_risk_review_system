@@ -27,6 +27,7 @@ class PermissionCode(StrEnum):
     APPROVAL_READ_ASSIGNED = "approval:read:assigned"
     FINANCE_READ_SCOPED = "finance:read:scoped"
     CONFIG_MANAGE = "config:manage"
+    CONFIG_READ = "config:read"
     USER_READ = "user:read"
     USER_CREATE = "user:create"
     USER_UPDATE = "user:update"

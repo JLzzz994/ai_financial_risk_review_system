@@ -4,6 +4,7 @@ from collections.abc import Callable
 from typing import Any
 
 from fastapi import Request
+from fastapi.exceptions import RequestValidationError
 from fastapi.responses import JSONResponse
 
 
@@ -53,6 +54,22 @@ async def app_error_handler(request: Request, exc: Exception) -> JSONResponse:
 async def unhandled_error_handler(request: Request, exc: Exception) -> JSONResponse:
     """将未捕获异常转换为不暴露堆栈的统一响应。"""
     return await app_error_handler(request, exc)
+
+
+async def request_validation_error_handler(
+    request: Request, exc: Exception
+) -> JSONResponse:
+    """将请求体和参数校验错误转换为统一错误响应。"""
+    validation = exc if isinstance(exc, RequestValidationError) else None
+    return await app_error_handler(
+        request,
+        AppError(
+            "validation_error",
+            "请求参数校验失败",
+            422,
+            details={"errors": validation.errors() if validation else []},
+        ),
+    )
 
 
 ErrorHandler = Callable[[Request, Exception], Any]
