@@ -91,8 +91,8 @@ def advance_analysis_stage(
     else:
         current_rank = _STAGE_ORDER.get(state.stage, -1)
         requested_rank = _STAGE_ORDER.get(stage, -1)
-        if requested_rank < current_rank:
-            raise ValueError("分析阶段不能回退")
+        if requested_rank != current_rank + 1:
+            raise ValueError("分析阶段必须按固定顺序逐阶段推进")
         next_stage = stage
         next_state = replace(state, stage=stage)
     event_type = AnalysisEventType.RESULT if next_stage is AnalysisStage.SUCCEEDED else (
@@ -136,17 +136,7 @@ async def _run_analysis_pipeline_with_ports(
             failed = advance_analysis_stage(
                 state, AnalysisStage.FAILED, error=f"阶段 {stage.value} 失败：{exc}"
             ).state
-            await state_store.save(failed)
-            await event_publisher.publish(
-                AnalysisEvent(
-                    event_id=next_event_id,
-                    type=AnalysisEventType.ERROR,
-                    task_id=failed.task_id,
-                    step=failed.stage.value,
-                    status=failed.stage.value,
-                    data={"document_version_id": str(failed.document_version_id)},
-                )
-            )
+            # 失败由 Celery 外层统一持久化，避免重复写状态和事件。
             return failed
         result = advance_analysis_stage(state, stage)
         state = result.state
@@ -197,9 +187,9 @@ async def _persist_analysis_state(state: AnalysisWorkerState) -> None:
             AnalysisStage.SUCCEEDED,
         } else None
         async with session.begin():
-            await repository.update(session, task)
+            await repository.update_worker_state(session, task)
         event = AnalysisEvent(
-            event_id=len(event_store.list_after(state.task_id, 0)) + 1,
+            event_id=1,
             type=AnalysisEventType.RESULT if state.stage is AnalysisStage.SUCCEEDED else (
                 AnalysisEventType.ERROR
                 if state.stage in {AnalysisStage.FAILED, AnalysisStage.MANUAL_REVIEW}
@@ -210,7 +200,18 @@ async def _persist_analysis_state(state: AnalysisWorkerState) -> None:
             status=state.stage.value,
             data={"document_version_id": str(state.document_version_id)},
         )
-        event_store.append(state.task_id, event)
+        event_store.append_atomic(state.task_id, event)
+
+
+async def _terminal_status(task_id: UUID) -> str | None:
+    """读取终态，重复投递不重复执行外部适配器。"""
+    async with async_session_factory() as session:
+        task = await SqlAnalysisTaskRepository().get(session, task_id)
+        if task is None:
+            raise ValueError("分析任务不存在")
+        if task.stage in {AnalysisStage.SUCCEEDED, AnalysisStage.MANUAL_REVIEW}:
+            return task.stage.value
+    return None
 
 
 @celery_app.task(  # type: ignore[untyped-decorator]
@@ -229,6 +230,13 @@ def run_analysis_task(
     if not idempotency_key.strip():
         raise ValueError("分析任务必须提供幂等键")
     try:
+        terminal = asyncio.run(_terminal_status(task_uuid))
+        if terminal is not None:
+            return {
+                "task_id": task_id,
+                "document_version_id": document_version_id,
+                "status": terminal,
+            }
         return asyncio.run(_run_analysis(task_uuid, version_uuid, self.request.retries))
     except RuntimeError as exc:
         # 外部适配器不可用时持久化失败并交给 Celery 做有界重试。

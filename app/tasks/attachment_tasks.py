@@ -1,7 +1,12 @@
-"""附件解析任务的 Celery 适配边界。"""
+"""附件解析任务的 Celery Worker 入口。"""
 
+import json
 from dataclasses import dataclass
+from typing import Any, cast
 from uuid import UUID
+
+from app.config import settings
+from app.tasks.celery_app import celery_app
 
 
 @dataclass(frozen=True, slots=True)
@@ -16,13 +21,97 @@ class ParseTaskResult:
     error_code: str | None = None
 
 
+@dataclass(frozen=True, slots=True)
+class AttachmentParseState:
+    """解析任务状态，不携带附件内容。"""
+
+    attachment_id: UUID
+    document_version_id: UUID
+    status: str = "queued"
+    retry_count: int = 0
+    error_message: str | None = None
+
+
+def attachment_parse_state(
+    attachment_id: UUID,
+    document_version_id: UUID,
+    idempotency_key: str,
+    *,
+    attempt: int = 0,
+    error: str | None = None,
+) -> AttachmentParseState:
+    """校验稳定参数并计算有界重试后的状态。"""
+    if not idempotency_key.strip():
+        raise ValueError("解析任务必须提供幂等键")
+    if attempt < 0:
+        raise ValueError("解析尝试次数不能小于 0")
+    status = "manual_review" if attempt >= 3 else ("failed" if error else "queued")
+    return AttachmentParseState(
+        attachment_id,
+        document_version_id,
+        status,
+        min(attempt, 3),
+        error[:500] if error else None,
+    )
+
+
+def _redis_client() -> Any:
+    """创建 Worker 侧短期状态客户端。"""
+    from redis import Redis
+
+    return Redis.from_url(settings.redis_url, decode_responses=True)
+
+
+@celery_app.task(  # type: ignore[untyped-decorator]
+    name="financial_review.attachment_parse",
+    bind=True,
+    max_retries=3,
+    autoretry_for=(RuntimeError,),
+    retry_backoff=True,
+)
+def run_attachment_parse(
+    self: Any,
+    attachment_id: str,
+    document_version_id: str,
+    idempotency_key: str,
+) -> dict[str, str]:
+    """Worker 只接收附件/版本 ID，未配置解析器时失败而非伪造成功。"""
+    attachment_uuid = UUID(attachment_id)
+    version_uuid = UUID(document_version_id)
+    attempt = int(self.request.retries)
+    key = f"financial-review:attachment-parse:{attachment_uuid}"
+    client = _redis_client()
+    cached = client.get(key)
+    if cached:
+        return cast(dict[str, str], json.loads(cached))
+    try:
+        raise RuntimeError("OCR 解析适配器尚未配置")
+    except RuntimeError as exc:
+        failed = attachment_parse_state(
+            attachment_uuid,
+            version_uuid,
+            idempotency_key,
+            attempt=attempt + 1,
+            error=str(exc),
+        )
+        payload = {
+            "attachment_id": attachment_id,
+            "status": failed.status,
+            "error_message": failed.error_message or "",
+        }
+        client.set(key, json.dumps(payload, ensure_ascii=False), ex=86400)
+        if attempt < 3:
+            raise self.retry(exc=exc, countdown=2**attempt) from exc
+        return payload
+
+
 def parse_attachment_task(
     attachment_id: UUID,
     idempotency_key: str,
     attempt: int = 1,
     document_version_id: UUID | None = None,
 ) -> ParseTaskResult:
-    """提交解析任务契约；未安装 Celery 时明确失败，不伪造完成结果。"""
+    """仅投递解析任务；API 进程不直接执行 OCR。"""
     if not idempotency_key.strip():
         raise ValueError("解析任务必须提供幂等键")
     if attempt < 1:
@@ -36,11 +125,11 @@ def parse_attachment_task(
             current_step="manual_review",
             error_code="parse_retry_exhausted",
         )
-    try:
-        import celery  # type: ignore[import-not-found,unused-ignore]
-    except ImportError as exc:
-        raise RuntimeError("Celery 依赖未安装，无法提交解析任务") from exc
-    del celery
+    run_attachment_parse.delay(
+        str(attachment_id),
+        str(document_version_id or UUID(int=0)),
+        idempotency_key,
+    )
     return ParseTaskResult(
         attachment_id,
         "queued",
@@ -48,3 +137,12 @@ def parse_attachment_task(
         document_version_id,
         current_step="queued",
     )
+
+
+__all__ = [
+    "AttachmentParseState",
+    "ParseTaskResult",
+    "attachment_parse_state",
+    "parse_attachment_task",
+    "run_attachment_parse",
+]

@@ -73,6 +73,32 @@ class SqlAnalysisTaskRepository:
         )
         return task
 
+    async def update_worker_state(
+        self, session: AsyncSession, task: AnalysisTaskResponse
+    ) -> AnalysisTaskResponse:
+        """Worker 状态回写，保护已完成或人工接管的终态不被覆盖。"""
+        result = await session.execute(
+            update(analysis_tasks)
+            .where(
+                analysis_tasks.c.id == task.task_id,
+                analysis_tasks.c.task_status.notin_(["succeeded", "manual_review"]),
+            )
+            .values(
+                task_status=task.stage.value,
+                current_step=task.stage.value,
+                retry_count=task.retry_count,
+                error_message=task.error_message,
+                finished_at=task.finished_at,
+            )
+        )
+        if int(getattr(result, "rowcount", 0)) == 0:
+            current = await self.get(session, task.task_id)
+            if current is None:
+                raise ValueError("分析任务不存在")
+            if current.stage.value != task.stage.value:
+                raise RuntimeError("分析任务已被其他 Worker 推进")
+        return task
+
     @staticmethod
     def _to_response(row: Any) -> AnalysisTaskResponse:
         """将数据表状态映射到 API 任务契约。"""

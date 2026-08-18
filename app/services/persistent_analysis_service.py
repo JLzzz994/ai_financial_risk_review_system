@@ -59,6 +59,14 @@ class RedisAnalysisEventStore:
         self.client.rpush(self._key(task_id), payload)  # type: ignore[attr-defined]
         self.client.ltrim(self._key(task_id), -1000, -1)  # type: ignore[attr-defined]
 
+    def append_atomic(self, task_id: UUID, event: AnalysisEvent) -> AnalysisEvent:
+        """使用 Redis INCR 分配跨 Worker 唯一事件 ID 后追加事件。"""
+        sequence_key = f"{self._key_prefix}:event-seq:{task_id}"
+        event_id = int(self.client.incr(sequence_key))  # type: ignore[attr-defined]
+        assigned = event.model_copy(update={"event_id": event_id})
+        self.append(task_id, assigned)
+        return assigned
+
     def list_after(self, task_id: UUID, last_event_id: int) -> list[AnalysisEvent]:
         """按事件 ID 过滤 Redis 列表。"""
         values = self.client.lrange(self._key(task_id), 0, -1)  # type: ignore[attr-defined]
