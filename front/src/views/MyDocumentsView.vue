@@ -6,7 +6,7 @@ import { handleApiError, safeErrorMessage } from '@/api/client'
 import { useAppStore } from '@/stores/app'
 import { useAuthStore } from '@/stores/auth'
 import { documentStatusMap, documentStatusView } from '@/types/status'
-import { documentTypeLabels, type DocumentSummary, type DocumentType } from '@/types/domain'
+import { documentTypeLabels, type DocumentPayload, type DocumentSummary, type DocumentType } from '@/types/domain'
 import AmountText from '@/components/AmountText.vue'
 import ApiHint from '@/components/ApiHint.vue'
 import ConfirmDialog from '@/components/ConfirmDialog.vue'
@@ -79,12 +79,68 @@ function onFilterChange(): void {
 
 async function handleCreate(): Promise<void> {
   if (creating.value) return
+  const principal = auth.principal
+  if (!principal) {
+    app.push('warning', '登录主体信息尚未加载，请刷新后重试')
+    return
+  }
   creating.value = true
   try {
+    const today = new Date().toISOString().slice(0, 10)
+    const type = createType.value
+    const payload: DocumentPayload = type === 'expense_reimbursement'
+      ? {
+          document_type: type,
+          currency: 'CNY',
+          expense_details: [{
+            expense_item: '待填写费用项目',
+            consumption_date: today,
+            consumption_location: '待填写',
+            expense_category: '市场推广费',
+            reimbursement_amount: '0.01',
+            currency: 'CNY',
+          }],
+        }
+      : type === 'batch_payment'
+        ? {
+            document_type: type,
+            currency: 'CNY',
+            payment_details: [{ payee_name: '待填写收款人', amount: '0.01' }],
+            total_amount: '0.01',
+            payment_count: 1,
+          }
+        : type === 'travel_reimbursement'
+          ? {
+              document_type: type,
+              currency: 'CNY',
+              travel_location: '待填写出差地点',
+              travel_start_date: today,
+              travel_end_date: today,
+              transportation_amount: '0.01',
+              accommodation_amount: '0.00',
+              meal_amount: '0.00',
+              allowance_amount: '0.00',
+            }
+          : {
+              document_type: type,
+              currency: 'CNY',
+              contract_no: '待填写合同号',
+              supplier_name: '待填写供应商',
+              payment_ratio: '100',
+              payment_terms: '待填写付款条款',
+              planned_payment_date: today,
+            }
     const draft = await createDocument(
       {
-        document_type: createType.value,
-        expense_category: createType.value === 'expense_reimbursement' ? '市场推广费' : undefined,
+        applicant_id: principal.user_id,
+        applicant_department: principal.department ?? '待填写部门',
+        total_amount: '0.01',
+        currency: 'CNY',
+        apply_date: today,
+        reason_text: '待填写申请事由',
+        document_type: type,
+        expense_category: type === 'expense_reimbursement' ? '市场推广费' : undefined,
+        document_payload: payload,
       },
       crypto.randomUUID(),
     )

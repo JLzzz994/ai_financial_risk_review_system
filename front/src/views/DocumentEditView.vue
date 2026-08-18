@@ -54,6 +54,7 @@ const form = reactive({
   payment_ratio: '100',
   payment_terms: '',
   planned_payment_date: new Date().toISOString().slice(0, 10),
+  payment_amount: '0.01',
   travel_location: '',
   travel_start_date: new Date().toISOString().slice(0, 10),
   travel_end_date: new Date().toISOString().slice(0, 10),
@@ -75,6 +76,9 @@ const categoryOptions = ['市场推广费', '差旅费', '办公用品', '业务
 
 const totalAmount = computed(() => addAmounts(...items.value.map((i) => i.amount || '0')))
 const specializedTotalAmount = computed(() => {
+  if (form.document_type === 'public_payment' || form.document_type === 'prepayment') {
+    return form.payment_amount || '0.00'
+  }
   if (form.document_type === 'batch_payment') {
     return addAmounts(...paymentDetails.value.map((item) => item.amount || '0'))
   }
@@ -106,10 +110,10 @@ const isEditable = computed(() =>
 const canSubmit = computed(
   () =>
     isEditable.value &&
-    items.value.length > 0 &&
     !isZeroAmount(effectiveTotalAmount.value) &&
     form.reason_text.trim().length > 0 &&
-    form.payee_name.trim().length > 0,
+    (form.document_type !== 'expense_reimbursement' ||
+      (items.value.length > 0 && form.payee_name.trim().length > 0)),
 )
 
 async function load(): Promise<void> {
@@ -126,6 +130,7 @@ async function load(): Promise<void> {
     form.payee_account = doc.payee_account ?? ''
     form.payee_bank = doc.payee_bank ?? ''
     form.reason_text = doc.reason_text
+    form.payment_amount = doc.total_amount || '0.01'
     form.document_type = doc.document_type as DocumentType
     const payload = doc.document_payload
     if (payload?.document_type === 'public_payment' || payload?.document_type === 'prepayment') {
@@ -192,7 +197,8 @@ function validateSpecialized(): boolean {
   if (form.document_type === 'public_payment' || form.document_type === 'prepayment') {
     return Boolean(
       form.contract_no.trim() && form.supplier_name.trim() && form.payment_terms.trim() &&
-      form.planned_payment_date && /^\d+(\.\d{1,2})?$/.test(form.payment_ratio.trim()),
+      form.planned_payment_date && /^(100(?:\.0{1,2})?|(?:[0-9]|[1-9][0-9])(?:\.\d{1,2})?)$/.test(form.payment_ratio.trim()) &&
+      isValidAmountInput(form.payment_amount) && !isZeroAmount(form.payment_amount),
     )
   }
   if (form.document_type === 'batch_payment') {
@@ -205,7 +211,7 @@ function validateSpecialized(): boolean {
       form.travel_location.trim() && form.travel_start_date && form.travel_end_date &&
       form.travel_end_date >= form.travel_start_date &&
       [form.transportation_amount, form.accommodation_amount, form.meal_amount, form.allowance_amount]
-        .every((amount) => isValidAmountInput(amount || '0')),
+        .every((amount) => isValidAmountInput(amount || '0')) && !isZeroAmount(specializedTotalAmount.value),
     )
   }
   return true
@@ -269,14 +275,18 @@ function removePaymentDetail(index: number): void {
   paymentDetails.value.splice(index, 1)
 }
 
-async function saveDraft(): Promise<void> {
+async function saveDraft(): Promise<boolean> {
   if (form.document_type === 'expense_reimbursement' && !validateItems()) {
     app.push('warning', '费用明细存在校验错误，请修正后保存')
-    return
+    return false
   }
   if (form.document_type !== 'expense_reimbursement' && !validateSpecialized()) {
     app.push('warning', '请完善单据专属字段并检查金额格式')
-    return
+    return false
+  }
+  if (isZeroAmount(effectiveTotalAmount.value)) {
+    app.push('warning', '金额必须大于 0，不能保存 0.00')
+    return false
   }
   saving.value = true
   try {
@@ -324,9 +334,11 @@ async function saveDraft(): Promise<void> {
     }
     app.push('success', '草稿已保存')
     await load()
+    return true
   } catch (error) {
     handleApiError(error)
     app.push('error', safeErrorMessage(error))
+    return false
   } finally {
     saving.value = false
   }
@@ -347,7 +359,7 @@ async function confirmSubmit(reason: string): Promise<void> {
   submitting.value = true
   try {
     // 先保存再提交，保证提交的是当前编辑内容（幂等键一次性使用）
-    await saveDraft()
+    if (!await saveDraft()) return
     const result = await submitDocument(documentId.value, reason, crypto.randomUUID())
     app.push('success', '已提交，进入解析与风险分析')
     submitDialogOpen.value = false
@@ -542,6 +554,13 @@ onMounted(load)
             <label>付款比例（%） <span class="field-required" /></label><input
               v-model="form.payment_ratio"
               class="input"
+              inputmode="decimal"
+            >
+          </div>
+          <div class="field">
+            <label>付款金额（CNY） <span class="field-required" /></label><input
+              v-model="form.payment_amount"
+              class="input input-amount"
               inputmode="decimal"
             >
           </div>

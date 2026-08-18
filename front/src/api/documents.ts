@@ -28,6 +28,7 @@ export function getDocument(documentId: string): Promise<DocumentDetail> {
 
 export interface DocumentPayload {
   document_type: TypedDocumentPayload['document_type']
+  applicant_id?: string
   expense_category?: string
   applicant_department?: string
   budget_department?: string
