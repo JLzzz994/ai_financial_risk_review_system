@@ -94,3 +94,64 @@ class ApprovalHistoryNode(BaseModel):
     decision: str | None = None
     review_comment: str | None = None
     processed_at: datetime | None = None
+
+
+class WorkflowNodeCommand(BaseModel):
+    """流程节点配置。"""
+
+    order: int = Field(ge=1)
+    name: str = Field(min_length=1, max_length=128)
+    approver_role: str = Field(min_length=1, max_length=32)
+    approver_names: str = ""
+    approver_id: UUID | None = None
+
+
+class WorkflowCreateCommand(BaseModel):
+    """创建审批流程草稿。"""
+
+    name: str = Field(min_length=1, max_length=128)
+    document_type: str = Field(default="expense_reimbursement", max_length=32)
+    match_condition: str = ""
+    nodes: list[WorkflowNodeCommand] = Field(min_length=1)
+
+
+class WorkflowPatchCommand(BaseModel):
+    """更新审批流程草稿。"""
+
+    name: str | None = Field(default=None, max_length=128)
+    document_type: str | None = Field(default=None, max_length=32)
+    match_condition: str | None = None
+    status: str | None = None
+    nodes: list[WorkflowNodeCommand] | None = None
+
+
+class WorkflowNodeResponse(BaseModel):
+    """流程节点响应。"""
+
+    node_id: UUID
+    order: int
+    name: str
+    approver_role: str
+    approver_names: str
+    approver_id: UUID | None = None
+
+
+class WorkflowTemplateResponse(BaseModel):
+    """版本化审批流程响应。"""
+
+    workflow_id: UUID
+    name: str
+    version: int
+    document_type: str
+    match_condition: str
+    approval_mode: str = "sequential"
+    status: str
+    nodes: list[WorkflowNodeResponse]
+    published_at: datetime | None = None
+    updated_at: datetime
+
+
+class WorkflowPublishCommand(BaseModel):
+    """发布流程前填写的审核原因。"""
+
+    reason: str = Field(min_length=1, max_length=500)

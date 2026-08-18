@@ -9,6 +9,7 @@ from app.middleware.request_context import RequestContextMiddleware
 from app.routers.analysis import router as analysis_router
 from app.routers.approval import history_router as approval_history_router
 from app.routers.approval import router as approval_router
+from app.routers.approval import workflow_router as approval_workflow_router
 from app.routers.attachments import direct_router as direct_attachment_router
 from app.routers.attachments import router as attachment_router
 from app.routers.audit import router as audit_router
@@ -35,6 +36,7 @@ app.include_router(risk_router)
 app.include_router(document_risk_router)
 app.include_router(approval_router)
 app.include_router(approval_history_router)
+app.include_router(approval_workflow_router)
 app.include_router(reports_router)
 app.include_router(audit_router)
 app.include_router(documents_router)
