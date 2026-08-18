@@ -60,6 +60,7 @@ class SqlAttachmentStatePort:
                 raise ValueError("附件版本不存在")
             record.parse_status = state.status
             record.parse_error = state.error_message
+            await session.rollback()
             async with session.begin():
                 await repository.save(session, record)
 
