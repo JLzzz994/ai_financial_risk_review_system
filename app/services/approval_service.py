@@ -177,6 +177,8 @@ class ApprovalService:
         self, task_id: UUID, command: ApprovalDecisionCommand, is_last_node: bool = True
     ) -> ApprovalDecisionResponse:
         """校验审批人、幂等键和任务状态后保存不可变决定。"""
+        if command.approver_id is None:
+            raise ValueError("审批决定必须绑定审批人")
         if not is_last_node and task_id not in self._task_to_sequence:
             raise ValueError("审批任务不存在")
         try:
