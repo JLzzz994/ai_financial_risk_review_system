@@ -7,6 +7,8 @@ from dataclasses import dataclass
 from typing import Any, Protocol, cast
 from uuid import UUID
 
+from redis.exceptions import ConnectionError as RedisConnectionError
+
 from app.config import settings
 from app.db.engine import async_session_factory
 from app.repositories.sql_attachment_repository import SqlAttachmentRepository
@@ -101,14 +103,17 @@ def _redis_client() -> Any:
     """创建 Worker 侧短期状态客户端。"""
     from redis import Redis
 
-    return Redis.from_url(settings.redis_url, decode_responses=True)
+    try:
+        return Redis.from_url(settings.redis_url, decode_responses=True)
+    except Exception as exc:
+        raise RuntimeError(sanitize_error(f"Redis 连接失败：{exc}")) from exc
 
 
 @celery_app.task(  # type: ignore[untyped-decorator]
     name="financial_review.attachment_parse",
     bind=True,
     max_retries=3,
-    autoretry_for=(RuntimeError, ConnectionError, OSError),
+    autoretry_for=(RuntimeError, ConnectionError, RedisConnectionError, OSError),
     retry_backoff=True,
 )
 def run_attachment_parse(
@@ -127,6 +132,15 @@ def run_attachment_parse(
     if cached:
         cached_payload = cast(dict[str, str], json.loads(cached))
         if cached_payload.get("status") in {"succeeded", "manual_review"}:
+            logger.info(
+                "attachment_parse_terminal",
+                extra={
+                    "task_id": attachment_id,
+                    "document_version_id": document_version_id,
+                    "request_id": idempotency_key,
+                    "status": cached_payload["status"],
+                },
+            )
             return cached_payload
     if _attachment_state_port is None:
         raise RuntimeError("附件状态仓储尚未配置")

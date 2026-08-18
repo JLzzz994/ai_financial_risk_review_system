@@ -6,6 +6,8 @@ import logging
 from typing import Any, Protocol
 from uuid import UUID
 
+from redis.exceptions import ConnectionError as RedisConnectionError
+
 from app.config import settings
 from app.tasks.celery_app import celery_app
 from app.tasks.safety import sanitize_error
@@ -33,13 +35,16 @@ def _redis_client() -> Any:
     """创建 Worker 侧 Redis 客户端。"""
     from redis import Redis
 
-    return Redis.from_url(settings.redis_url, decode_responses=True)
+    try:
+        return Redis.from_url(settings.redis_url, decode_responses=True)
+    except Exception as exc:
+        raise RuntimeError(sanitize_error(f"Redis 连接失败：{exc}")) from exc
 
 
 @celery_app.task(  # type: ignore[untyped-decorator]
     name="financial_review.report_export",
     bind=True,
-    autoretry_for=(RuntimeError, ConnectionError, OSError),
+    autoretry_for=(RuntimeError, ConnectionError, RedisConnectionError, OSError),
     retry_backoff=True,
     max_retries=3,
 )
@@ -60,7 +65,10 @@ def run_report_export(
     raw = client.get(key)
     if raw is None:
         raise ValueError("导出任务不存在")
-    payload = json.loads(raw)
+    try:
+        payload = json.loads(raw)
+    except Exception as exc:
+        raise RuntimeError(sanitize_error(f"报告导出状态损坏：{exc}")) from exc
     if payload.get("status") in {"succeeded", "manual_review"}:
         return {"export_task_id": export_task_id, "status": payload["status"]}
     try:
