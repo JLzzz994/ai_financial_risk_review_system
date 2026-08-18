@@ -10,7 +10,9 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from app.config import settings
 from app.db.engine import get_session
 from app.dependencies.auth import get_current_principal
+from app.errors import AppError
 from app.repositories.sql_support_repository import SqlSupportRepository
+from app.schemas.auth import PermissionCode, Principal
 from app.schemas.support import (
     AmountComparisonResponse,
     MarketPricePatch,
@@ -25,6 +27,7 @@ from app.schemas.support import (
     SystemParameterPatch,
     SystemParameterResponse,
 )
+from app.services.permission_service import authorize
 
 router = APIRouter(prefix="/api/v1", tags=["support"])
 repository = SqlSupportRepository()
@@ -87,6 +90,23 @@ _SYSTEM_PARAMETER_DESCRIPTIONS = {
     "export.max_rows": "审计/报告导出最大行数",
     "rag_rule_version": "当前风险规则版本",
 }
+_CONFIG_IDEMPOTENCY: dict[
+    tuple[str, str], RuleItemResponse | SupplierRuleResponse | SystemParameterResponse
+] = {}
+
+
+async def _authorize_config(authorization: str | None) -> Principal:
+    """认证并校验配置管理权限。"""
+    principal = await get_current_principal(authorization)
+    authorize(principal, PermissionCode.CONFIG_MANAGE, is_configuration_resource=True)
+    return principal
+
+
+def _require_idempotency(key: str | None) -> str:
+    """校验配置写操作的幂等键。"""
+    if not key or not key.strip():
+        raise AppError("missing_idempotency_key", "配置变更必须提供 Idempotency-Key", 400)
+    return key.strip()
 
 
 @router.get("/documents/{document_id}/amount-comparison", response_model=AmountComparisonResponse)
@@ -217,19 +237,26 @@ async def publish_rule(
     rule_id: str,
     payload: RulePublishRequest,
     authorization: str | None = Header(default=None),
+    idempotency_key: str | None = Header(default=None, alias="Idempotency-Key"),
 ) -> RuleItemResponse:
     """由人工配置接口发布规则，审批和 Agent 不得调用该状态变更。"""
-    await get_current_principal(authorization)
+    await _authorize_config(authorization)
+    key = _require_idempotency(idempotency_key)
+    cache_key = (f"rule.publish:{rule_id}", key)
+    cached = _CONFIG_IDEMPOTENCY.get(cache_key)
+    if isinstance(cached, RuleItemResponse):
+        return cached
     rule = next((item for item in _RULES if item.rule_id == rule_id), None)
     if rule is None:
-        raise HTTPException(status_code=404, detail="规则不存在")
+        raise AppError("not_found", "规则不存在", 404)
     rule.status = "published"
     try:
         version = float(rule.rule_version.removeprefix("v")) + 0.1
         rule.rule_version = f"v{version:.1f}"
     except ValueError as exc:
-        raise HTTPException(status_code=409, detail="规则版本格式不正确") from exc
+        raise AppError("conflict", "规则版本格式不正确", 409) from exc
     rule.updated_at = datetime.now(UTC)
+    _CONFIG_IDEMPOTENCY[cache_key] = rule
     return rule
 
 
@@ -257,18 +284,25 @@ async def update_supplier_rule(
     rule_id: str,
     payload: SupplierRulePatch,
     authorization: str | None = Header(default=None),
+    idempotency_key: str | None = Header(default=None, alias="Idempotency-Key"),
 ) -> SupplierRuleResponse:
     """更新供应商规则启用状态和阈值。"""
-    await get_current_principal(authorization)
+    await _authorize_config(authorization)
+    key = _require_idempotency(idempotency_key)
+    cache_key = (f"supplier-rule.patch:{rule_id}", key)
+    cached = _CONFIG_IDEMPOTENCY.get(cache_key)
+    if isinstance(cached, SupplierRuleResponse):
+        return cached
     item = next((rule for rule in _SUPPLIER_RULES if rule.id == rule_id), None)
     if item is None:
-        raise HTTPException(status_code=404, detail="供应商规则不存在")
+        raise AppError("not_found", "供应商规则不存在", 404)
     if payload.enabled is None and payload.threshold is None:
-        raise HTTPException(status_code=409, detail="没有需要更新的字段")
+        raise AppError("conflict", "没有需要更新的字段", 409)
     if payload.enabled is not None:
         item.enabled = payload.enabled
     if payload.threshold is not None:
         item.threshold = payload.threshold
+    _CONFIG_IDEMPOTENCY[cache_key] = item
     return item
 
 
@@ -295,17 +329,25 @@ async def update_system_parameter(
     key: str,
     payload: SystemParameterPatch,
     authorization: str | None = Header(default=None),
+    idempotency_key: str | None = Header(default=None, alias="Idempotency-Key"),
 ) -> SystemParameterResponse:
     """更新已登记的系统参数；未知参数明确返回 404。"""
-    await get_current_principal(authorization)
+    await _authorize_config(authorization)
+    key_value = _require_idempotency(idempotency_key)
+    cache_key = (f"system-parameter.patch:{key}", key_value)
+    cached = _CONFIG_IDEMPOTENCY.get(cache_key)
+    if isinstance(cached, SystemParameterResponse):
+        return cached
     if key not in _SYSTEM_PARAMETERS:
-        raise HTTPException(status_code=404, detail="系统参数不存在")
+        raise AppError("not_found", "系统参数不存在", 404)
     _SYSTEM_PARAMETERS[key] = payload.value
     if key == "rag_rule_version":
         settings.rag_rule_version = payload.value
-    return SystemParameterResponse(
+    response = SystemParameterResponse(
         key=key,
         value=payload.value,
         description=_SYSTEM_PARAMETER_DESCRIPTIONS[key],
         updated_at=datetime.now(UTC),
     )
+    _CONFIG_IDEMPOTENCY[cache_key] = response
+    return response

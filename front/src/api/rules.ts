@@ -47,6 +47,7 @@ export function patchSupplierRule(id: string, enabled: boolean, threshold?: stri
   return apiFetch<SupplierRuleItem>(`/supplier-risk-rules/${id}`, {
     method: 'PATCH',
     body: { enabled, threshold },
+    idempotencyKey: crypto.randomUUID(),
   })
 }
 
@@ -62,5 +63,9 @@ export function listSystemParameters(): Promise<SystemParameter[]> {
 }
 
 export function patchSystemParameter(key: string, value: string): Promise<SystemParameter> {
-  return apiFetch<SystemParameter>(`/system-parameters/${key}`, { method: 'PATCH', body: { value } })
+  return apiFetch<SystemParameter>(`/system-parameters/${key}`, {
+    method: 'PATCH',
+    body: { value },
+    idempotencyKey: crypto.randomUUID(),
+  })
 }
