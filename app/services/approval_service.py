@@ -4,6 +4,7 @@ from collections.abc import Sequence
 from dataclasses import dataclass
 from uuid import UUID, uuid4
 
+from app.logging_config import get_logger, log_boundary
 from app.schemas.approval import (
     ApprovalDecisionCommand,
     ApprovalDecisionRecord,
@@ -11,6 +12,8 @@ from app.schemas.approval import (
     DecisionCode,
 )
 from engines.approval.state_machine import ApprovalDecision, next_document_status
+
+logger = get_logger(__name__)
 
 
 @dataclass
@@ -104,6 +107,13 @@ class ApprovalService:
         idempotency_key: str,
     ) -> ApprovalDecisionResponse:
         """执行审批决定的同步核心，供兼容入口和异步入口共用。"""
+        log_boundary(
+            logger,
+            "decide",
+            "enter",
+            task_id=str(task_id),
+            actor_id=str(actor),
+        )
         sequence = self._task_to_sequence.get(task_id)
         if sequence is None:
             raise PermissionError("只有当前节点分配的审批人可以提交决定")
@@ -153,6 +163,14 @@ class ApprovalService:
             record=record,
         )
         self._idempotent_results[(task_id, idempotency_key)] = response
+        log_boundary(
+            logger,
+            "decide",
+            "exit",
+            task_id=str(task_id),
+            actor_id=str(actor),
+            status=status,
+        )
         return response
 
     def submit_decision(
@@ -161,10 +179,18 @@ class ApprovalService:
         """校验审批人、幂等键和任务状态后保存不可变决定。"""
         if not is_last_node and task_id not in self._task_to_sequence:
             raise ValueError("审批任务不存在")
-        return self._decide(
-            task_id,
-            command.approver_id,
-            command.decision,
-            command.comment,
-            command.idempotency_key,
-        )
+        try:
+            return self._decide(
+                task_id,
+                command.approver_id,
+                command.decision,
+                command.comment,
+                command.idempotency_key,
+            )
+        except Exception:
+            logger.exception(
+                "approval operation=decide status=failed task_id=%s actor_id=%s",
+                task_id,
+                command.approver_id,
+            )
+            raise
