@@ -1,6 +1,7 @@
 """附件解析任务的 Celery Worker 入口。"""
 
 import json
+import logging
 from dataclasses import dataclass
 from typing import Any, Protocol, cast
 from uuid import UUID
@@ -8,6 +9,8 @@ from uuid import UUID
 from app.config import settings
 from app.tasks.celery_app import celery_app
 from app.tasks.safety import sanitize_error
+
+logger = logging.getLogger(__name__)
 
 
 @dataclass(frozen=True, slots=True)
@@ -116,6 +119,15 @@ def run_attachment_parse(
             error=str(exc),
         )
         _attachment_state_port.save(failed)
+        logger.warning(
+            "attachment_parse_state",
+            extra={
+                "task_id": attachment_id,
+                "document_version_id": document_version_id,
+                "request_id": idempotency_key,
+                "status": failed.status,
+            },
+        )
         payload = {
             "attachment_id": attachment_id,
             "status": failed.status,
