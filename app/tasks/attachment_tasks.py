@@ -4,8 +4,9 @@ import asyncio
 import json
 import logging
 from dataclasses import dataclass
+from datetime import UTC, datetime
 from typing import Any, Protocol, cast
-from uuid import UUID
+from uuid import UUID, uuid4
 
 from redis.exceptions import ConnectionError as RedisConnectionError
 
@@ -14,6 +15,7 @@ from app.db.engine import async_session_factory
 from app.repositories.sql_attachment_repository import SqlAttachmentRepository
 from app.tasks.celery_app import celery_app
 from app.tasks.safety import sanitize_error
+from engines.ocr.contracts import OcrAdapter, OcrRequest, OcrResult
 
 logger = logging.getLogger(__name__)
 
@@ -39,6 +41,9 @@ class AttachmentParseState:
     status: str = "queued"
     retry_count: int = 0
     error_message: str | None = None
+    page_count: int | None = None
+    confidence: float | None = None
+    recognized_text: str | None = None
 
 
 class AttachmentStatePort(Protocol):
@@ -47,12 +52,28 @@ class AttachmentStatePort(Protocol):
     def save(self, state: AttachmentParseState) -> None:
         """保存 parsing/failed/manual_review 状态。"""
 
+    def get_request(self, attachment_id: UUID, document_version_id: UUID) -> OcrRequest:
+        """读取附件对象键，组装 OCR 请求。"""
+
 
 class SqlAttachmentStatePort:
     """生产附件事实状态端口，回写 PostgreSQL 附件元数据。"""
 
     def save(self, state: AttachmentParseState) -> None:
         asyncio.run(self._save(state))
+
+    def get_request(self, attachment_id: UUID, document_version_id: UUID) -> OcrRequest:
+        """从 PostgreSQL 获取对象键，禁止 Worker 自行拼接物理路径。"""
+        return asyncio.run(self._get_request(attachment_id, document_version_id))
+
+    async def _get_request(self, attachment_id: UUID, document_version_id: UUID) -> OcrRequest:
+        """查询附件版本并转换为 OCR 窄契约。"""
+        repository = SqlAttachmentRepository()
+        async with async_session_factory() as session:
+            record = await repository.get(session, attachment_id)
+            if record is None or record.document_version_id != document_version_id:
+                raise ValueError("附件版本不存在")
+            return OcrRequest(attachment_id, record.object_key)
 
     async def _save(self, state: AttachmentParseState) -> None:
         repository = SqlAttachmentRepository()
@@ -65,15 +86,41 @@ class SqlAttachmentStatePort:
             await session.rollback()
             async with session.begin():
                 await repository.save(session, record)
+                if state.status == "succeeded" and state.recognized_text is not None:
+                    from app.repositories.sql_attachment_repository import ParseResultRecord
+
+                    await repository.append_parse_result(
+                        session,
+                        ParseResultRecord(
+                            result_id=uuid4(),
+                            attachment_id=state.attachment_id,
+                            document_version_id=state.document_version_id,
+                            document_category="unknown",
+                            full_text=state.recognized_text,
+                            fields={},
+                            evidence_positions={"page_count": state.page_count or 0},
+                            confidence=state.confidence,
+                            provider_name="paddleocr",
+                            provider_version="3.x",
+                            created_at=datetime.now(UTC),
+                        ),
+                    )
 
 
 _attachment_state_port: AttachmentStatePort | None = SqlAttachmentStatePort()
+_ocr_adapter: OcrAdapter | None = None
 
 
 def set_attachment_state_port(port: AttachmentStatePort | None) -> None:
     """注入附件状态事实仓储；未注入时任务明确失败。"""
     global _attachment_state_port
     _attachment_state_port = port
+
+
+def set_attachment_ocr_adapter(adapter: OcrAdapter | None) -> None:
+    """注入 OCR 适配器；生产启动组装时注册 PaddleOCR，测试注入 Fake。"""
+    global _ocr_adapter
+    _ocr_adapter = adapter
 
 
 def attachment_parse_state(
@@ -97,6 +144,23 @@ def attachment_parse_state(
         min(attempt, 3),
         sanitize_error(error) if error else None,
     )
+
+
+def _get_ocr_adapter() -> OcrAdapter:
+    """从应用 ProviderRegistry 获取默认 PaddleOCR，避免任务直接依赖 SDK。"""
+    if _ocr_adapter is not None:
+        return _ocr_adapter
+    from app.providers import build_provider_registry
+    from engines.common.minio_storage import MinioFileStorage
+
+    storage = MinioFileStorage.from_settings(
+        settings.minio_endpoint,
+        settings.minio_access_key,
+        settings.minio_secret_key,
+        settings.minio_bucket,
+        settings.minio_secure,
+    )
+    return cast(OcrAdapter, build_provider_registry(storage).get("ocr", "paddleocr"))
 
 
 def _redis_client() -> Any:
@@ -184,7 +248,38 @@ def run_attachment_parse(
             )
             return cached_payload
     try:
-        raise RuntimeError("OCR 解析适配器尚未配置")
+        request = port.get_request(attachment_uuid, version_uuid)
+        result = asyncio.run(_ocr_adapter_result(_get_ocr_adapter(), request))
+        succeeded = AttachmentParseState(
+            attachment_uuid,
+            version_uuid,
+            "succeeded",
+            attempt,
+            None,
+            result.page_count,
+            result.confidence,
+            result.text,
+        )
+        port.save(succeeded)
+        payload = {
+            "attachment_id": attachment_id,
+            "status": "succeeded",
+            "page_count": str(result.page_count),
+            "confidence": str(result.confidence),
+        }
+        client.set(key, json.dumps(payload, ensure_ascii=False), ex=86400)
+        logger.info(
+            "attachment_parse_succeeded",
+            extra={
+                "task_id": attachment_id,
+                "document_version_id": document_version_id,
+                "request_id": idempotency_key,
+                "page_count": result.page_count,
+                "confidence": result.confidence,
+                "provider": "paddleocr",
+            },
+        )
+        return payload
     except Exception as exc:
         failed = attachment_parse_state(
             attachment_uuid,
@@ -212,6 +307,11 @@ def run_attachment_parse(
         if attempt < 3:
             raise self.retry(exc=exc, countdown=2**attempt) from exc
         return payload
+
+
+async def _ocr_adapter_result(adapter: OcrAdapter, request: OcrRequest) -> OcrResult:
+    """执行 OCR 协议调用，保持 Worker 与 SDK 解耦。"""
+    return await adapter.recognize(request)
 
 
 def parse_attachment_task(
@@ -257,4 +357,5 @@ __all__ = [
     "parse_attachment_task",
     "run_attachment_parse",
     "set_attachment_state_port",
+    "set_attachment_ocr_adapter",
 ]
