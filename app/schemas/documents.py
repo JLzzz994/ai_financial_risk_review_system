@@ -4,11 +4,13 @@ from datetime import date
 from decimal import Decimal
 from uuid import UUID
 
-from pydantic import BaseModel, Field
+from pydantic import BaseModel, Field, model_validator
+
+from engines.document_types.contracts import DocumentType, DocumentTypePayload
 
 
 class CreateDocumentCommand(BaseModel):
-    """创建费用报销草稿。"""
+    """创建五类单据草稿并保留费用报销兼容字段。"""
 
     applicant_id: UUID
     applicant_department: str = Field(min_length=1, max_length=128)
@@ -17,6 +19,18 @@ class CreateDocumentCommand(BaseModel):
     apply_date: date
     reason_text: str = Field(min_length=1, max_length=2000)
     line_items: list["DocumentLineItemCommand"] = Field(default_factory=list)
+    document_type: DocumentType = DocumentType.EXPENSE_REIMBURSEMENT
+    document_payload: DocumentTypePayload | None = None
+
+    @model_validator(mode="after")
+    def validate_payload_type(self) -> "CreateDocumentCommand":
+        """确保专属 payload 的类型与命令单据类型一致。"""
+        if (
+            self.document_payload is not None
+            and self.document_payload.document_type != self.document_type
+        ):
+            raise ValueError("单据类型与专属载荷类型不一致")
+        return self
 
 
 class DocumentLineItemCommand(BaseModel):
@@ -54,7 +68,7 @@ class DocumentResponse(BaseModel):
 
 
 class UpdateDocumentCommand(BaseModel):
-    """草稿或退回单据编辑请求。"""
+    """草稿或退回单据编辑请求，支持五类单据专属载荷。"""
 
     applicant_department: str | None = Field(default=None, max_length=128)
     budget_department: str | None = Field(default=None, max_length=128)
@@ -66,7 +80,20 @@ class UpdateDocumentCommand(BaseModel):
     payee_account: str | None = Field(default=None, max_length=128)
     reason_text: str | None = Field(default=None, max_length=2000)
     line_items: list["DocumentLineItemCommand"] | None = None
+    document_type: DocumentType | None = None
+    document_payload: DocumentTypePayload | None = None
     expected_state_version: int = Field(default=1, ge=1)
+
+    @model_validator(mode="after")
+    def validate_payload_type(self) -> "UpdateDocumentCommand":
+        """确保同时提供类型和 payload 时两者保持一致。"""
+        if (
+            self.document_type is not None
+            and self.document_payload is not None
+            and self.document_payload.document_type != self.document_type
+        ):
+            raise ValueError("单据类型与专属载荷类型不一致")
+        return self
 
 
 class DocumentActionCommand(BaseModel):

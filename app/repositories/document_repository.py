@@ -5,6 +5,7 @@ from datetime import UTC, date, datetime
 from decimal import Decimal
 from uuid import UUID, uuid4
 
+from engines.document_types.contracts import DocumentType
 from engines.expense_reimbursement.contracts import ExpenseLine
 
 
@@ -24,6 +25,7 @@ class StoredDocument:
     current_version: int = 0
     state_version: int = 1
     line_items: tuple[ExpenseLine, ...] = ()
+    document_type: str = DocumentType.EXPENSE_REIMBURSEMENT.value
 
 
 @dataclass(frozen=True)
@@ -44,12 +46,19 @@ class InMemoryDocumentRepository:
         """初始化空仓储。"""
         self.documents: dict[UUID, StoredDocument] = {}
         self.versions: list[StoredVersion] = []
-        self._sequence = 0
+        self._sequences: dict[DocumentType, int] = {}
 
-    def next_document_no(self) -> str:
-        """生成单调递增单据编号。"""
-        self._sequence += 1
-        return f"EXP-{self._sequence:08d}"
+    def next_document_no(self, document_type: DocumentType) -> str:
+        """按单据类型生成仅供内存兼容服务使用的递增编号。"""
+        self._sequences[document_type] = self._sequences.get(document_type, 0) + 1
+        prefix = {
+            DocumentType.PUBLIC_PAYMENT: "PUB",
+            DocumentType.PREPAYMENT: "PRE",
+            DocumentType.BATCH_PAYMENT: "BAT",
+            DocumentType.EXPENSE_REIMBURSEMENT: "EXP",
+            DocumentType.TRAVEL_REIMBURSEMENT: "TRV",
+        }[document_type]
+        return f"{prefix}-{self._sequences[document_type]:08d}"
 
     def add_version(self, document: StoredDocument, actor_id: UUID) -> StoredVersion:
         """创建并追加不可变版本。"""

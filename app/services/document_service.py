@@ -22,7 +22,7 @@ class DocumentService:
         self.repository = repository or InMemoryDocumentRepository()
 
     def create_draft(self, command: CreateDocumentCommand) -> DocumentResponse:
-        """创建费用报销草稿，MVP仅支持人民币。"""
+        """创建五类单据草稿并在内存兼容服务中回显实际类型。"""
         log_boundary(logger, "create_draft", "enter", applicant_id=str(command.applicant_id))
         try:
             if command.currency != "CNY":
@@ -35,7 +35,7 @@ class DocumentService:
                 validate_expense_total(command.total_amount, line_items, command.currency)
             document = StoredDocument(
                 uuid4(),
-                self.repository.next_document_no(),
+                self.repository.next_document_no(command.document_type),
                 command.applicant_id,
                 command.applicant_department,
                 command.total_amount,
@@ -43,6 +43,7 @@ class DocumentService:
                 command.apply_date,
                 command.reason_text,
                 line_items=line_items,
+                document_type=command.document_type.value,
             )
             self.repository.documents[document.document_id] = document
             response = self._response(document)
@@ -129,4 +130,5 @@ class DocumentService:
             document_status=document.status,
             current_version=document.current_version,
             state_version=document.state_version,
+            document_type=document.document_type,
         )

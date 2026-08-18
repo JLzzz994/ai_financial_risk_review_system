@@ -4,6 +4,7 @@ from collections.abc import Sequence
 from typing import Any
 from uuid import UUID
 
+from pydantic import ValidationError
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.errors import AuthorizationError
@@ -25,6 +26,12 @@ from app.schemas.documents import (
 )
 from app.services.persistent_analysis_service import PersistentAnalysisService
 from app.services.persistent_workflow_service import PersistentWorkflowService
+from engines.document_types.contracts import (
+    DocumentType,
+    DocumentTypePayload,
+    ExpenseReimbursementPayload,
+    validate_document_type_payload,
+)
 from engines.expense_reimbursement.contracts import ExpenseLine
 from engines.expense_reimbursement.validators import validate_expense_total
 
@@ -49,14 +56,15 @@ class PersistentDocumentService:
         actor: Principal,
         command: CreateDocumentCommand,
     ) -> DocumentResponse:
-        """创建费用报销草稿，草稿明细暂存载荷，提交时固化到明细表。"""
+        """创建五类单据草稿，并保存规范化的专属 payload。"""
         self._assert_applicant(actor, command.applicant_id)
-        lines = self._to_domain_lines(command.line_items)
-        if lines:
-            validate_expense_total(command.total_amount, lines, command.currency)
-        payload: dict[str, Any] = {
-            "line_items": [item.model_dump(mode="json") for item in command.line_items]
-        }
+        payload = self._validate_command_payload(
+            command.document_type,
+            command.document_payload,
+            command.line_items,
+            command.total_amount,
+            command.currency,
+        )
         async with session.begin():
             document = await self.repository.create_draft(
                 session,
@@ -66,6 +74,7 @@ class PersistentDocumentService:
                 currency=command.currency,
                 apply_date=command.apply_date,
                 reason_text=command.reason_text,
+                document_type=command.document_type.value,
                 document_payload=payload,
             )
         return self.repository.to_response(document)
@@ -111,13 +120,26 @@ class PersistentDocumentService:
         document_id: UUID,
         command: UpdateDocumentCommand,
     ) -> DocumentResponse:
-        """更新本人草稿或退回单据。"""
+        """更新本人草稿或退回单据，并校验其专属 payload。"""
         async with session.begin():
             document = await self.repository.get(session, document_id)
             if document is None:
                 raise ValueError("单据不存在")
             self._assert_applicant(actor, document.applicant_id)
-            updated = await self.repository.update_draft(session, document_id, command)
+            if command.currency is not None and command.currency != "CNY":
+                raise ValueError("MVP 仅支持 CNY")
+            document_type = command.document_type or DocumentType(document.document_type)
+            payload = self._resolve_update_payload(document, command, document_type)
+            updates: dict[str, Any] = {}
+            if command.document_type is not None:
+                updates["document_type"] = document_type
+            if (
+                command.document_payload is not None
+                or document_type.value != document.document_type
+            ):
+                updates["document_payload"] = payload
+            updated_command = command.model_copy(update=updates)
+            updated = await self.repository.update_draft(session, document_id, updated_command)
         return self.repository.to_response(updated)
 
     async def copy(
@@ -207,7 +229,7 @@ class PersistentDocumentService:
         expected_state_version: int,
         idempotency_key: str | None = None,
     ) -> DocumentVersionResponse:
-        """提交草稿，固化版本快照并落库版本明细。"""
+        """提交草稿，校验专属 payload、固化版本快照并落库版本明细。"""
         async with session.begin():
             document = await self.repository.get(session, document_id)
             if document is None:
@@ -217,10 +239,8 @@ class PersistentDocumentService:
                 raise ValueError("单据已被其他请求修改")
             if document.document_status not in {"draft", "returned"}:
                 raise ValueError("当前状态不可提交")
-            line_commands = self._payload_lines(document.document_payload)
-            lines = self._to_domain_lines(line_commands)
-            validate_expense_total(document.total_amount, lines, document.currency)
-            snapshot = self._snapshot(document, line_commands)
+            payload, line_commands = self._validate_stored_payload(document)
+            snapshot = self._snapshot(document, payload, line_commands)
             version = await self.repository.create_version(
                 session, document, actor.user_id, snapshot
             )
@@ -248,7 +268,7 @@ class PersistentDocumentService:
             analysis_task_id = analysis_task.task_id
             await self.workflow_service.create_instance_for_document(
                 session,
-                "expense_reimbursement",
+                document.document_type,
                 version.document_id,
                 version.id,
             )
@@ -282,9 +302,13 @@ class PersistentDocumentService:
         return [DocumentLineItemCommand.model_validate(item) for item in raw_items]
 
     @staticmethod
-    def _snapshot(document: Any, line_items: Sequence[DocumentLineItemCommand]) -> dict[str, Any]:
-        """构造不可变版本快照，不保存对象存储绝对路径。"""
-        return {
+    def _snapshot(
+        document: Any,
+        payload: dict[str, Any],
+        line_items: Sequence[DocumentLineItemCommand],
+    ) -> dict[str, Any]:
+        """构造包含类型和规范化 payload 的不可变版本快照。"""
+        snapshot = {
             "document_type": document.document_type,
             "document_no": document.document_no,
             "applicant_id": str(document.applicant_id),
@@ -294,7 +318,111 @@ class PersistentDocumentService:
             "apply_date": document.apply_date.isoformat(),
             "reason_text": document.reason_text,
             "line_items": [item.model_dump(mode="json") for item in line_items],
+            "document_payload": payload,
         }
+        return snapshot
+
+    @classmethod
+    def _validate_command_payload(
+        cls,
+        document_type: DocumentType,
+        document_payload: DocumentTypePayload | None,
+        line_items: Sequence[DocumentLineItemCommand],
+        total_amount: Any,
+        currency: str,
+    ) -> dict[str, Any]:
+        """统一校验创建或编辑命令携带的单据类型与 payload。"""
+        if currency != "CNY":
+            raise ValueError("MVP 仅支持 CNY")
+        if document_type == DocumentType.EXPENSE_REIMBURSEMENT:
+            if document_payload is not None:
+                normalized = cls._validate_specialized_payload(
+                    document_type, document_payload.model_dump(mode="json")
+                )
+                return normalized.model_dump(mode="json")
+            lines = cls._to_domain_lines(line_items)
+            if lines:
+                validate_expense_total(total_amount, lines, currency)
+            return {"line_items": [item.model_dump(mode="json") for item in line_items]}
+        if document_payload is None:
+            return {}
+        normalized = cls._validate_specialized_payload(
+            document_type, document_payload.model_dump(mode="json")
+        )
+        return normalized.model_dump(mode="json")
+
+    @classmethod
+    def _resolve_update_payload(
+        cls,
+        document: Any,
+        command: UpdateDocumentCommand,
+        document_type: DocumentType,
+    ) -> DocumentTypePayload | None:
+        """统一解析编辑后的 payload，避免复用不同类型的旧草稿字段。"""
+        if command.document_payload is not None:
+            cls._validate_command_payload(
+                document_type,
+                command.document_payload,
+                command.line_items or (),
+                command.total_amount or document.total_amount,
+                command.currency or document.currency,
+            )
+            return command.document_payload
+        if (
+            command.document_type is not None
+            and command.document_type.value != document.document_type
+        ):
+            return None
+        if document_type == DocumentType.EXPENSE_REIMBURSEMENT and command.line_items is not None:
+            cls._validate_command_payload(
+                document_type,
+                None,
+                command.line_items,
+                command.total_amount or document.total_amount,
+                command.currency or document.currency,
+            )
+        return None
+
+    @classmethod
+    def _validate_stored_payload(
+        cls, document: Any
+    ) -> tuple[dict[str, Any], list[DocumentLineItemCommand]]:
+        """提交前按实际类型复验草稿 payload 并恢复费用明细。"""
+        if document.currency != "CNY":
+            raise ValueError("MVP 仅支持 CNY")
+        document_type = DocumentType(document.document_type)
+        payload = dict(document.document_payload)
+        if document_type != DocumentType.EXPENSE_REIMBURSEMENT:
+            normalized = cls._validate_specialized_payload(document_type, payload)
+            return normalized.model_dump(mode="json"), []
+        if "expense_details" in payload:
+            normalized = cls._validate_specialized_payload(document_type, payload)
+            if not isinstance(normalized, ExpenseReimbursementPayload):
+                raise ValueError("费用报销专属载荷类型不正确")
+            line_items = [
+                DocumentLineItemCommand(
+                    expense_item=item.expense_item,
+                    expense_date=item.consumption_date,
+                    amount=item.reimbursement_amount,
+                    currency=item.currency,
+                )
+                for item in normalized.expense_details
+            ]
+            return normalized.model_dump(mode="json"), line_items
+        line_items = cls._payload_lines(payload)
+        lines = cls._to_domain_lines(line_items)
+        validate_expense_total(document.total_amount, lines, document.currency)
+        return {"line_items": [item.model_dump(mode="json") for item in line_items]}, line_items
+
+    @staticmethod
+    def _validate_specialized_payload(
+        document_type: DocumentType, payload: dict[str, Any]
+    ) -> DocumentTypePayload:
+        """将 Pydantic 专属字段错误转换为清晰的业务校验错误。"""
+        try:
+            return validate_document_type_payload(document_type, payload)
+        except ValidationError as exc:
+            raise ValueError("单据专属载荷不合法") from exc
 
     @staticmethod
     def _to_response(document: Any) -> DocumentResponse:

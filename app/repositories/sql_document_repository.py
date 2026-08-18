@@ -21,6 +21,7 @@ from app.schemas.documents import (
     DocumentResponse,
     UpdateDocumentCommand,
 )
+from engines.document_types.contracts import DocumentType
 
 
 @dataclass(frozen=True, slots=True)
@@ -47,13 +48,15 @@ class SqlDocumentRepository:
         currency: str,
         apply_date: date,
         reason_text: str,
+        document_type: str,
         document_payload: Mapping[str, Any],
     ) -> FinancialDocument:
-        """创建草稿并在数据库事务中生成当天唯一单据编号。"""
-        document_no = await self._next_document_no(session, apply_date)
+        """创建草稿并按实际类型生成当天唯一单据编号。"""
+        normalized_type = DocumentType(document_type)
+        document_no = await self._next_document_no(session, normalized_type.value, apply_date)
         document = FinancialDocument(
             id=uuid4(),
-            document_type="expense_reimbursement",
+            document_type=normalized_type.value,
             document_no=document_no,
             applicant_id=applicant_id,
             applicant_department=applicant_department,
@@ -123,7 +126,7 @@ class SqlDocumentRepository:
         document_id: UUID,
         command: UpdateDocumentCommand,
     ) -> FinancialDocument:
-        """更新草稿字段和 JSON 中的明细，提交时再固化关系明细。"""
+        """更新草稿字段、类型和 JSON payload，提交时再固化关系明细。"""
         document = await session.scalar(
             select(FinancialDocument)
             .where(FinancialDocument.id == document_id)
@@ -135,9 +138,12 @@ class SqlDocumentRepository:
             raise ValueError("单据已被其他请求修改")
         if document.document_status not in {"draft", "returned"}:
             raise ValueError("当前状态不可编辑")
+        previous_document_type = document.document_type
         values = command.model_dump(exclude_unset=True)
         values.pop("expected_state_version", None)
         values.pop("line_items", None)
+        values.pop("document_type", None)
+        values.pop("document_payload", None)
         line_items = command.line_items
         for field in (
             "applicant_department",
@@ -153,6 +159,18 @@ class SqlDocumentRepository:
             if field in values:
                 setattr(document, field, values[field])
         payload = deepcopy(document.document_payload)
+        if command.document_type is not None:
+            document.document_type = command.document_type.value
+            if document.document_type != previous_document_type:
+                document.document_no = await self._next_document_no(
+                    session, document.document_type, document.apply_date
+                )
+        if "document_payload" in command.model_fields_set:
+            payload = (
+                command.document_payload.model_dump(mode="json")
+                if command.document_payload is not None
+                else {}
+            )
         if line_items is not None:
             payload["line_items"] = [
                 item.model_dump(mode="json")
@@ -175,7 +193,9 @@ class SqlDocumentRepository:
         document = FinancialDocument(
             id=uuid4(),
             document_type=source.document_type,
-            document_no=await self._next_document_no(session, source.apply_date),
+            document_no=await self._next_document_no(
+                session, source.document_type, source.apply_date
+            ),
             applicant_id=applicant_id,
             applicant_department=source.applicant_department,
             budget_department=source.budget_department,
@@ -339,20 +359,34 @@ class SqlDocumentRepository:
         ]
         await session.execute(document_line_items.insert(), rows)
 
-    async def _next_document_no(self, session: AsyncSession, apply_date: date) -> str:
-        """使用事务级 advisory lock 生成当天递增编号，避免并发重复。"""
+    async def _next_document_no(
+        self, session: AsyncSession, document_type: str, apply_date: date
+    ) -> str:
+        """按单据类型使用事务锁生成当天递增编号，避免并发重复。"""
+        normalized_type = DocumentType(document_type)
         date_key = apply_date.strftime("%Y%m%d")
-        lock_key = f"expense_reimbursement:{date_key}"
+        lock_key = f"{normalized_type.value}:{date_key}"
         await session.execute(
             text("SELECT pg_advisory_xact_lock(hashtext(:lock_key))"),
             {"lock_key": lock_key},
         )
         count_statement = select(func.count(FinancialDocument.id)).where(
-            FinancialDocument.document_type == "expense_reimbursement",
+            FinancialDocument.document_type == normalized_type.value,
             FinancialDocument.apply_date == apply_date,
         )
         count = int((await session.scalar(count_statement)) or 0)
-        return f"EXP-{date_key}-{count + 1:06d}"
+        return f"{self._document_no_prefix(normalized_type)}-{date_key}-{count + 1:06d}"
+
+    @staticmethod
+    def _document_no_prefix(document_type: DocumentType) -> str:
+        """返回五类单据各自稳定且可读的编号前缀。"""
+        return {
+            DocumentType.PUBLIC_PAYMENT: "PUB",
+            DocumentType.PREPAYMENT: "PRE",
+            DocumentType.BATCH_PAYMENT: "BAT",
+            DocumentType.EXPENSE_REIMBURSEMENT: "EXP",
+            DocumentType.TRAVEL_REIMBURSEMENT: "TRV",
+        }[document_type]
 
     async def _owned_document(
         self, session: AsyncSession, document_id: UUID, actor_id: UUID
