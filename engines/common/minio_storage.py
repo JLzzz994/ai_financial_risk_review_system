@@ -1,6 +1,9 @@
-"""MinIO 适配器契约；实际 SDK 接入通过构造注入，业务层不依赖 SDK。"""
+"""MinIO 适配器契约；业务层不依赖 MinIO SDK 类型。"""
 
 from collections.abc import Callable
+from importlib import import_module
+from io import BytesIO
+from typing import cast
 
 from engines.common.storage import StoredObject
 
@@ -21,6 +24,59 @@ class MinioFileStorage:
         self._getter = getter
         self._deleter = deleter
         self._presigner = presigner
+
+    @classmethod
+    def from_settings(
+        cls,
+        endpoint: str,
+        access_key: str,
+        secret_key: str,
+        bucket: str,
+        secure: bool = False,
+    ) -> "MinioFileStorage":
+        """使用环境配置创建 MinIO SDK 回调，业务服务仍只依赖 FileStorage。"""
+        try:
+            module = import_module("minio")
+        except ImportError as exc:
+            raise RuntimeError("MinIO 适配器依赖未安装") from exc
+        client = module.Minio(endpoint, access_key=access_key, secret_key=secret_key, secure=secure)
+
+        def putter(object_key: str, content: bytes, content_type: str) -> StoredObject:
+            client.put_object(
+                bucket,
+                object_key,
+                BytesIO(content),
+                len(content),
+                content_type=content_type,
+            )
+            return StoredObject(object_key, len(content), content_type)
+
+        def getter(object_key: str) -> bytes:
+            response = client.get_object(bucket, object_key)
+            try:
+                return cast(bytes, response.read())
+            finally:
+                response.close()
+                response.release_conn()
+
+        def deleter(object_key: str) -> None:
+            client.remove_object(bucket, object_key)
+
+        def presigner(object_key: str, expires_seconds: int) -> str:
+            from datetime import timedelta
+
+            return cast(str, client.presigned_get_object(
+                bucket,
+                object_key,
+                expires=timedelta(seconds=expires_seconds),
+            ))
+
+        return cls.with_callbacks(
+            putter,
+            getter=getter,
+            deleter=deleter,
+            presigner=presigner,
+        )
 
     @classmethod
     def with_callbacks(

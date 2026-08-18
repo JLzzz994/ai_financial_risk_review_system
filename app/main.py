@@ -8,6 +8,7 @@ from app.logging_config import configure_logging, get_logger, log_boundary
 from app.middleware.request_context import RequestContextMiddleware
 from app.routers.analysis import router as analysis_router
 from app.routers.approval import router as approval_router
+from app.routers.attachments import direct_router as direct_attachment_router
 from app.routers.attachments import router as attachment_router
 from app.routers.audit import router as audit_router
 from app.routers.auth import router as auth_router
@@ -26,6 +27,7 @@ app.add_exception_handler(Exception, unhandled_error_handler)
 app.include_router(auth_router)
 app.include_router(analysis_router)
 app.include_router(attachment_router)
+app.include_router(direct_attachment_router)
 app.include_router(session_router)
 app.include_router(risk_router)
 app.include_router(approval_router)
