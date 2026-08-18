@@ -41,6 +41,50 @@ def _redis_client() -> Any:
         raise RuntimeError(sanitize_error(f"Redis 连接失败：{exc}")) from exc
 
 
+def _final_report_failure(
+    export_task_id: str,
+    document_version_id: str,
+    request_id: str,
+    error: str,
+    client: Any | None = None,
+    key: str | None = None,
+) -> dict[str, str]:
+    """尽力保存报告终态；Redis 不可用时仍记录最终失败。"""
+    message = sanitize_error(error)
+    payload = {
+        "export_task_id": export_task_id,
+        "status": "manual_review",
+        "error_message": message,
+    }
+    if client is not None and key is not None:
+        try:
+            client.set(
+                key,
+                json.dumps(payload, ensure_ascii=False),
+                ex=settings.report_export_ttl_seconds,
+            )
+        except Exception as exc:
+            logger.error(
+                "report_export_final_state_unavailable",
+                extra={
+                    "task_id": export_task_id,
+                    "document_version_id": document_version_id,
+                    "request_id": request_id,
+                    "error": sanitize_error(str(exc)),
+                },
+            )
+    logger.error(
+        "report_export_manual_review",
+        extra={
+            "task_id": export_task_id,
+            "document_version_id": document_version_id,
+            "request_id": request_id,
+            "status": "manual_review",
+        },
+    )
+    return payload
+
+
 @celery_app.task(  # type: ignore[untyped-decorator]
     name="financial_review.report_export",
     bind=True,
@@ -60,14 +104,26 @@ def run_report_export(
     UUID(document_version_id)
     if export_format not in {"pdf", "xlsx"}:
         raise ValueError("导出格式不合法")
-    client = _redis_client()
     key = f"financial-review:report-export:{export_task_id}"
-    raw = client.get(key)
-    if raw is None:
-        raise ValueError("导出任务不存在")
+    request_key = request_id or export_task_id
+    try:
+        client = _redis_client()
+        raw = client.get(key)
+        if raw is None:
+            raise ValueError("导出任务不存在")
+    except Exception as exc:
+        if self.request.retries >= 3:
+            return _final_report_failure(
+                export_task_id, document_version_id, request_key, str(exc),
+            )
+        raise RuntimeError(sanitize_error(str(exc))) from exc
     try:
         payload = json.loads(raw)
     except Exception as exc:
+        if self.request.retries >= 3:
+            return _final_report_failure(
+                export_task_id, document_version_id, request_key, str(exc), client, key
+            )
         raise RuntimeError(sanitize_error(f"报告导出状态损坏：{exc}")) from exc
     if payload.get("status") in {"succeeded", "manual_review"}:
         return {"export_task_id": export_task_id, "status": payload["status"]}
