@@ -23,6 +23,8 @@ from app.schemas.documents import (
     DocumentVersionResponse,
     UpdateDocumentCommand,
 )
+from app.services.persistent_analysis_service import PersistentAnalysisService
+from app.services.persistent_workflow_service import PersistentWorkflowService
 from engines.expense_reimbursement.contracts import ExpenseLine
 from engines.expense_reimbursement.validators import validate_expense_total
 
@@ -30,9 +32,16 @@ from engines.expense_reimbursement.validators import validate_expense_total
 class PersistentDocumentService:
     """以 PostgreSQL 为事实源编排草稿、版本和明细。"""
 
-    def __init__(self, repository: SqlDocumentRepository | None = None) -> None:
+    def __init__(
+        self,
+        repository: SqlDocumentRepository | None = None,
+        analysis_service: PersistentAnalysisService | None = None,
+        workflow_service: PersistentWorkflowService | None = None,
+    ) -> None:
         """注入 SQL 仓储，便于测试替换。"""
         self.repository = repository or SqlDocumentRepository()
+        self.analysis_service = analysis_service or PersistentAnalysisService()
+        self.workflow_service = workflow_service or PersistentWorkflowService()
 
     async def create_draft(
         self,
@@ -196,6 +205,7 @@ class PersistentDocumentService:
         actor: Principal,
         document_id: UUID,
         expected_state_version: int,
+        idempotency_key: str | None = None,
     ) -> DocumentVersionResponse:
         """提交草稿，固化版本快照并落库版本明细。"""
         async with session.begin():
@@ -230,11 +240,26 @@ class PersistentDocumentService:
                 document_version_id=version.id,
                 line_items=records,
             )
+        analysis_task_id: UUID | None = None
+        if idempotency_key:
+            analysis_task = await self.analysis_service.start(
+                session, version.document_id, version.id, idempotency_key
+            )
+            analysis_task_id = analysis_task.task_id
+            await self.workflow_service.create_instance_for_document(
+                session,
+                "expense_reimbursement",
+                version.document_id,
+                version.id,
+            )
         return DocumentVersionResponse(
             version_id=version.id,
             document_id=version.document_id,
             version_no=version.version_no,
             created_by=version.created_by,
+            document_version_id=version.id,
+            analysis_task_id=analysis_task_id,
+            status="pending_review",
         )
 
     @staticmethod

@@ -9,6 +9,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.config import settings
 from app.repositories.sql_analysis_repository import SqlAnalysisTaskRepository
+from app.repositories.sql_risk_repository import SqlRiskRepository
 from app.schemas.analysis import (
     AnalysisEvent,
     AnalysisEventType,
@@ -78,6 +79,7 @@ class PersistentAnalysisService:
         """注入仓储和事件存储。"""
         self.repository = repository or SqlAnalysisTaskRepository()
         self.event_store = event_store or RedisAnalysisEventStore()
+        self.risk_repository = SqlRiskRepository()
 
     async def start(
         self,
@@ -156,6 +158,28 @@ class PersistentAnalysisService:
         if last_event_id < 0:
             raise ValueError("last_event_id 不能小于 0")
         return self.event_store.list_after(task_id, last_event_id)
+
+    async def list_findings(
+        self, session: AsyncSession, task_id: UUID
+    ) -> list[dict[str, object]]:
+        """按分析任务绑定的版本查询已落库风险项。"""
+        task = await self.repository.get(session, task_id)
+        if task is None:
+            raise ValueError("分析任务不存在")
+        findings = await self.risk_repository.list_by_version(session, task.document_version_id)
+        return [
+            {
+                "rule_code": finding.rule_code,
+                "risk_level": finding.level,
+                "status": finding.status,
+                "message": finding.message,
+                "evidence": finding.evidence.model_dump(mode="json")
+                if finding.evidence
+                else None,
+                "suggestion": finding.suggestion,
+            }
+            for finding in findings
+        ]
 
     def _append_event(
         self, task: AnalysisTaskResponse, event_type: AnalysisEventType, step: str, status: str

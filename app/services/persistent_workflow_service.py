@@ -64,5 +64,21 @@ class PersistentWorkflowService:
                 session, workflow_id, document_id, document_version_id
             )
 
+    async def create_instance_for_document(
+        self,
+        session: AsyncSession,
+        document_type: str,
+        document_id: UUID,
+        document_version_id: UUID,
+    ) -> UUID | None:
+        """按单据类型查找发布模板并创建实例；没有模板时返回空。"""
+        async with session.begin():
+            workflow_id = await self.repository.find_published_for_document(session, document_type)
+            if workflow_id is None:
+                return None
+            return await self.repository.create_instance(
+                session, workflow_id, document_id, document_version_id
+            )
+
 
 __all__ = ["PersistentWorkflowService"]

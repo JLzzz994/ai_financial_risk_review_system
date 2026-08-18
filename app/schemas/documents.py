@@ -122,4 +122,5 @@ class DocumentVersionResponse(BaseModel):
     version_no: int
     created_by: UUID
     document_version_id: UUID | None = None
+    analysis_task_id: UUID | None = None
     status: str | None = None

@@ -198,6 +198,25 @@ class SqlWorkflowRepository:
             )
         return instance_id
 
+    async def find_published_for_document(
+        self, session: AsyncSession, document_type: str
+    ) -> UUID | None:
+        """选择当前单据类型最新发布流程。"""
+        result = await session.execute(
+            select(approval_workflows.c.id)
+            .where(
+                approval_workflows.c.document_type == document_type,
+                approval_workflows.c.status == "published",
+            )
+            .order_by(
+                approval_workflows.c.version_no.desc(),
+                approval_workflows.c.updated_at.desc(),
+            )
+            .limit(1)
+        )
+        value = result.scalar_one_or_none()
+        return UUID(str(value)) if value is not None else None
+
     async def _replace_nodes(
         self,
         session: AsyncSession,

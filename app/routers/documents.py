@@ -138,9 +138,15 @@ async def submit_document(
     resolved = command or DocumentSubmitCommand(expected_state_version=expected_state_version)
     try:
         if settings.document_backend == "postgres":
+            if not idempotency_key:
+                raise ValueError("提交单据必须提供 Idempotency-Key")
             principal = await get_current_principal(authorization, session)
             version = await persistent_service.submit(
-                session, principal, document_id, resolved.expected_state_version
+                session,
+                principal,
+                document_id,
+                resolved.expected_state_version,
+                idempotency_key,
             )
         else:
             if actor_id is None:

@@ -87,8 +87,7 @@ async def list_analysis_findings(
     try:
         if settings.document_backend == "postgres":
             await get_current_principal(authorization, session)
-            await persistent_service.get(session, task_id)
-            return []
+            return await persistent_service.list_findings(session, task_id)
         return service.list_findings(task_id)
     except ValueError as exc:
         raise HTTPException(status_code=404, detail=str(exc)) from exc
