@@ -5,6 +5,8 @@ from datetime import UTC, date, datetime
 from decimal import Decimal
 from uuid import UUID, uuid4
 
+from engines.expense_reimbursement.contracts import ExpenseLine
+
 
 @dataclass
 class StoredDocument:
@@ -21,6 +23,7 @@ class StoredDocument:
     status: str = "draft"
     current_version: int = 0
     state_version: int = 1
+    line_items: tuple[ExpenseLine, ...] = ()
 
 
 @dataclass(frozen=True)

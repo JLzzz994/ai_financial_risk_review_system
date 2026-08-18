@@ -7,6 +7,8 @@ from app.repositories.document_repository import (
     StoredDocument,
 )
 from app.schemas.documents import CreateDocumentCommand, DocumentResponse, DocumentVersionResponse
+from engines.expense_reimbursement.contracts import ExpenseLine
+from engines.expense_reimbursement.validators import validate_expense_total
 
 
 class DocumentService:
@@ -20,6 +22,12 @@ class DocumentService:
         """创建费用报销草稿，MVP仅支持人民币。"""
         if command.currency != "CNY":
             raise ValueError("MVP 仅支持 CNY")
+        line_items = tuple(
+            ExpenseLine(item.expense_item, item.amount, item.currency)
+            for item in command.line_items
+        )
+        if line_items:
+            validate_expense_total(command.total_amount, line_items, command.currency)
         document = StoredDocument(
             uuid4(),
             self.repository.next_document_no(),
@@ -29,6 +37,7 @@ class DocumentService:
             command.currency,
             command.apply_date,
             command.reason_text,
+            line_items=line_items,
         )
         self.repository.documents[document.document_id] = document
         return self._response(document)

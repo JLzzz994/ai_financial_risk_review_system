@@ -16,6 +16,18 @@ class CreateDocumentCommand(BaseModel):
     currency: str = Field(default="CNY", min_length=3, max_length=3)
     apply_date: date
     reason_text: str = Field(min_length=1, max_length=2000)
+    line_items: list["DocumentLineItemCommand"] = Field(default_factory=list)
+
+
+class DocumentLineItemCommand(BaseModel):
+    """费用报销草稿中的一条明细。"""
+
+    expense_item: str = Field(min_length=1, max_length=255)
+    expense_date: date
+    amount: Decimal = Field(gt=Decimal("0"), max_digits=18, decimal_places=2)
+    currency: str = Field(default="CNY", min_length=3, max_length=3)
+    invoice_no: str | None = Field(default=None, max_length=64)
+    remark: str | None = Field(default=None, max_length=2000)
 
 
 class DocumentResponse(BaseModel):
