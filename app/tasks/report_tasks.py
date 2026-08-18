@@ -1,11 +1,16 @@
 """审核报告导出 Celery 任务。"""
 
+import base64
 import json
+import logging
 from typing import Any, Protocol
 from uuid import UUID
 
 from app.config import settings
 from app.tasks.celery_app import celery_app
+from app.tasks.safety import sanitize_error
+
+logger = logging.getLogger(__name__)
 
 
 class ReportExporter(Protocol):
@@ -52,6 +57,8 @@ def run_report_export(
     if raw is None:
         raise ValueError("导出任务不存在")
     payload = json.loads(raw)
+    if payload.get("status") in {"succeeded", "manual_review"}:
+        return {"export_task_id": export_task_id, "status": payload["status"]}
     try:
         if _report_exporter is None:
             raise RuntimeError("报告导出适配器尚未配置")
@@ -59,11 +66,19 @@ def run_report_export(
         if not generated:
             raise RuntimeError("报告导出器未返回内容")
         payload["status"] = "succeeded"
-        payload["content_bytes"] = len(generated)
-    except RuntimeError as exc:
+        payload["snapshot_b64"] = base64.b64encode(generated).decode("ascii")
+    except (ConnectionError, OSError, RuntimeError, ValueError) as exc:
         payload["status"] = "manual_review" if self.request.retries >= 3 else "failed"
-        payload["error_message"] = str(exc)[:500]
+        payload["error_message"] = sanitize_error(str(exc))
         client.set(key, json.dumps(payload, ensure_ascii=False), ex=86400)
+        logger.warning(
+            "report_export_failure",
+            extra={
+                "task_id": export_task_id,
+                "document_version_id": document_version_id,
+                "request_id": export_task_id,
+            },
+        )
         if self.request.retries < 3:
             raise self.retry(exc=exc, countdown=2**self.request.retries) from exc
         return {"export_task_id": export_task_id, "status": payload["status"]}

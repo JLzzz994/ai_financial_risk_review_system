@@ -1,5 +1,6 @@
 """版本化审核报告和异步导出服务。"""
 
+import base64
 import json
 from typing import Protocol
 from uuid import UUID, uuid4
@@ -156,6 +157,9 @@ class PersistentReportService:
         payload = json.loads(raw)
         if payload.get("status") != "succeeded":
             raise ValueError("导出任务尚未完成")
+        snapshot = payload.get("snapshot_b64")
+        if isinstance(snapshot, str):
+            return base64.b64decode(snapshot)
         return json.dumps(payload.get("content", {}), ensure_ascii=False, indent=2).encode("utf-8")
 
     @staticmethod

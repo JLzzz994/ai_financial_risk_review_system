@@ -2,11 +2,12 @@
 
 import json
 from dataclasses import dataclass
-from typing import Any, cast
+from typing import Any, Protocol, cast
 from uuid import UUID
 
 from app.config import settings
 from app.tasks.celery_app import celery_app
+from app.tasks.safety import sanitize_error
 
 
 @dataclass(frozen=True, slots=True)
@@ -32,6 +33,22 @@ class AttachmentParseState:
     error_message: str | None = None
 
 
+class AttachmentStatePort(Protocol):
+    """附件事实状态回写端口，生产实现应更新附件表。"""
+
+    def save(self, state: AttachmentParseState) -> None:
+        """保存 parsing/failed/manual_review 状态。"""
+
+
+_attachment_state_port: AttachmentStatePort | None = None
+
+
+def set_attachment_state_port(port: AttachmentStatePort | None) -> None:
+    """注入附件状态事实仓储；未注入时任务明确失败。"""
+    global _attachment_state_port
+    _attachment_state_port = port
+
+
 def attachment_parse_state(
     attachment_id: UUID,
     document_version_id: UUID,
@@ -51,7 +68,7 @@ def attachment_parse_state(
         document_version_id,
         status,
         min(attempt, 3),
-        error[:500] if error else None,
+        sanitize_error(error) if error else None,
     )
 
 
@@ -66,7 +83,7 @@ def _redis_client() -> Any:
     name="financial_review.attachment_parse",
     bind=True,
     max_retries=3,
-    autoretry_for=(RuntimeError,),
+    autoretry_for=(RuntimeError, ConnectionError, OSError),
     retry_backoff=True,
 )
 def run_attachment_parse(
@@ -83,10 +100,14 @@ def run_attachment_parse(
     client = _redis_client()
     cached = client.get(key)
     if cached:
-        return cast(dict[str, str], json.loads(cached))
+        cached_payload = cast(dict[str, str], json.loads(cached))
+        if cached_payload.get("status") in {"succeeded", "manual_review"}:
+            return cached_payload
+    if _attachment_state_port is None:
+        raise RuntimeError("附件状态仓储尚未配置")
     try:
         raise RuntimeError("OCR 解析适配器尚未配置")
-    except RuntimeError as exc:
+    except (ConnectionError, OSError, RuntimeError, ValueError) as exc:
         failed = attachment_parse_state(
             attachment_uuid,
             version_uuid,
@@ -94,6 +115,7 @@ def run_attachment_parse(
             attempt=attempt + 1,
             error=str(exc),
         )
+        _attachment_state_port.save(failed)
         payload = {
             "attachment_id": attachment_id,
             "status": failed.status,
@@ -141,8 +163,10 @@ def parse_attachment_task(
 
 __all__ = [
     "AttachmentParseState",
+    "AttachmentStatePort",
     "ParseTaskResult",
     "attachment_parse_state",
     "parse_attachment_task",
     "run_attachment_parse",
+    "set_attachment_state_port",
 ]

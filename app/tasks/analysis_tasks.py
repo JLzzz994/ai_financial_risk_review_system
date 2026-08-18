@@ -13,6 +13,7 @@ from app.repositories.sql_analysis_repository import SqlAnalysisTaskRepository
 from app.schemas.analysis import AnalysisEvent, AnalysisEventType, AnalysisStage
 from app.services.persistent_analysis_service import RedisAnalysisEventStore
 from app.tasks.celery_app import celery_app
+from app.tasks.safety import sanitize_error
 
 logger = logging.getLogger(__name__)
 
@@ -113,7 +114,7 @@ def advance_analysis_stage(
 
 def _safe_error(message: str | None) -> str | None:
     """只保留脱敏后的短错误，不记录外部输入和附件原文。"""
-    return message[:500] if message else None
+    return sanitize_error(message) if message else None
 
 
 async def _run_analysis_pipeline_with_ports(
@@ -249,7 +250,7 @@ def run_analysis_task(
         result = asyncio.run(_run_analysis(task_uuid, version_uuid, self.request.retries))
         logger.info("analysis_worker_exit", extra={**result, "request_id": idempotency_key})
         return result
-    except RuntimeError as exc:
+    except (ConnectionError, OSError, RuntimeError) as exc:
         # 外部适配器不可用时持久化失败并交给 Celery 做有界重试。
         state = AnalysisWorkerState(
             task_uuid,

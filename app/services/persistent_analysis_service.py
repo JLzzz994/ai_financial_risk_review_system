@@ -70,10 +70,8 @@ class RedisAnalysisEventStore:
     def list_after(self, task_id: UUID, last_event_id: int) -> list[AnalysisEvent]:
         """按事件 ID 过滤 Redis 列表。"""
         values = self.client.lrange(self._key(task_id), 0, -1)  # type: ignore[attr-defined]
-        return [
-            AnalysisEvent.model_validate(json.loads(value))
-            for value in values[last_event_id:]
-        ]
+        events = [AnalysisEvent.model_validate(json.loads(value)) for value in values]
+        return [event for event in events if event.event_id > last_event_id]
 
 
 class PersistentAnalysisService:
