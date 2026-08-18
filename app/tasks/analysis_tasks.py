@@ -230,6 +230,14 @@ def run_analysis_task(
     version_uuid = UUID(document_version_id)
     if not idempotency_key.strip():
         raise ValueError("分析任务必须提供幂等键")
+    logger.info(
+        "analysis_worker_enter",
+        extra={
+            "task_id": task_id,
+            "document_version_id": document_version_id,
+            "request_id": idempotency_key,
+        },
+    )
     try:
         terminal = asyncio.run(_terminal_status(task_uuid))
         if terminal is not None:
@@ -238,7 +246,9 @@ def run_analysis_task(
                 "document_version_id": document_version_id,
                 "status": terminal,
             }
-        return asyncio.run(_run_analysis(task_uuid, version_uuid, self.request.retries))
+        result = asyncio.run(_run_analysis(task_uuid, version_uuid, self.request.retries))
+        logger.info("analysis_worker_exit", extra={**result, "request_id": idempotency_key})
+        return result
     except RuntimeError as exc:
         # 外部适配器不可用时持久化失败并交给 Celery 做有界重试。
         state = AnalysisWorkerState(
@@ -254,6 +264,15 @@ def run_analysis_task(
                 "document_version_id": document_version_id,
                 "status": state.stage.value,
             }
+        logger.warning(
+            "analysis_worker_retry",
+            extra={
+                "task_id": task_id,
+                "document_version_id": document_version_id,
+                "request_id": idempotency_key,
+                "error": _safe_error(str(exc)),
+            },
+        )
         failed = advance_analysis_stage(state, AnalysisStage.FAILED, error=str(exc)).state
         asyncio.run(_persist_analysis_state(failed))
         raise self.retry(exc=exc, countdown=2**self.request.retries) from exc
