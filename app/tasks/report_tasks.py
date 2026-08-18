@@ -85,6 +85,18 @@ def _final_report_failure(
     return payload
 
 
+def _write_report_state(client: Any, key: str, payload: dict[str, Any]) -> None:
+    """统一写入报告状态，Redis 异常转换为可重试错误。"""
+    try:
+        client.set(
+            key,
+            json.dumps(payload, ensure_ascii=False),
+            ex=settings.report_export_ttl_seconds,
+        )
+    except Exception as exc:
+        raise RuntimeError(sanitize_error(f"报告状态写入失败：{exc}")) from exc
+
+
 @celery_app.task(  # type: ignore[untyped-decorator]
     name="financial_review.report_export",
     bind=True,
@@ -138,11 +150,15 @@ def run_report_export(
     except Exception as exc:
         payload["status"] = "manual_review" if self.request.retries >= 3 else "failed"
         payload["error_message"] = sanitize_error(str(exc))
-        client.set(
-            key,
-            json.dumps(payload, ensure_ascii=False),
-            ex=settings.report_export_ttl_seconds,
-        )
+        try:
+            _write_report_state(client, key, payload)
+        except RuntimeError as write_exc:
+            if self.request.retries >= 3:
+                return _final_report_failure(
+                    export_task_id, document_version_id, request_key,
+                    str(write_exc), client, key,
+                )
+            raise self.retry(exc=write_exc, countdown=2**self.request.retries) from write_exc
         logger.warning(
             "report_export_failure",
             extra={
@@ -154,7 +170,15 @@ def run_report_export(
         if self.request.retries < 3:
             raise self.retry(exc=exc, countdown=2**self.request.retries) from exc
         return {"export_task_id": export_task_id, "status": payload["status"]}
-    client.set(key, json.dumps(payload, ensure_ascii=False), ex=settings.report_export_ttl_seconds)
+    try:
+        _write_report_state(client, key, payload)
+    except RuntimeError as write_exc:
+        if self.request.retries >= 3:
+            return _final_report_failure(
+                export_task_id, document_version_id, request_key,
+                str(write_exc), client, key,
+            )
+        raise self.retry(exc=write_exc, countdown=2**self.request.retries) from write_exc
     logger.info(
         "report_export_succeeded",
         extra={

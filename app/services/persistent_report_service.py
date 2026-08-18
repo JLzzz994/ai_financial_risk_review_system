@@ -133,11 +133,15 @@ class PersistentReportService:
             "content": report.content,
             "format": export_format,
         }
-        self.export_store.set(key, json.dumps(payload, ensure_ascii=False), ex=86400)
+        self.export_store.set(
+            key,
+            json.dumps(payload, ensure_ascii=False),
+            ex=settings.report_export_ttl_seconds,
+        )
         self.export_store.set(
             f"financial-review:report-export:{task.export_task_id}",
             json.dumps(payload, ensure_ascii=False),
-            ex=86400,
+            ex=settings.report_export_ttl_seconds,
         )
         self._enqueue(task.export_task_id, document_version_id, export_format, idempotency_key)
         return task
