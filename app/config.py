@@ -1,6 +1,7 @@
 """应用配置。"""
 
 from pathlib import Path
+from typing import Literal
 
 from pydantic_settings import BaseSettings, SettingsConfigDict
 
@@ -19,6 +20,7 @@ class Settings(BaseSettings):
     log_dir: str
     app_host: str
     app_port: int
+    document_backend: Literal["memory", "postgres"] = "memory"
 
     database_url: str
     redis_url: str
