@@ -14,6 +14,7 @@ from app.routers.audit import router as audit_router
 from app.routers.auth import router as auth_router
 from app.routers.documents import router as documents_router
 from app.routers.reports import router as reports_router
+from app.routers.risk import document_risk_router
 from app.routers.risk import router as risk_router
 from app.routers.sessions import router as session_router
 from app.services.health_service import get_readiness
@@ -30,6 +31,7 @@ app.include_router(attachment_router)
 app.include_router(direct_attachment_router)
 app.include_router(session_router)
 app.include_router(risk_router)
+app.include_router(document_risk_router)
 app.include_router(approval_router)
 app.include_router(reports_router)
 app.include_router(audit_router)

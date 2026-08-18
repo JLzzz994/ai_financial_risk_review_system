@@ -62,3 +62,10 @@ class ManualReviewResponse(BaseModel):
     status: str
     reviewer_id: UUID | None = None
     comment: str | None = None
+
+
+class RiskReviewStatusRequest(BaseModel):
+    """风险项复核状态变更，与前端 PATCH 契约保持一致。"""
+
+    review_status: str
+    review_comment: str = ""
