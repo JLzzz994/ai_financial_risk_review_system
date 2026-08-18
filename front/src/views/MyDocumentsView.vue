@@ -6,7 +6,7 @@ import { handleApiError, safeErrorMessage } from '@/api/client'
 import { useAppStore } from '@/stores/app'
 import { useAuthStore } from '@/stores/auth'
 import { documentStatusMap, documentStatusView } from '@/types/status'
-import type { DocumentSummary } from '@/types/domain'
+import { documentTypeLabels, type DocumentSummary, type DocumentType } from '@/types/domain'
 import AmountText from '@/components/AmountText.vue'
 import ApiHint from '@/components/ApiHint.vue'
 import ConfirmDialog from '@/components/ConfirmDialog.vue'
@@ -26,9 +26,10 @@ const total = ref(0)
 const loading = ref(false)
 const loadError = ref<string | null>(null)
 const creating = ref(false)
+const createType = ref<DocumentType>('expense_reimbursement')
 
 const filters = reactive({
-  document_type: 'expense_reimbursement',
+  document_type: '',
   document_status: '',
   keyword: '',
   date_from: '',
@@ -82,8 +83,8 @@ async function handleCreate(): Promise<void> {
   try {
     const draft = await createDocument(
       {
-        document_type: 'expense_reimbursement',
-        expense_category: '市场推广费',
+        document_type: createType.value,
+        expense_category: createType.value === 'expense_reimbursement' ? '市场推广费' : undefined,
       },
       crypto.randomUUID(),
     )
@@ -167,6 +168,20 @@ onMounted(load)
         >
           {{ creating ? '创建中…' : '新建单据' }}
         </button>
+        <select
+          v-if="auth.roles.includes('applicant')"
+          v-model="createType"
+          class="select create-type"
+          aria-label="新建单据类型"
+        >
+          <option
+            v-for="(label, value) in documentTypeLabels"
+            :key="value"
+            :value="value"
+          >
+            新建{{ label }}
+          </option>
+        </select>
       </div>
     </template>
 
@@ -180,8 +195,15 @@ onMounted(load)
           class="select"
           aria-label="单据类型"
         >
-          <option value="expense_reimbursement">
-            费用报销单
+          <option value="">
+            全部单据类型
+          </option>
+          <option
+            v-for="(label, value) in documentTypeLabels"
+            :key="value"
+            :value="value"
+          >
+            {{ label }}
           </option>
         </select>
         <select
@@ -244,7 +266,7 @@ onMounted(load)
           </div>
         </template>
         <template #cell-document_type="{ row }">
-          {{ row.document_type === 'expense_reimbursement' ? '费用报销单' : row.document_type }}
+          {{ documentTypeLabels[row.document_type as DocumentType] ?? '未知单据类型' }}
         </template>
         <template #cell-total_amount="{ row }">
           <AmountText
@@ -349,6 +371,10 @@ onMounted(load)
 
 .filter-keyword {
   width: 240px !important;
+}
+
+.create-type {
+  min-width: 150px;
 }
 
 .doc-link {

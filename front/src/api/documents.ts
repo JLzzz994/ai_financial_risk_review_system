@@ -1,4 +1,5 @@
 import type {
+  DocumentPayload as TypedDocumentPayload,
   DocumentDetail,
   DocumentSummary,
   DocumentVersionInfo,
@@ -26,7 +27,7 @@ export function getDocument(documentId: string): Promise<DocumentDetail> {
 }
 
 export interface DocumentPayload {
-  document_type: string
+  document_type: TypedDocumentPayload['document_type']
   expense_category?: string
   applicant_department?: string
   budget_department?: string
@@ -38,6 +39,8 @@ export interface DocumentPayload {
   payee_bank?: string
   reason_text?: string
   expected_updated_at?: string
+  /** 新接口的强类型专属字段；旧费用报销接口可不传。 */
+  document_payload?: TypedDocumentPayload
 }
 
 export function createDocument(payload: DocumentPayload, idempotencyKey: string): Promise<DocumentSummary> {

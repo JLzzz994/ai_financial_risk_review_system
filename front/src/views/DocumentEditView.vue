@@ -4,9 +4,15 @@ import { useRoute, useRouter } from 'vue-router'
 import { createLineItem, deleteLineItem, getDocument, submitDocument, updateDocument, updateLineItem } from '@/api/documents'
 import { handleApiError, safeErrorMessage } from '@/api/client'
 import { useAppStore } from '@/stores/app'
-import type { DocumentDetail, LineItem } from '@/types/domain'
+import type {
+  BatchPaymentDetail,
+  DocumentDetail,
+  DocumentPayload,
+  DocumentType,
+  LineItem,
+} from '@/types/domain'
 import { documentStatusView } from '@/types/status'
-import { addAmounts, formatMoney, isValidAmountInput } from '@/utils/format'
+import { addAmounts, formatMoney, isValidAmountInput, isZeroAmount } from '@/utils/format'
 import ApiHint from '@/components/ApiHint.vue'
 import AttachmentUploader from '@/components/AttachmentUploader.vue'
 import ConfirmDialog from '@/components/ConfirmDialog.vue'
@@ -34,6 +40,7 @@ const loadError = ref<string | null>(null)
 const saving = ref(false)
 
 const form = reactive({
+  document_type: 'expense_reimbursement' as DocumentType,
   expense_category: '市场推广费',
   apply_date: new Date().toISOString().slice(0, 10),
   applicant_department: '市场部',
@@ -42,10 +49,23 @@ const form = reactive({
   payee_account: '',
   payee_bank: '',
   reason_text: '',
+  contract_no: '',
+  supplier_name: '',
+  payment_ratio: '100',
+  payment_terms: '',
+  planned_payment_date: new Date().toISOString().slice(0, 10),
+  travel_location: '',
+  travel_start_date: new Date().toISOString().slice(0, 10),
+  travel_end_date: new Date().toISOString().slice(0, 10),
+  transportation_amount: '',
+  accommodation_amount: '',
+  meal_amount: '',
+  allowance_amount: '',
 })
 
 const items = ref<EditableLineItem[]>([])
 const itemErrors = ref<Record<number, string>>({})
+const paymentDetails = ref<Array<BatchPaymentDetail & { _id: number }>>([])
 
 const submitDialogOpen = ref(false)
 const submitReason = ref('')
@@ -54,6 +74,30 @@ const submitting = ref(false)
 const categoryOptions = ['市场推广费', '差旅费', '办公用品', '业务招待费', '培训费']
 
 const totalAmount = computed(() => addAmounts(...items.value.map((i) => i.amount || '0')))
+const specializedTotalAmount = computed(() => {
+  if (form.document_type === 'batch_payment') {
+    return addAmounts(...paymentDetails.value.map((item) => item.amount || '0'))
+  }
+  if (form.document_type === 'travel_reimbursement') {
+    return addAmounts(
+      form.transportation_amount || '0',
+      form.accommodation_amount || '0',
+      form.meal_amount || '0',
+      form.allowance_amount || '0',
+    )
+  }
+  return '0.00'
+})
+const effectiveTotalAmount = computed(() =>
+  form.document_type === 'expense_reimbursement' ? totalAmount.value : specializedTotalAmount.value,
+)
+const documentTypeLabel = computed(() => ({
+  public_payment: '对公付款单',
+  prepayment: '预付款单',
+  batch_payment: '批量付款单',
+  expense_reimbursement: '费用报销单',
+  travel_reimbursement: '差旅报销单',
+}[form.document_type]))
 
 const isEditable = computed(() =>
   ['draft', 'returned'].includes(document.value?.document_status ?? 'draft'),
@@ -63,7 +107,7 @@ const canSubmit = computed(
   () =>
     isEditable.value &&
     items.value.length > 0 &&
-    Number(totalAmount.value) > 0 &&
+    !isZeroAmount(effectiveTotalAmount.value) &&
     form.reason_text.trim().length > 0 &&
     form.payee_name.trim().length > 0,
 )
@@ -82,6 +126,25 @@ async function load(): Promise<void> {
     form.payee_account = doc.payee_account ?? ''
     form.payee_bank = doc.payee_bank ?? ''
     form.reason_text = doc.reason_text
+    form.document_type = doc.document_type as DocumentType
+    const payload = doc.document_payload
+    if (payload?.document_type === 'public_payment' || payload?.document_type === 'prepayment') {
+      form.contract_no = payload.contract_no
+      form.supplier_name = payload.supplier_name
+      form.payment_ratio = payload.payment_ratio
+      form.payment_terms = payload.payment_terms
+      form.planned_payment_date = payload.planned_payment_date
+    } else if (payload?.document_type === 'batch_payment') {
+      paymentDetails.value = payload.payment_details.map((item, index) => ({ ...item, _id: index }))
+    } else if (payload?.document_type === 'travel_reimbursement') {
+      form.travel_location = payload.travel_location
+      form.travel_start_date = payload.travel_start_date
+      form.travel_end_date = payload.travel_end_date
+      form.transportation_amount = payload.transportation_amount
+      form.accommodation_amount = payload.accommodation_amount
+      form.meal_amount = payload.meal_amount
+      form.allowance_amount = payload.allowance_amount
+    }
     items.value = (doc.line_items ?? []).map((item) => ({
       item_id: item.item_id,
       expense_item: item.expense_item,
@@ -124,16 +187,102 @@ function validateItems(): boolean {
   return Object.keys(itemErrors.value).length === 0
 }
 
+/** 校验专属表单，金额仅按字符串规则检查，不进行浮点运算。 */
+function validateSpecialized(): boolean {
+  if (form.document_type === 'public_payment' || form.document_type === 'prepayment') {
+    return Boolean(
+      form.contract_no.trim() && form.supplier_name.trim() && form.payment_terms.trim() &&
+      form.planned_payment_date && /^\d+(\.\d{1,2})?$/.test(form.payment_ratio.trim()),
+    )
+  }
+  if (form.document_type === 'batch_payment') {
+    return paymentDetails.value.length > 0 && paymentDetails.value.every(
+      (item) => item.payee_name.trim() && isValidAmountInput(item.amount) && !isZeroAmount(item.amount),
+    )
+  }
+  if (form.document_type === 'travel_reimbursement') {
+    return Boolean(
+      form.travel_location.trim() && form.travel_start_date && form.travel_end_date &&
+      form.travel_end_date >= form.travel_start_date &&
+      [form.transportation_amount, form.accommodation_amount, form.meal_amount, form.allowance_amount]
+        .every((amount) => isValidAmountInput(amount || '0')),
+    )
+  }
+  return true
+}
+
+/** 按后端五类契约组装专属载荷，所有金额字段原样以字符串发送。 */
+function buildDocumentPayload(): DocumentPayload | undefined {
+  const currency = 'CNY' as const
+  if (form.document_type === 'public_payment' || form.document_type === 'prepayment') {
+    return {
+      document_type: form.document_type,
+      currency,
+      contract_no: form.contract_no,
+      supplier_name: form.supplier_name,
+      payment_ratio: form.payment_ratio,
+      payment_terms: form.payment_terms,
+      planned_payment_date: form.planned_payment_date,
+    }
+  }
+  if (form.document_type === 'batch_payment') {
+    return {
+      document_type: form.document_type,
+      currency,
+      payment_details: paymentDetails.value.map(({ _id, ...item }) => item),
+      total_amount: specializedTotalAmount.value,
+      payment_count: paymentDetails.value.length,
+    }
+  }
+  if (form.document_type === 'travel_reimbursement') {
+    return {
+      document_type: form.document_type,
+      currency,
+      travel_location: form.travel_location,
+      travel_start_date: form.travel_start_date,
+      travel_end_date: form.travel_end_date,
+      transportation_amount: form.transportation_amount || '0.00',
+      accommodation_amount: form.accommodation_amount || '0.00',
+      meal_amount: form.meal_amount || '0.00',
+      allowance_amount: form.allowance_amount || '0.00',
+    }
+  }
+  return {
+    document_type: 'expense_reimbursement',
+    currency,
+    expense_details: items.value.map((item) => ({
+      expense_item: item.expense_item,
+      consumption_date: item.expense_date,
+      consumption_location: '未填写',
+      expense_category: form.expense_category,
+      reimbursement_amount: item.amount,
+      currency,
+    })),
+  }
+}
+
+function addPaymentDetail(): void {
+  paymentDetails.value.push({ payee_name: '', amount: '', _id: Date.now() })
+}
+
+function removePaymentDetail(index: number): void {
+  paymentDetails.value.splice(index, 1)
+}
+
 async function saveDraft(): Promise<void> {
-  if (!validateItems()) {
+  if (form.document_type === 'expense_reimbursement' && !validateItems()) {
     app.push('warning', '费用明细存在校验错误，请修正后保存')
+    return
+  }
+  if (form.document_type !== 'expense_reimbursement' && !validateSpecialized()) {
+    app.push('warning', '请完善单据专属字段并检查金额格式')
     return
   }
   saving.value = true
   try {
     // 1. 同步单据公共字段
     const updated = await updateDocument(documentId.value, {
-      document_type: 'expense_reimbursement',
+      document_type: form.document_type,
       expense_category: form.expense_category,
       apply_date: form.apply_date,
       applicant_department: form.applicant_department,
@@ -142,7 +291,8 @@ async function saveDraft(): Promise<void> {
       payee_account: form.payee_account || undefined,
       payee_bank: form.payee_bank || undefined,
       reason_text: form.reason_text,
-      total_amount: totalAmount.value,
+      total_amount: effectiveTotalAmount.value,
+      document_payload: buildDocumentPayload(),
     }, crypto.randomUUID())
     document.value = updated
     // 2. 同步明细行：删除 → 新增 → 更新
@@ -183,7 +333,8 @@ async function saveDraft(): Promise<void> {
 }
 
 function askSubmit(): void {
-  if (!canSubmit.value || !validateItems()) {
+  if (!canSubmit.value || (form.document_type === 'expense_reimbursement' && !validateItems()) ||
+      (form.document_type !== 'expense_reimbursement' && !validateSpecialized())) {
     app.push('warning', '提交前请完善：费用明细、收款方与报销事由为必填')
     return
   }
@@ -269,11 +420,14 @@ onMounted(load)
             <label>单据类型</label>
             <input
               class="input"
-              value="费用报销单"
+              :value="documentTypeLabel"
               disabled
             >
           </div>
-          <div class="field">
+          <div
+            v-if="form.document_type === 'expense_reimbursement'"
+            class="field"
+          >
             <label for="edit-category">费用类别 <span class="field-required" /></label>
             <select
               id="edit-category"
@@ -320,7 +474,10 @@ onMounted(load)
         </div>
       </section>
 
-      <section class="card">
+      <section
+        v-if="form.document_type === 'expense_reimbursement'"
+        class="card"
+      >
         <h2 class="card-title">
           收款方信息
         </h2>
@@ -358,7 +515,156 @@ onMounted(load)
         </div>
       </section>
 
-      <section class="card">
+      <section
+        v-if="form.document_type !== 'expense_reimbursement'"
+        class="card"
+      >
+        <h2 class="card-title">
+          {{ documentTypeLabel }}专属信息
+        </h2>
+        <div
+          v-if="form.document_type === 'public_payment' || form.document_type === 'prepayment'"
+          class="form-grid"
+        >
+          <div class="field">
+            <label>合同号 <span class="field-required" /></label><input
+              v-model="form.contract_no"
+              class="input"
+            >
+          </div>
+          <div class="field">
+            <label>供应商 <span class="field-required" /></label><input
+              v-model="form.supplier_name"
+              class="input"
+            >
+          </div>
+          <div class="field">
+            <label>付款比例（%） <span class="field-required" /></label><input
+              v-model="form.payment_ratio"
+              class="input"
+              inputmode="decimal"
+            >
+          </div>
+          <div class="field">
+            <label>计划付款日期 <span class="field-required" /></label><input
+              v-model="form.planned_payment_date"
+              type="date"
+              class="input"
+            >
+          </div>
+          <div class="field field-wide">
+            <label>付款条款 <span class="field-required" /></label><textarea
+              v-model="form.payment_terms"
+              class="textarea"
+              rows="3"
+            />
+          </div>
+        </div>
+        <template v-else-if="form.document_type === 'batch_payment'">
+          <div class="card-title">
+            <span>收款明细</span><button
+              type="button"
+              class="btn btn-secondary btn-sm"
+              @click="addPaymentDetail"
+            >
+              添加收款人
+            </button>
+          </div>
+          <p
+            v-if="paymentDetails.length === 0"
+            class="muted empty-items"
+          >
+            暂无收款明细，请添加至少一笔付款。
+          </p>
+          <div
+            v-for="(item, index) in paymentDetails"
+            :key="item._id"
+            class="form-grid payment-row"
+          >
+            <div class="field">
+              <label>收款人 <span class="field-required" /></label><input
+                v-model="item.payee_name"
+                class="input"
+              >
+            </div>
+            <div class="field">
+              <label>金额（CNY） <span class="field-required" /></label><input
+                v-model="item.amount"
+                class="input input-amount"
+                inputmode="decimal"
+              >
+            </div>
+            <button
+              type="button"
+              class="btn-link btn-link-danger"
+              @click="removePaymentDetail(index)"
+            >
+              删除
+            </button>
+          </div>
+        </template>
+        <div
+          v-else-if="form.document_type === 'travel_reimbursement'"
+          class="form-grid"
+        >
+          <div class="field">
+            <label>出差地点 <span class="field-required" /></label><input
+              v-model="form.travel_location"
+              class="input"
+            >
+          </div>
+          <div class="field">
+            <label>开始日期 <span class="field-required" /></label><input
+              v-model="form.travel_start_date"
+              type="date"
+              class="input"
+            >
+          </div>
+          <div class="field">
+            <label>结束日期 <span class="field-required" /></label><input
+              v-model="form.travel_end_date"
+              type="date"
+              class="input"
+            >
+          </div>
+          <div class="field">
+            <label>交通费（CNY）</label><input
+              v-model="form.transportation_amount"
+              class="input input-amount"
+              inputmode="decimal"
+            >
+          </div>
+          <div class="field">
+            <label>住宿费（CNY）</label><input
+              v-model="form.accommodation_amount"
+              class="input input-amount"
+              inputmode="decimal"
+            >
+          </div>
+          <div class="field">
+            <label>餐费（CNY）</label><input
+              v-model="form.meal_amount"
+              class="input input-amount"
+              inputmode="decimal"
+            >
+          </div>
+          <div class="field">
+            <label>补贴（CNY）</label><input
+              v-model="form.allowance_amount"
+              class="input input-amount"
+              inputmode="decimal"
+            >
+          </div>
+        </div>
+        <div class="items-total">
+          <span>合计金额</span><span class="items-total-value">{{ formatMoney(effectiveTotalAmount) }}</span><span class="muted">（仅支持人民币 CNY 单币种）</span>
+        </div>
+      </section>
+
+      <section
+        v-if="form.document_type === 'expense_reimbursement'"
+        class="card"
+      >
         <div class="card-title">
           <span>费用明细</span>
           <button
@@ -464,7 +770,7 @@ onMounted(load)
         </div>
         <div class="items-total">
           <span>合计金额</span>
-          <span class="items-total-value">{{ formatMoney(totalAmount) }}</span>
+          <span class="items-total-value">{{ formatMoney(effectiveTotalAmount) }}</span>
           <span class="muted">（仅支持人民币 CNY 单币种）</span>
         </div>
       </section>

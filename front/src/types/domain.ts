@@ -36,7 +36,76 @@ export interface Paginated<T> {
 
 /* ---------------- 单据 ---------------- */
 
-export type DocumentType = 'expense_reimbursement'
+export type DocumentType =
+  | 'public_payment'
+  | 'prepayment'
+  | 'batch_payment'
+  | 'expense_reimbursement'
+  | 'travel_reimbursement'
+
+/** 五类单据的专属载荷；金额保持字符串，避免前端浮点精度丢失。 */
+export interface BaseDocumentPayload {
+  document_type: DocumentType
+  currency: 'CNY'
+}
+
+export interface PaymentDocumentPayload extends BaseDocumentPayload {
+  document_type: 'public_payment' | 'prepayment'
+  contract_no: string
+  supplier_name: string
+  payment_ratio: string
+  payment_terms: string
+  planned_payment_date: string
+}
+
+export interface BatchPaymentDetail {
+  payee_name: string
+  amount: Money
+}
+
+export interface BatchPaymentPayload extends BaseDocumentPayload {
+  document_type: 'batch_payment'
+  payment_details: BatchPaymentDetail[]
+  total_amount: Money
+  payment_count: number
+}
+
+export interface ExpenseReimbursementPayload extends BaseDocumentPayload {
+  document_type: 'expense_reimbursement'
+  expense_details: Array<{
+    expense_item: string
+    consumption_date: string
+    consumption_location: string
+    expense_category: string
+    reimbursement_amount: Money
+    currency: 'CNY'
+  }>
+}
+
+export interface TravelReimbursementPayload extends BaseDocumentPayload {
+  document_type: 'travel_reimbursement'
+  travel_location: string
+  travel_start_date: string
+  travel_end_date: string
+  transportation_amount: Money
+  accommodation_amount: Money
+  meal_amount: Money
+  allowance_amount: Money
+}
+
+export type DocumentPayload =
+  | PaymentDocumentPayload
+  | BatchPaymentPayload
+  | ExpenseReimbursementPayload
+  | TravelReimbursementPayload
+
+export const documentTypeLabels: Record<DocumentType, string> = {
+  public_payment: '对公付款单',
+  prepayment: '预付款单',
+  batch_payment: '批量付款单',
+  expense_reimbursement: '费用报销单',
+  travel_reimbursement: '差旅报销单',
+}
 
 export interface DocumentSummary {
   document_id: string
@@ -76,6 +145,8 @@ export interface DocumentDetail extends DocumentSummary {
   line_items: LineItem[]
   analysis_task_id?: string
   review_session_id?: string
+  /** 老版本接口可能不返回该字段，页面需展示明确空状态。 */
+  document_payload?: DocumentPayload | null
 }
 
 export interface DocumentVersionInfo {

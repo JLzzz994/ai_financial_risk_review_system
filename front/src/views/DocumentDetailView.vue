@@ -16,6 +16,7 @@ import type {
   DocumentVersionInfo,
   RiskFinding,
 } from '@/types/domain'
+import { documentTypeLabels } from '@/types/domain'
 import {
   approvalTaskStatusView,
   approvalDecisionView,
@@ -23,7 +24,7 @@ import {
   reportStatusView,
   reviewStatusView,
 } from '@/types/status'
-import { formatDateTime } from '@/utils/format'
+import { formatDateTime, formatMoney } from '@/utils/format'
 import AmountText from '@/components/AmountText.vue'
 import ApiHint from '@/components/ApiHint.vue'
 import ApprovalDecisionDialog from '@/components/ApprovalDecisionDialog.vue'
@@ -172,6 +173,41 @@ function goSession(): void {
 
 const currentReport = computed(() => reports.value[0] ?? null)
 
+/** 将专属载荷转换为详情摘要，缺失 payload 时明确提示而不是猜测字段。 */
+const payloadSummary = computed(() => {
+  const payload = document.value?.document_payload
+  if (!payload) return [] as Array<[string, string]>
+  switch (payload.document_type) {
+    case 'public_payment':
+    case 'prepayment':
+      return [
+        ['合同号', payload.contract_no],
+        ['供应商', payload.supplier_name],
+        ['付款比例', `${payload.payment_ratio}%`],
+        ['计划付款日期', payload.planned_payment_date],
+        ['付款条款', payload.payment_terms],
+      ]
+    case 'batch_payment':
+      return [
+        ['付款笔数', String(payload.payment_count)],
+        ['批次总额', formatMoney(payload.total_amount, payload.currency)],
+        ['收款明细', `${payload.payment_details.length} 笔`],
+      ]
+    case 'travel_reimbursement':
+      return [
+        ['出差地点', payload.travel_location],
+        ['出差日期', `${payload.travel_start_date} 至 ${payload.travel_end_date}`],
+        ['交通费', formatMoney(payload.transportation_amount, payload.currency)],
+        ['住宿费', formatMoney(payload.accommodation_amount, payload.currency)],
+        ['餐费', formatMoney(payload.meal_amount, payload.currency)],
+        ['补贴', formatMoney(payload.allowance_amount, payload.currency)],
+      ]
+    case 'expense_reimbursement':
+      return [['费用明细', `${payload.expense_details.length} 条`]]
+  }
+  return []
+})
+
 onMounted(load)
 onBeforeUnmount(() => subscription?.close())
 </script>
@@ -250,7 +286,7 @@ onBeforeUnmount(() => subscription?.close())
         <dl class="summary-grid">
           <div class="summary-item">
             <dt>单据类型</dt>
-            <dd>费用报销单</dd>
+            <dd>{{ documentTypeLabels[document.document_type as keyof typeof documentTypeLabels] ?? '未知单据类型' }}</dd>
           </div>
           <div class="summary-item">
             <dt>费用类别</dt>
@@ -295,6 +331,30 @@ onBeforeUnmount(() => subscription?.close())
             <dd>{{ document.reason_text || '—' }}</dd>
           </div>
         </dl>
+        <div class="payload-summary">
+          <h3 class="card-title">
+            专属字段摘要
+          </h3>
+          <p
+            v-if="payloadSummary.length === 0"
+            class="muted"
+          >
+            当前接口未返回该单据的专属字段。
+          </p>
+          <dl
+            v-else
+            class="summary-grid"
+          >
+            <div
+              v-for="entry in payloadSummary"
+              :key="entry[0]"
+              class="summary-item"
+            >
+              <dt>{{ entry[0] }}</dt>
+              <dd>{{ entry[1] || '—' }}</dd>
+            </div>
+          </dl>
+        </div>
         <div class="summary-links">
           <button
             type="button"
