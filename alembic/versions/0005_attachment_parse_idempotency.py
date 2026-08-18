@@ -2,7 +2,7 @@
 
 import sqlalchemy as sa
 
-from alembic import op
+from alembic import context, op
 
 revision = "0005_attachment_parse_idempotency"
 down_revision = "0004_explicit_data_object_tables"
@@ -12,6 +12,10 @@ depends_on = None
 
 def upgrade() -> None:
     """为已重建的附件表增加可恢复、可幂等的事实字段。"""
+    # 0004 的 Base.metadata.create_all 已包含这些字段；离线模式无法读取
+    # Inspector，只需让静态 SQL 顺利遍历迁移链即可。
+    if context.is_offline_mode():
+        return
     bind = op.get_bind()
     inspector = sa.inspect(bind)
     attachment_columns = {
@@ -51,6 +55,8 @@ def upgrade() -> None:
 
 def downgrade() -> None:
     """回滚附件解析幂等字段。"""
+    if context.is_offline_mode():
+        return
     bind = op.get_bind()
     inspector = sa.inspect(bind)
     constraints = {

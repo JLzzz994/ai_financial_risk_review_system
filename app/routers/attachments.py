@@ -237,16 +237,20 @@ async def parse_attachment(
     attachment_id: UUID,
     authorization: str | None = Header(default=None),
     session: AsyncSession = Depends(get_session),
+    idempotency_key: str | None = Header(default=None, alias="Idempotency-Key"),
 ) -> AttachmentResponse:
     """触发解析任务；任务只携带附件 ID、版本 ID 和幂等键。"""
+    normalized_idempotency_key = idempotency_key.strip() if idempotency_key else ""
     if settings.document_backend != "postgres":
         response = _attachments.get(attachment_id)
         if response is None:
             raise HTTPException(status_code=404, detail="附件不存在")
+        if not normalized_idempotency_key:
+            raise HTTPException(status_code=422, detail="缺少有效的 Idempotency-Key")
         from app.tasks.attachment_tasks import parse_attachment_task
 
         try:
-            parse_attachment_task(attachment_id, f"attachment-{attachment_id}")
+            parse_attachment_task(attachment_id, normalized_idempotency_key)
         except (RuntimeError, ValueError) as exc:
             raise HTTPException(status_code=503, detail=str(exc)) from exc
         return response
@@ -260,12 +264,14 @@ async def parse_attachment(
         raise HTTPException(status_code=403, detail=str(exc)) from exc
     if record.document_id != document_id:
         raise HTTPException(status_code=404, detail="附件不存在")
+    if not normalized_idempotency_key:
+        raise HTTPException(status_code=422, detail="缺少有效的 Idempotency-Key")
     from app.tasks.attachment_tasks import parse_attachment_task
 
     try:
         parse_attachment_task(
             attachment_id,
-            f"attachment-{attachment_id}",
+            normalized_idempotency_key,
             document_version_id=record.document_version_id,
         )
     except (RuntimeError, ValueError) as exc:
@@ -335,9 +341,16 @@ async def parse_attachment_direct(
     attachment_id: UUID,
     authorization: str | None = Header(default=None),
     session: AsyncSession = Depends(get_session),
+    idempotency_key: str | None = Header(default=None, alias="Idempotency-Key"),
 ) -> AttachmentResponse:
     """兼容非嵌套路由，委托同一解析业务逻辑。"""
-    return await parse_attachment(UUID(int=0), attachment_id, authorization, session)
+    return await parse_attachment(
+        UUID(int=0),
+        attachment_id,
+        authorization,
+        session,
+        idempotency_key,
+    )
 
 
 __all__ = ["AttachmentResponse", "direct_router", "get_attachment_service", "router"]

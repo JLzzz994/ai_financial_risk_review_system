@@ -1,6 +1,7 @@
 """附件解析任务的 Celery Worker 入口。"""
 
 import asyncio
+import hashlib
 import json
 import logging
 from dataclasses import dataclass
@@ -198,7 +199,11 @@ def run_attachment_parse(
     port = _attachment_state_port
     if port is None:
         raise RuntimeError("附件状态仓储尚未配置")
-    key = f"financial-review:attachment-parse:{attachment_uuid}"
+    idempotency_digest = hashlib.sha256(idempotency_key.encode("utf-8")).hexdigest()[:32]
+    key = (
+        "financial-review:attachment-parse:"
+        f"{attachment_uuid}:{version_uuid}:{idempotency_digest}"
+    )
     client: Any | None = None
     cached: str | None = None
     try:
