@@ -14,9 +14,14 @@ from app.repositories.sql_document_repository import (
 from app.schemas.auth import Principal
 from app.schemas.documents import (
     CreateDocumentCommand,
+    DocumentActionCommand,
     DocumentLineItemCommand,
+    DocumentLineItemPatch,
+    DocumentLineItemResponse,
+    DocumentPage,
     DocumentResponse,
     DocumentVersionResponse,
+    UpdateDocumentCommand,
 )
 from engines.expense_reimbursement.contracts import ExpenseLine
 from engines.expense_reimbursement.validators import validate_expense_total
@@ -54,7 +59,7 @@ class PersistentDocumentService:
                 reason_text=command.reason_text,
                 document_payload=payload,
             )
-        return self._to_response(document)
+        return self.repository.to_response(document)
 
     async def get(
         self, session: AsyncSession, actor: Principal, document_id: UUID
@@ -64,7 +69,107 @@ class PersistentDocumentService:
         if document is None:
             raise ValueError("单据不存在")
         self._assert_applicant(actor, document.applicant_id)
-        return self._to_response(document)
+        return self.repository.to_response(document)
+
+    async def list_documents(
+        self,
+        session: AsyncSession,
+        actor: Principal,
+        *,
+        page: int,
+        page_size: int,
+        document_type: str | None = None,
+        document_status: str | None = None,
+        keyword: str | None = None,
+    ) -> DocumentPage:
+        """按本人范围分页查询单据。"""
+        if page < 1 or page_size < 1 or page_size > 100:
+            raise ValueError("分页参数不合法")
+        return await self.repository.list_documents(
+            session,
+            actor.user_id,
+            page=page,
+            page_size=page_size,
+            document_type=document_type,
+            document_status=document_status,
+            keyword=keyword,
+        )
+
+    async def update_draft(
+        self,
+        session: AsyncSession,
+        actor: Principal,
+        document_id: UUID,
+        command: UpdateDocumentCommand,
+    ) -> DocumentResponse:
+        """更新本人草稿或退回单据。"""
+        async with session.begin():
+            document = await self.repository.get(session, document_id)
+            if document is None:
+                raise ValueError("单据不存在")
+            self._assert_applicant(actor, document.applicant_id)
+            updated = await self.repository.update_draft(session, document_id, command)
+        return self.repository.to_response(updated)
+
+    async def copy(
+        self, session: AsyncSession, actor: Principal, document_id: UUID
+    ) -> DocumentResponse:
+        """复制本人单据为新草稿。"""
+        async with session.begin():
+            document = await self.repository.copy_document(session, document_id, actor.user_id)
+        return self.repository.to_response(document)
+
+    async def change_status(
+        self,
+        session: AsyncSession,
+        actor: Principal,
+        document_id: UUID,
+        command: DocumentActionCommand,
+        target_status: str,
+    ) -> None:
+        """撤回或作废本人单据。"""
+        async with session.begin():
+            await self.repository.change_status(
+                session, document_id, actor.user_id, target_status, command.reason
+            )
+
+    async def list_line_items(
+        self, session: AsyncSession, actor: Principal, document_id: UUID
+    ) -> list[DocumentLineItemResponse]:
+        """查询本人单据明细。"""
+        return await self.repository.list_line_items(session, document_id, actor.user_id)
+
+    async def add_line_item(
+        self,
+        session: AsyncSession,
+        actor: Principal,
+        document_id: UUID,
+        item: DocumentLineItemCommand,
+    ) -> DocumentLineItemResponse:
+        """新增本人草稿明细。"""
+        async with session.begin():
+            return await self.repository.add_line_item(session, document_id, actor.user_id, item)
+
+    async def update_line_item(
+        self,
+        session: AsyncSession,
+        actor: Principal,
+        document_id: UUID,
+        item_id: UUID,
+        patch: DocumentLineItemPatch,
+    ) -> DocumentLineItemResponse:
+        """更新本人草稿明细。"""
+        async with session.begin():
+            return await self.repository.update_line_item(
+                session, document_id, item_id, actor.user_id, patch
+            )
+
+    async def delete_line_item(
+        self, session: AsyncSession, actor: Principal, document_id: UUID, item_id: UUID
+    ) -> None:
+        """删除本人草稿明细。"""
+        async with session.begin():
+            await self.repository.delete_line_item(session, document_id, item_id, actor.user_id)
 
     async def list_versions(
         self, session: AsyncSession, actor: Principal, document_id: UUID
@@ -169,13 +274,4 @@ class PersistentDocumentService:
     @staticmethod
     def _to_response(document: Any) -> DocumentResponse:
         """将 ORM 对象转换为 API 响应模型。"""
-        return DocumentResponse(
-            document_id=document.id,
-            document_no=document.document_no,
-            applicant_id=document.applicant_id,
-            total_amount=document.total_amount,
-            currency=document.currency,
-            document_status=document.document_status,
-            current_version=document.current_version,
-            state_version=document.document_state_version,
-        )
+        return SqlDocumentRepository.to_response(document)
