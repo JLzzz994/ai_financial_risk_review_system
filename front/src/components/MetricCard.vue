@@ -6,7 +6,7 @@ withDefaults(
     hint?: string
     tone?: 'default' | 'risk-high' | 'risk-medium' | 'risk-low' | 'primary'
   }>(),
-  { tone: 'default' },
+  { hint: '', tone: 'default' },
 )
 </script>
 

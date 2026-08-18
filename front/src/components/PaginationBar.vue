@@ -3,9 +3,9 @@ import { computed } from 'vue'
 
 const props = withDefaults(
   defineProps<{
-    page: number
-    pageSize: number
-    total: number
+    page?: number
+    pageSize?: number
+    total?: number
   }>(),
   { page: 1, pageSize: 50, total: 0 },
 )

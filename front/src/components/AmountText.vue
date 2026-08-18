@@ -7,7 +7,7 @@ withDefaults(
     currency?: string
     strong?: boolean
   }>(),
-  { currency: 'CNY', strong: false },
+  { value: null, currency: 'CNY', strong: false },
 )
 </script>
 
