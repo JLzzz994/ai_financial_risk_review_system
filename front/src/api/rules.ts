@@ -17,7 +17,11 @@ export function patchRule(
   ruleId: string,
   payload: Partial<Pick<RuleItem, 'params' | 'status'>>,
 ): Promise<RuleItem> {
-  return apiFetch<RuleItem>(`/rules/${ruleId}`, { method: 'PATCH', body: payload })
+  return apiFetch<RuleItem>(`/rules/${ruleId}`, {
+    method: 'PATCH',
+    body: payload,
+    idempotencyKey: crypto.randomUUID(),
+  })
 }
 
 export function publishRule(ruleId: string, reason: string): Promise<RuleItem> {

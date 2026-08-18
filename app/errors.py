@@ -4,6 +4,7 @@ from collections.abc import Callable
 from typing import Any
 
 from fastapi import Request
+from fastapi.encoders import jsonable_encoder
 from fastapi.exceptions import RequestValidationError
 from fastapi.responses import JSONResponse
 
@@ -67,7 +68,9 @@ async def request_validation_error_handler(
             "validation_error",
             "请求参数校验失败",
             422,
-            details={"errors": validation.errors() if validation else []},
+            details={
+                "errors": jsonable_encoder(validation.errors()) if validation else []
+            },
         ),
     )
 

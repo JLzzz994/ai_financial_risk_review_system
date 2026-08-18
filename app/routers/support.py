@@ -248,18 +248,28 @@ async def update_rule(
     rule_id: str,
     payload: RulePatch,
     authorization: str | None = Header(default=None),
+    idempotency_key: str | None = Header(default=None, alias="Idempotency-Key"),
 ) -> RuleItemResponse:
     """更新内置规则的启用状态或参数。"""
-    await get_current_principal(authorization)
+    await _authorize_config(authorization)
+    key = _require_idempotency(idempotency_key)
+    cache_key = (f"rule.patch:{rule_id}", key)
+    fingerprint = payload.model_dump_json()
+    cached = _cached_config_response(cache_key, fingerprint)
+    if isinstance(cached, RuleItemResponse):
+        return cached
     rule = next((item for item in _RULES if item.rule_id == rule_id), None)
     if rule is None:
-        raise HTTPException(status_code=404, detail="规则不存在")
+        raise AppError("not_found", "规则不存在", 404)
+    if payload.status is None and payload.params is None:
+        raise AppError("conflict", "没有需要更新的字段", 409)
     if payload.status is not None:
         rule.status = payload.status
     if payload.params is not None:
         rule.params = payload.params
     rule.updated_at = datetime.now(UTC)
-    return rule
+    _store_config_response(cache_key, fingerprint, rule)
+    return deepcopy(rule)
 
 
 @router.post("/rules/{rule_id}/publish", response_model=RuleItemResponse)
