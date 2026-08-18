@@ -6,7 +6,7 @@ from decimal import Decimal
 from enum import StrEnum
 from typing import Annotated, Any, Literal
 
-from pydantic import BaseModel, ConfigDict, Field, field_validator, model_validator
+from pydantic import BaseModel, BeforeValidator, ConfigDict, Field, field_validator, model_validator
 
 from engines.expense_reimbursement.contracts import ExpenseLine
 from engines.expense_reimbursement.validators import validate_expense_lines
@@ -22,9 +22,6 @@ class DocumentType(StrEnum):
     TRAVEL_REIMBURSEMENT = "travel_reimbursement"
 
 
-Amount = Annotated[Decimal, Field(ge=Decimal("0"), max_digits=18, decimal_places=2)]
-
-
 def _validate_decimal_amount(value: object) -> object:
     """拒绝 float，并保证金额不为负且最多两位小数。"""
     if isinstance(value, float):
@@ -34,6 +31,13 @@ def _validate_decimal_amount(value: object) -> object:
         if value < 0 or not isinstance(exponent, int) or exponent < -2:
             raise ValueError("金额不得为负且最多两位小数")
     return value
+
+
+Amount = Annotated[
+    Decimal,
+    BeforeValidator(_validate_decimal_amount),
+    Field(ge=Decimal("0"), max_digits=18, decimal_places=2),
+]
 
 
 class BaseDocumentTypePayload(BaseModel):
