@@ -4,7 +4,7 @@ from datetime import date, datetime
 from decimal import Decimal
 from uuid import UUID
 
-from pydantic import BaseModel, Field
+from pydantic import BaseModel, Field, field_validator
 
 
 class AmountRow(BaseModel):
@@ -113,6 +113,43 @@ class RulePatch(BaseModel):
     params: dict[str, str] | None = None
 
 
+class RulePublishRequest(BaseModel):
+    """规则发布申请。"""
+
+    reason: str = Field(min_length=1, max_length=500)
+
+    @field_validator("reason")
+    @classmethod
+    def validate_reason(cls, value: str) -> str:
+        """拒绝只有空白字符的发布原因。"""
+        value = value.strip()
+        if not value:
+            raise ValueError("发布原因不能为空")
+        return value
+
+
+class SupplierRulePatch(BaseModel):
+    """供应商风险规则局部更新。"""
+
+    enabled: bool | None = None
+    threshold: Decimal | None = Field(default=None, gt=Decimal("0"))
+
+
+class SystemParameterPatch(BaseModel):
+    """系统参数局部更新。"""
+
+    value: str = Field(min_length=1, max_length=500)
+
+    @field_validator("value")
+    @classmethod
+    def validate_value(cls, value: str) -> str:
+        """拒绝空白参数值。"""
+        value = value.strip()
+        if not value:
+            raise ValueError("参数值不能为空")
+        return value
+
+
 class SupplierRuleResponse(BaseModel):
     """供应商风险规则摘要。"""
 
@@ -130,3 +167,4 @@ class SystemParameterResponse(BaseModel):
     key: str
     value: str
     description: str = ""
+    updated_at: datetime
