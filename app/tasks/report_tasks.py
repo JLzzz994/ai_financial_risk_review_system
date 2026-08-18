@@ -79,7 +79,7 @@ def run_report_export(
             raise RuntimeError("报告导出器未返回内容")
         payload["status"] = "succeeded"
         payload["snapshot_b64"] = base64.b64encode(generated).decode("ascii")
-    except (ConnectionError, OSError, RuntimeError, ValueError) as exc:
+    except Exception as exc:
         payload["status"] = "manual_review" if self.request.retries >= 3 else "failed"
         payload["error_message"] = sanitize_error(str(exc))
         client.set(
@@ -99,6 +99,15 @@ def run_report_export(
             raise self.retry(exc=exc, countdown=2**self.request.retries) from exc
         return {"export_task_id": export_task_id, "status": payload["status"]}
     client.set(key, json.dumps(payload, ensure_ascii=False), ex=settings.report_export_ttl_seconds)
+    logger.info(
+        "report_export_succeeded",
+        extra={
+            "task_id": export_task_id,
+            "document_version_id": document_version_id,
+            "request_id": request_id or export_task_id,
+            "status": "succeeded",
+        },
+    )
     return {"export_task_id": export_task_id, "status": "succeeded"}
 
 

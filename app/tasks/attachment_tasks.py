@@ -128,9 +128,28 @@ def run_attachment_parse(
     attempt = int(self.request.retries)
     key = f"financial-review:attachment-parse:{attachment_uuid}"
     client = _redis_client()
+    port = _attachment_state_port
+    if port is None:
+        raise RuntimeError("附件状态仓储尚未配置")
     cached = client.get(key)
     if cached:
-        cached_payload = cast(dict[str, str], json.loads(cached))
+        try:
+            cached_payload = cast(dict[str, str], json.loads(cached))
+        except Exception as exc:
+            failed = attachment_parse_state(
+                attachment_uuid, version_uuid, idempotency_key,
+                attempt=attempt, error=sanitize_error(str(exc)),
+            )
+            port.save(failed)
+            if attempt < 3:
+                raise self.retry(
+                    exc=RuntimeError(failed.error_message), countdown=2**attempt
+                ) from exc
+            return {
+                "attachment_id": attachment_id,
+                "status": "manual_review",
+                "error_message": failed.error_message or "",
+            }
         if cached_payload.get("status") in {"succeeded", "manual_review"}:
             logger.info(
                 "attachment_parse_terminal",
@@ -142,8 +161,6 @@ def run_attachment_parse(
                 },
             )
             return cached_payload
-    if _attachment_state_port is None:
-        raise RuntimeError("附件状态仓储尚未配置")
     try:
         raise RuntimeError("OCR 解析适配器尚未配置")
     except Exception as exc:
@@ -151,10 +168,10 @@ def run_attachment_parse(
             attachment_uuid,
             version_uuid,
             idempotency_key,
-            attempt=attempt + 1,
+            attempt=attempt,
             error=str(exc),
         )
-        _attachment_state_port.save(failed)
+        port.save(failed)
         logger.warning(
             "attachment_parse_state",
             extra={
@@ -170,7 +187,7 @@ def run_attachment_parse(
             "error_message": failed.error_message or "",
         }
         client.set(key, json.dumps(payload, ensure_ascii=False), ex=86400)
-        if attempt < 2:
+        if attempt < 3:
             raise self.retry(exc=exc, countdown=2**attempt) from exc
         return payload
 
