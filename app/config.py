@@ -21,6 +21,7 @@ class Settings(BaseSettings):
     app_host: str
     app_port: int
     document_backend: Literal["memory", "postgres"] = "memory"
+    auth_backend: Literal["memory", "postgres"] = "memory"
 
     database_url: str
     redis_url: str

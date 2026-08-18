@@ -139,6 +139,56 @@ class InMemoryRateLimiter:
         self._failures.pop(key, None)
 
 
+class RedisRateLimiter:
+    """生产 Redis 登录失败限流器，按账号/IP 使用带 TTL 的计数键。"""
+
+    def __init__(self, client: object | None = None, key_prefix: str | None = None) -> None:
+        """延迟创建 Redis 客户端，便于测试注入假客户端。"""
+        self._client = client
+        self._key_prefix = key_prefix or "financial-review:auth:login-failures"
+
+    @property
+    def client(self) -> object:
+        """获取 Redis 客户端；连接异常交给认证服务转换为 503。"""
+        if self._client is None:
+            try:
+                from redis import Redis
+
+                self._client = Redis.from_url(settings.redis_url, decode_responses=True)
+            except Exception as exc:
+                raise RuntimeError("Redis 限流依赖不可用") from exc
+        return self._client
+
+    def _key(self, key: str) -> str:
+        """拼接限流命名空间，避免和业务缓存键冲突。"""
+        return f"{self._key_prefix}:{key}"
+
+    def is_blocked(self, key: str, max_attempts: int, window_seconds: int) -> bool:
+        """读取窗口内失败次数，达到阈值即拒绝继续登录。"""
+        try:
+            count = self.client.get(self._key(key))  # type: ignore[attr-defined]
+            return int(count or 0) >= max_attempts
+        except Exception as exc:
+            raise RuntimeError("Redis 限流依赖不可用") from exc
+
+    def record_failure(self, key: str, window_seconds: int) -> None:
+        """递增失败次数并为首次计数设置窗口 TTL。"""
+        try:
+            redis_key = self._key(key)
+            count = int(self.client.incr(redis_key))  # type: ignore[attr-defined]
+            if count == 1:
+                self.client.expire(redis_key, max(window_seconds, 1))  # type: ignore[attr-defined]
+        except Exception as exc:
+            raise RuntimeError("Redis 限流依赖不可用") from exc
+
+    def clear(self, key: str) -> None:
+        """登录成功后清理账号和 IP 的失败计数。"""
+        try:
+            self.client.delete(self._key(key))  # type: ignore[attr-defined]
+        except Exception as exc:
+            raise RuntimeError("Redis 限流依赖不可用") from exc
+
+
 @dataclass(frozen=True)
 class AuthAuditEvent:
     """认证审计摘要，不保存密码、完整令牌或附件原文。"""
