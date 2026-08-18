@@ -19,6 +19,7 @@ from app.routers.reports import router as reports_router
 from app.routers.risk import document_risk_router
 from app.routers.risk import router as risk_router
 from app.routers.sessions import router as session_router
+from app.routers.support import router as support_router
 from app.services.health_service import get_readiness
 
 configure_logging()
@@ -32,6 +33,7 @@ app.include_router(analysis_router)
 app.include_router(attachment_router)
 app.include_router(direct_attachment_router)
 app.include_router(session_router)
+app.include_router(support_router)
 app.include_router(risk_router)
 app.include_router(document_risk_router)
 app.include_router(approval_router)
