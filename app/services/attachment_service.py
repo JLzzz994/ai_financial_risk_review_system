@@ -49,6 +49,7 @@ class AttachmentRecord:
     parse_status: str = "pending"
     retry_count: int = 0
     parse_error: str | None = None
+    parse_idempotency_key: str | None = None
     storage_error: str | None = None
 
 

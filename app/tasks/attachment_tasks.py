@@ -44,6 +44,7 @@ class AttachmentParseState:
     page_count: int | None = None
     confidence: float | None = None
     recognized_text: str | None = None
+    idempotency_key: str = ""
 
 
 class AttachmentStatePort(Protocol):
@@ -83,6 +84,8 @@ class SqlAttachmentStatePort:
                 raise ValueError("附件版本不存在")
             record.parse_status = state.status
             record.parse_error = state.error_message
+            record.retry_count = state.retry_count
+            record.parse_idempotency_key = state.idempotency_key
             await session.rollback()
             async with session.begin():
                 await repository.save(session, record)
@@ -103,6 +106,7 @@ class SqlAttachmentStatePort:
                             provider_name="paddleocr",
                             provider_version="3.x",
                             created_at=datetime.now(UTC),
+                            idempotency_key=state.idempotency_key,
                         ),
                     )
 
@@ -143,6 +147,7 @@ def attachment_parse_state(
         status,
         min(attempt, 3),
         sanitize_error(error) if error else None,
+        idempotency_key=idempotency_key,
     )
 
 
@@ -194,48 +199,36 @@ def run_attachment_parse(
     if port is None:
         raise RuntimeError("附件状态仓储尚未配置")
     key = f"financial-review:attachment-parse:{attachment_uuid}"
+    client: Any | None = None
+    cached: str | None = None
     try:
         client = _redis_client()
         cached = client.get(key)
     except Exception as exc:
-        if attempt >= 3:
-            failed = attachment_parse_state(
-                attachment_uuid, version_uuid, idempotency_key,
-                attempt=3, error=sanitize_error(str(exc)),
-            )
-            port.save(failed)
-            logger.error(
-                "attachment_parse_manual_review",
-                extra={
-                    "task_id": attachment_id,
-                    "document_version_id": document_version_id,
-                    "request_id": idempotency_key,
-                },
-            )
-            return {
-                "attachment_id": attachment_id,
-                "status": "manual_review",
-                "error_message": failed.error_message or "",
-            }
-        raise RuntimeError(sanitize_error(str(exc))) from exc
+        logger.warning(
+            "attachment_parse_cache_read_failed",
+            extra={
+                "task_id": attachment_id,
+                "document_version_id": document_version_id,
+                "request_id": idempotency_key,
+                "error": sanitize_error(str(exc)),
+            },
+        )
     if cached:
         try:
             cached_payload = cast(dict[str, str], json.loads(cached))
         except Exception as exc:
-            failed = attachment_parse_state(
-                attachment_uuid, version_uuid, idempotency_key,
-                attempt=attempt, error=sanitize_error(str(exc)),
+            logger.warning(
+                "attachment_parse_cache_corrupted",
+                extra={
+                    "task_id": attachment_id,
+                    "document_version_id": document_version_id,
+                    "request_id": idempotency_key,
+                    "error": sanitize_error(str(exc)),
+                },
             )
-            port.save(failed)
-            if attempt < 3:
-                raise self.retry(
-                    exc=RuntimeError(failed.error_message), countdown=2**attempt
-                ) from exc
-            return {
-                "attachment_id": attachment_id,
-                "status": "manual_review",
-                "error_message": failed.error_message or "",
-            }
+            cached = None
+            cached_payload = {}
         if cached_payload.get("status") in {"succeeded", "manual_review"}:
             logger.info(
                 "attachment_parse_terminal",
@@ -259,6 +252,7 @@ def run_attachment_parse(
             result.page_count,
             result.confidence,
             result.text,
+            idempotency_key,
         )
         port.save(succeeded)
         payload = {
@@ -267,7 +261,9 @@ def run_attachment_parse(
             "page_count": str(result.page_count),
             "confidence": str(result.confidence),
         }
-        client.set(key, json.dumps(payload, ensure_ascii=False), ex=86400)
+        _cache_set_nonfatal(
+            client, key, payload, attachment_id, document_version_id, idempotency_key
+        )
         logger.info(
             "attachment_parse_succeeded",
             extra={
@@ -289,8 +285,12 @@ def run_attachment_parse(
             error=str(exc),
         )
         port.save(failed)
-        logger.warning(
-            "attachment_parse_state",
+        logger.error(
+            (
+                "attachment_parse_manual_review"
+                if failed.status == "manual_review"
+                else "attachment_parse_state"
+            ),
             extra={
                 "task_id": attachment_id,
                 "document_version_id": document_version_id,
@@ -303,10 +303,37 @@ def run_attachment_parse(
             "status": failed.status,
             "error_message": failed.error_message or "",
         }
-        client.set(key, json.dumps(payload, ensure_ascii=False), ex=86400)
+        _cache_set_nonfatal(
+            client, key, payload, attachment_id, document_version_id, idempotency_key
+        )
         if attempt < 3:
             raise self.retry(exc=exc, countdown=2**attempt) from exc
         return payload
+
+
+def _cache_set_nonfatal(
+    client: Any | None,
+    key: str,
+    payload: dict[str, str],
+    attachment_id: str,
+    document_version_id: str,
+    request_id: str,
+) -> None:
+    """写入 Redis 短缓存；失败不得影响 PostgreSQL 事实状态和任务结果。"""
+    if client is None:
+        return
+    try:
+        client.set(key, json.dumps(payload, ensure_ascii=False), ex=86400)
+    except Exception as exc:
+        logger.warning(
+            "attachment_parse_cache_write_failed",
+            extra={
+                "task_id": attachment_id,
+                "document_version_id": document_version_id,
+                "request_id": request_id,
+                "error": sanitize_error(str(exc)),
+            },
+        )
 
 
 async def _ocr_adapter_result(adapter: OcrAdapter, request: OcrRequest) -> OcrResult:

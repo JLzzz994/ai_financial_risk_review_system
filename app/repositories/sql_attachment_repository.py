@@ -28,6 +28,7 @@ class ParseResultRecord:
     provider_name: str
     provider_version: str
     created_at: datetime
+    idempotency_key: str | None = None
 
 
 class SqlAttachmentRepository:
@@ -98,6 +99,9 @@ class SqlAttachmentRepository:
             "file_hash": record.file_hash,
             "storage_status": record.storage_status,
             "parse_status": record.parse_status,
+            "parse_retry_count": record.retry_count,
+            "parse_error": record.parse_error,
+            "parse_idempotency_key": record.parse_idempotency_key,
             "virus_scan_status": "clean",
             "virus_scan_version": "clean-scanner-v1",
             "virus_scanned_at": record.uploaded_at,
@@ -117,6 +121,9 @@ class SqlAttachmentRepository:
                 .values(
                     storage_status=record.storage_status,
                     parse_status=record.parse_status,
+                    parse_retry_count=record.retry_count,
+                    parse_error=record.parse_error,
+                    parse_idempotency_key=record.parse_idempotency_key,
                     file_path=record.object_key,
                     object_key=record.object_key,
                 )
@@ -154,6 +161,22 @@ class SqlAttachmentRepository:
         self, session: AsyncSession, result: ParseResultRecord
     ) -> ParseResultRecord:
         """追加一条解析结果，禁止覆盖历史结果。"""
+        if result.idempotency_key:
+            # 同一附件行加锁，避免 select 后 insert 的并发竞态。
+            await session.execute(
+                select(document_attachments.c.id)
+                .where(document_attachments.c.id == result.attachment_id)
+                .with_for_update()
+            )
+            existing = await session.execute(
+                select(attachment_parse_results.c.id).where(
+                    attachment_parse_results.c.attachment_id == result.attachment_id,
+                    attachment_parse_results.c.document_version_id == result.document_version_id,
+                    attachment_parse_results.c.parse_idempotency_key == result.idempotency_key,
+                )
+            )
+            if existing.scalar_one_or_none() is not None:
+                return result
         await session.execute(
             insert(attachment_parse_results).values(
                 id=result.result_id,
@@ -166,6 +189,7 @@ class SqlAttachmentRepository:
                 confidence=result.confidence,
                 provider_name=result.provider_name,
                 provider_version=result.provider_version,
+                parse_idempotency_key=result.idempotency_key,
             )
         )
         return result
@@ -188,6 +212,9 @@ class SqlAttachmentRepository:
             uploaded_at=created_at,
             storage_status=str(row["storage_status"]),
             parse_status=str(row["parse_status"]),
+            retry_count=int(row.get("parse_retry_count") or 0),
+            parse_error=row.get("parse_error"),
+            parse_idempotency_key=row.get("parse_idempotency_key"),
         )
 
 

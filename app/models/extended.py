@@ -210,6 +210,9 @@ document_attachments = Table(
     Column("virus_scan_version", String(64)),
     Column("virus_scanned_at", DateTime(timezone=True)),
     Column("parse_status", String(32), nullable=False, server_default="pending"),
+    Column("parse_retry_count", Integer, nullable=False, server_default="0"),
+    Column("parse_error", Text),
+    Column("parse_idempotency_key", String(128)),
     _created_at(),
     CheckConstraint("file_size > 0", name="ck_document_attachments_file_size_positive"),
     UniqueConstraint(
@@ -230,10 +233,15 @@ attachment_parse_results = Table(
     Column("confidence", Numeric(5, 4)),
     Column("provider_name", String(128), nullable=False),
     Column("provider_version", String(64), nullable=False),
+    Column("parse_idempotency_key", String(128), nullable=True),
     _created_at(),
     CheckConstraint(
         "confidence IS NULL OR (confidence >= 0 AND confidence <= 1)",
         name="ck_parse_confidence_range",
+    ),
+    UniqueConstraint(
+        "attachment_id", "document_version_id", "parse_idempotency_key",
+        name="uq_attachment_parse_results_idempotency",
     ),
 )
 
