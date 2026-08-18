@@ -1,5 +1,6 @@
 """附件解析任务的 Celery Worker 入口。"""
 
+import asyncio
 import json
 import logging
 from dataclasses import dataclass
@@ -7,6 +8,8 @@ from typing import Any, Protocol, cast
 from uuid import UUID
 
 from app.config import settings
+from app.db.engine import async_session_factory
+from app.repositories.sql_attachment_repository import SqlAttachmentRepository
 from app.tasks.celery_app import celery_app
 from app.tasks.safety import sanitize_error
 
@@ -43,7 +46,25 @@ class AttachmentStatePort(Protocol):
         """保存 parsing/failed/manual_review 状态。"""
 
 
-_attachment_state_port: AttachmentStatePort | None = None
+class SqlAttachmentStatePort:
+    """生产附件事实状态端口，回写 PostgreSQL 附件元数据。"""
+
+    def save(self, state: AttachmentParseState) -> None:
+        asyncio.run(self._save(state))
+
+    async def _save(self, state: AttachmentParseState) -> None:
+        repository = SqlAttachmentRepository()
+        async with async_session_factory() as session:
+            record = await repository.get(session, state.attachment_id)
+            if record is None or record.document_version_id != state.document_version_id:
+                raise ValueError("附件版本不存在")
+            record.parse_status = state.status
+            record.parse_error = state.error_message
+            async with session.begin():
+                await repository.save(session, record)
+
+
+_attachment_state_port: AttachmentStatePort | None = SqlAttachmentStatePort()
 
 
 def set_attachment_state_port(port: AttachmentStatePort | None) -> None:
@@ -110,7 +131,7 @@ def run_attachment_parse(
         raise RuntimeError("附件状态仓储尚未配置")
     try:
         raise RuntimeError("OCR 解析适配器尚未配置")
-    except (ConnectionError, OSError, RuntimeError, ValueError) as exc:
+    except Exception as exc:
         failed = attachment_parse_state(
             attachment_uuid,
             version_uuid,
@@ -134,7 +155,7 @@ def run_attachment_parse(
             "error_message": failed.error_message or "",
         }
         client.set(key, json.dumps(payload, ensure_ascii=False), ex=86400)
-        if attempt < 3:
+        if attempt < 2:
             raise self.retry(exc=exc, countdown=2**attempt) from exc
         return payload
 
@@ -176,6 +197,7 @@ def parse_attachment_task(
 __all__ = [
     "AttachmentParseState",
     "AttachmentStatePort",
+    "SqlAttachmentStatePort",
     "ParseTaskResult",
     "attachment_parse_state",
     "parse_attachment_task",

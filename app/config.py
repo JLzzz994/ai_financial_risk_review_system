@@ -29,6 +29,7 @@ class Settings(BaseSettings):
     celery_result_backend: str
     celery_task_max_retries: int
     celery_task_timeout_seconds: int
+    report_export_ttl_seconds: int = 86400
 
     minio_endpoint: str
     minio_access_key: str

@@ -139,7 +139,7 @@ class PersistentReportService:
             json.dumps(payload, ensure_ascii=False),
             ex=86400,
         )
-        self._enqueue(task.export_task_id, document_version_id, export_format)
+        self._enqueue(task.export_task_id, document_version_id, export_format, idempotency_key)
         return task
 
     def get_export(self, export_task_id: UUID) -> ExportTaskResponse:
@@ -163,12 +163,19 @@ class PersistentReportService:
         return json.dumps(payload.get("content", {}), ensure_ascii=False, indent=2).encode("utf-8")
 
     @staticmethod
-    def _enqueue(export_task_id: UUID, document_version_id: UUID, export_format: str) -> None:
+    def _enqueue(
+        export_task_id: UUID,
+        document_version_id: UUID,
+        export_format: str,
+        request_id: str,
+    ) -> None:
         """向 Celery 投递稳定参数，API 不执行导出。"""
         try:
             from app.tasks.report_tasks import enqueue_report_export
 
-            enqueue_report_export(export_task_id, document_version_id, export_format)
+            enqueue_report_export(
+                export_task_id, document_version_id, export_format, request_id
+            )
         except Exception as exc:
             raise RuntimeError("报告导出队列不可用") from exc
 

@@ -39,12 +39,16 @@ def _redis_client() -> Any:
 @celery_app.task(  # type: ignore[untyped-decorator]
     name="financial_review.report_export",
     bind=True,
-    autoretry_for=(RuntimeError,),
+    autoretry_for=(RuntimeError, ConnectionError, OSError),
     retry_backoff=True,
     max_retries=3,
 )
 def run_report_export(
-    self: Any, export_task_id: str, document_version_id: str, export_format: str
+    self: Any,
+    export_task_id: str,
+    document_version_id: str,
+    export_format: str,
+    request_id: str | None = None,
 ) -> dict[str, str]:
     """Worker 更新导出状态；不接收附件二进制和 ORM 对象。"""
     UUID(export_task_id)
@@ -70,27 +74,39 @@ def run_report_export(
     except (ConnectionError, OSError, RuntimeError, ValueError) as exc:
         payload["status"] = "manual_review" if self.request.retries >= 3 else "failed"
         payload["error_message"] = sanitize_error(str(exc))
-        client.set(key, json.dumps(payload, ensure_ascii=False), ex=86400)
+        client.set(
+            key,
+            json.dumps(payload, ensure_ascii=False),
+            ex=settings.report_export_ttl_seconds,
+        )
         logger.warning(
             "report_export_failure",
             extra={
                 "task_id": export_task_id,
                 "document_version_id": document_version_id,
-                "request_id": export_task_id,
+                "request_id": request_id or export_task_id,
             },
         )
         if self.request.retries < 3:
             raise self.retry(exc=exc, countdown=2**self.request.retries) from exc
         return {"export_task_id": export_task_id, "status": payload["status"]}
-    client.set(key, json.dumps(payload, ensure_ascii=False), ex=86400)
+    client.set(key, json.dumps(payload, ensure_ascii=False), ex=settings.report_export_ttl_seconds)
     return {"export_task_id": export_task_id, "status": "succeeded"}
 
 
 def enqueue_report_export(
-    export_task_id: UUID, document_version_id: UUID, export_format: str
+    export_task_id: UUID,
+    document_version_id: UUID,
+    export_format: str,
+    request_id: str | None = None,
 ) -> None:
     """投递报告导出任务。"""
-    run_report_export.delay(str(export_task_id), str(document_version_id), export_format)
+    run_report_export.delay(
+        str(export_task_id),
+        str(document_version_id),
+        export_format,
+        request_id or str(export_task_id),
+    )
 
 
 __all__ = ["ReportExporter", "enqueue_report_export", "run_report_export", "set_report_exporter"]

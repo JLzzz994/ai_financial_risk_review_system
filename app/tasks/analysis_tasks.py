@@ -250,7 +250,7 @@ def run_analysis_task(
         result = asyncio.run(_run_analysis(task_uuid, version_uuid, self.request.retries))
         logger.info("analysis_worker_exit", extra={**result, "request_id": idempotency_key})
         return result
-    except (ConnectionError, OSError, RuntimeError) as exc:
+    except Exception as exc:
         # 外部适配器不可用时持久化失败并交给 Celery 做有界重试。
         state = AnalysisWorkerState(
             task_uuid,
