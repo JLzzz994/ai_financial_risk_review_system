@@ -4,7 +4,7 @@ from collections.abc import Mapping
 from datetime import date
 from decimal import Decimal
 from enum import StrEnum
-from typing import Annotated, Any, Literal
+from typing import Annotated, Any, Literal, TypeAlias
 
 from pydantic import BaseModel, BeforeValidator, ConfigDict, Field, field_validator, model_validator
 
@@ -219,7 +219,7 @@ class TravelReimbursementPayload(BaseDocumentTypePayload):
         )
 
 
-type DocumentTypePayload = (
+DocumentTypePayload: TypeAlias = (
     PublicPaymentPayload
     | PrepaymentPayload
     | BatchPaymentPayload

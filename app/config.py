@@ -20,6 +20,7 @@ class Settings(BaseSettings):
     log_dir: str
     app_host: str
     app_port: int
+    frontend_dist_dir: str | None = None
     document_backend: Literal["memory", "postgres"] = "memory"
     auth_backend: Literal["memory", "postgres"] = "memory"
 
@@ -69,6 +70,21 @@ class Settings(BaseSettings):
 
     rag_top_k: int
     rag_rule_version: str
+    rag_enabled: bool = False
+    milvus_uri: str = ""
+    milvus_token: str = ""
+    milvus_collection: str = "kb_chunks"
+    milvus_timeout_seconds: int = 10
+    rag_embedding_base_url: str = ""
+    rag_embedding_api_key: str = ""
+    rag_embedding_timeout_seconds: int = 60
+    rag_embedding_model_version: str = ""
+    rag_reranker_enabled: bool = False
+    rag_reranker_base_url: str = ""
+    rag_reranker_api_key: str = ""
+    rag_reranker_timeout_seconds: int = 60
+    rag_dense_weight: float = 0.6
+    rag_sparse_weight: float = 0.4
     external_model_calls_enabled: bool
 
     model_config = SettingsConfigDict(

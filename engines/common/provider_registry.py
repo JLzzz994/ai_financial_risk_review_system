@@ -7,6 +7,7 @@
 
 from dataclasses import dataclass
 from enum import StrEnum
+from typing import TypeAlias
 
 from engines.common.storage import FileStorage
 from engines.model.contracts import EmbeddingAdapter, LlmAdapter, RagAdapter
@@ -23,7 +24,7 @@ class ProviderKind(StrEnum):
     FILE_STORAGE = "file_storage"
 
 
-type ProviderImplementation = (
+ProviderImplementation: TypeAlias = (
     OcrAdapter | LlmAdapter | EmbeddingAdapter | RagAdapter | FileStorage
 )
 

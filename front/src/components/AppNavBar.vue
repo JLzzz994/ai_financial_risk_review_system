@@ -68,7 +68,7 @@ async function handleLogout(): Promise<void> {
       <span class="nav-user-name">{{ auth.displayName }}</span>
       <button
         type="button"
-        class="btn-link nav-logout"
+        class="btn btn-secondary btn-sm nav-logout"
         @click="handleLogout"
       >
         退出
@@ -140,6 +140,6 @@ async function handleLogout(): Promise<void> {
 }
 
 .nav-logout {
-  font-size: 13px;
+  flex-shrink: 0;
 }
 </style>

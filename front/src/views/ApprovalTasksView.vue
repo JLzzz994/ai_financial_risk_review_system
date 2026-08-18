@@ -7,7 +7,6 @@ import type { ApprovalTask } from '@/types/domain'
 import { approvalTaskStatusMap, approvalTaskStatusView } from '@/types/status'
 import { formatDate } from '@/utils/format'
 import AmountText from '@/components/AmountText.vue'
-import ApiHint from '@/components/ApiHint.vue'
 import ApprovalDecisionDialog from '@/components/ApprovalDecisionDialog.vue'
 import DataTable from '@/components/DataTable.vue'
 import MetricCard from '@/components/MetricCard.vue'
@@ -93,10 +92,6 @@ onMounted(async () => {
     title="审批任务"
     description="本人名下的顺序审批任务：通过、退回与驳回"
   >
-    <template #actions>
-      <ApiHint text="GET /api/v1/approval-tasks" />
-    </template>
-
     <section
       class="grid grid-3"
       aria-label="状态摘要"

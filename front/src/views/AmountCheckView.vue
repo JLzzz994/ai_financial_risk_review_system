@@ -6,7 +6,6 @@ import { safeErrorMessage } from '@/api/client'
 import type { AmountComparison } from '@/types/domain'
 import { subtractAmount, compareAmount, formatMoney } from '@/utils/format'
 import AmountText from '@/components/AmountText.vue'
-import ApiHint from '@/components/ApiHint.vue'
 import DataTable from '@/components/DataTable.vue'
 import ErrorState from '@/components/ErrorState.vue'
 import MetricCard from '@/components/MetricCard.vue'
@@ -93,7 +92,6 @@ onMounted(load)
   >
     <template #actions>
       <div class="row">
-        <ApiHint text="GET /api/v1/documents/{document_id}/amount-comparison" />
         <button
           type="button"
           class="btn btn-secondary"

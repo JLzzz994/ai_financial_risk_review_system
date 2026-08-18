@@ -52,6 +52,8 @@ async def list_audit_events(
             action=event.action,
             resource_type=event.resource_type,
             resource_id=event.resource_id,
+            result=event.result,
+            request_id=event.request_id,
         )
         for index, event in enumerate(events)
     ]
@@ -72,11 +74,12 @@ async def export_audit_events(
     """导出脱敏审计日志 CSV。"""
     if settings.document_backend == "postgres":
         await get_current_principal(authorization)
-    lines = ["log_id,occurred_at,action,resource_type,resource_id"]
+    lines = ["log_id,occurred_at,action,resource_type,resource_id,request_id,result"]
     for event in service.events:
         lines.append(
             f"{event.resource_id or ''},{event.occurred_at.isoformat()},"
-            f"{event.action},{event.resource_type},{event.resource_id or ''}"
+            f"{event.action},{event.resource_type},{event.resource_id or ''},"
+            f"{event.request_id},{event.result}"
         )
     return Response(
         content="\n".join(lines).encode("utf-8-sig"),

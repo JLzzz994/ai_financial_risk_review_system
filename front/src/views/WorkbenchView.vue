@@ -8,7 +8,6 @@ import type { ApprovalTask, DocumentSummary, RiskFinding } from '@/types/domain'
 import { documentStatusView } from '@/types/status'
 import { formatDate } from '@/utils/format'
 import AmountText from '@/components/AmountText.vue'
-import ApiHint from '@/components/ApiHint.vue'
 import MetricCard from '@/components/MetricCard.vue'
 import PageShell from '@/components/PageShell.vue'
 import RiskLevelTag from '@/components/RiskLevelTag.vue'
@@ -136,7 +135,6 @@ onMounted(load)
       <div class="card-title">
         <span>待处理单据</span>
         <div class="row">
-          <ApiHint text="GET /api/v1/approval-tasks?task_status=pending" />
           <RouterLink
             to="/approval-tasks"
             class="btn-link"
@@ -199,7 +197,6 @@ onMounted(load)
       <div class="card-title">
         <span>风险概览</span>
         <div class="row">
-          <ApiHint text="GET /api/v1/documents/{document_id}/risk-findings" />
           <RouterLink
             v-if="featuredDocumentId"
             :to="`/documents/${featuredDocumentId}/risk-analysis`"

@@ -19,6 +19,9 @@ class AuditService:
         action: str,
         resource_type: str,
         resource_id: UUID | None = None,
+        *,
+        result: str = "success",
+        request_id: str = "",
     ) -> AuditEvent:
         """记录审批、复核、外部调用和敏感下载事件。"""
         event = AuditEvent(
@@ -26,6 +29,8 @@ class AuditService:
             action=action,
             resource_type=resource_type,
             resource_id=resource_id,
+            result=result,
+            request_id=request_id,
             occurred_at=datetime.now(UTC),
         )
         self.events.append(event)

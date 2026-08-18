@@ -13,7 +13,6 @@ import type {
 } from '@/types/domain'
 import { documentStatusView } from '@/types/status'
 import { addAmounts, formatMoney, isValidAmountInput, isZeroAmount } from '@/utils/format'
-import ApiHint from '@/components/ApiHint.vue'
 import AttachmentUploader from '@/components/AttachmentUploader.vue'
 import ConfirmDialog from '@/components/ConfirmDialog.vue'
 import PageShell from '@/components/PageShell.vue'
@@ -382,7 +381,6 @@ onMounted(load)
   >
     <template #actions>
       <div class="row">
-        <ApiHint text="PATCH /api/v1/documents/{document_id}" />
         <StatusBadge
           v-if="document"
           v-bind="documentStatusView(document.document_status)"
@@ -797,7 +795,6 @@ onMounted(load)
       <section class="card">
         <div class="card-title">
           <span>附件</span>
-          <ApiHint text="POST /api/v1/documents/{document_id}/attachments" />
         </div>
         <AttachmentUploader :document-id="documentId" />
       </section>

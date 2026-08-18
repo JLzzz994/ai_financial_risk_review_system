@@ -14,7 +14,6 @@ import { useAppStore } from '@/stores/app'
 import type { ReviewReport } from '@/types/domain'
 import { reportStatusView } from '@/types/status'
 import { formatDateTime } from '@/utils/format'
-import ApiHint from '@/components/ApiHint.vue'
 import DataTable from '@/components/DataTable.vue'
 import ErrorState from '@/components/ErrorState.vue'
 import PageShell from '@/components/PageShell.vue'
@@ -143,7 +142,6 @@ onBeforeUnmount(() => {
   >
     <template #actions>
       <div class="row">
-        <ApiHint :text="isDetailMode ? 'GET /api/v1/review-reports/{document_version_id}' : 'GET /api/v1/documents/{document_id}/review-reports'" />
         <button
           v-if="isDetailMode"
           type="button"

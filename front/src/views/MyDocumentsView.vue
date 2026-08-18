@@ -8,7 +8,6 @@ import { useAuthStore } from '@/stores/auth'
 import { documentStatusMap, documentStatusView } from '@/types/status'
 import { documentTypeLabels, type DocumentPayload, type DocumentSummary, type DocumentType } from '@/types/domain'
 import AmountText from '@/components/AmountText.vue'
-import ApiHint from '@/components/ApiHint.vue'
 import ConfirmDialog from '@/components/ConfirmDialog.vue'
 import DataTable from '@/components/DataTable.vue'
 import PageShell from '@/components/PageShell.vue'
@@ -214,7 +213,6 @@ onMounted(load)
   >
     <template #actions>
       <div class="row">
-        <ApiHint text="GET /api/v1/documents" />
         <button
           v-if="auth.roles.includes('applicant')"
           type="button"

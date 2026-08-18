@@ -12,7 +12,6 @@ import { useAppStore } from '@/stores/app'
 import type { Attachment } from '@/types/domain'
 import { attachmentParseView, attachmentStorageView } from '@/types/status'
 import { formatDateTime, formatFileSize } from '@/utils/format'
-import ApiHint from './ApiHint.vue'
 import ConfirmDialog from './ConfirmDialog.vue'
 import StatusBadge from './StatusBadge.vue'
 
@@ -20,9 +19,8 @@ const props = withDefaults(
   defineProps<{
     documentId: string
     readonly?: boolean
-    hint?: boolean
   }>(),
-  { readonly: false, hint: true },
+  { readonly: false },
 )
 
 const app = useAppStore()
@@ -162,10 +160,6 @@ defineExpose({ reload: load })
         支持 PDF / Excel / Word / 图片，单文件不超过 {{ MAX_SIZE_MB }}MB；上传后将自动进行病毒扫描与解析。
       </p>
       <div class="row">
-        <ApiHint
-          v-if="hint"
-          text="POST /api/v1/documents/{document_id}/attachments"
-        />
         <button
           v-if="!readonly"
           type="button"

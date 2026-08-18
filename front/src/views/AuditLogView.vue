@@ -6,7 +6,6 @@ import { useAppStore } from '@/stores/app'
 import type { AuditLog } from '@/types/domain'
 import { auditResultView } from '@/types/status'
 import { formatDateTime } from '@/utils/format'
-import ApiHint from '@/components/ApiHint.vue'
 import BaseDrawer from '@/components/BaseDrawer.vue'
 import DataTable from '@/components/DataTable.vue'
 import ErrorState from '@/components/ErrorState.vue'
@@ -109,7 +108,6 @@ onMounted(load)
   >
     <template #actions>
       <div class="row">
-        <ApiHint text="GET /api/v1/audit-logs" />
         <button
           type="button"
           class="btn btn-secondary"

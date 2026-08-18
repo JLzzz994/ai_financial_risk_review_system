@@ -29,12 +29,17 @@
 !/*.conf
 !/*.example
 !/*.lock
+!/requirements.txt
 !/Dockerfile
 !/docker-compose.yml
 !/docker-compose.yaml
 !/docker-compose.app.yml
 !/Makefile
 !/README.md
+!/deploy/
+!/deploy/**
+!/交付物/
+!/交付物/**
 
 # 本地环境、缓存、构建产物和 IDE 文件
 .env

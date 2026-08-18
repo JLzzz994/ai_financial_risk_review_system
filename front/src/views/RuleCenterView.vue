@@ -16,7 +16,6 @@ import type { MarketPriceItem, RuleItem, SupplierRuleItem } from '@/types/domain
 import { configStatusView } from '@/types/status'
 import { formatDate } from '@/utils/format'
 import AmountText from '@/components/AmountText.vue'
-import ApiHint from '@/components/ApiHint.vue'
 import BaseModal from '@/components/BaseModal.vue'
 import ConfirmDialog from '@/components/ConfirmDialog.vue'
 import DataTable from '@/components/DataTable.vue'
@@ -182,10 +181,6 @@ onMounted(load)
     title="规则中心"
     description="风险规则、市场价参考、供应商规则与系统参数（配置变更全部版本化并写入审计）"
   >
-    <template #actions>
-      <ApiHint text="GET /api/v1/rules" />
-    </template>
-
     <div class="rule-version-banner">
       <span class="rule-version-title">当前规则版本 v3.2</span>
       <span class="muted">风险判断由确定性规则引擎负责；LLM 仅做解释与建议，规则变更需发布新版本并回归评估。</span>

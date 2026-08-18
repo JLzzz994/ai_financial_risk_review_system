@@ -4,7 +4,7 @@ import sqlalchemy as sa
 
 from alembic import context, op
 
-revision = "0005_attachment_parse_idempotency"
+revision = "0005_parse_idempotency"
 down_revision = "0004_explicit_data_object_tables"
 branch_labels = None
 depends_on = None
@@ -13,8 +13,33 @@ depends_on = None
 def upgrade() -> None:
     """为已重建的附件表增加可恢复、可幂等的事实字段。"""
     # 0004 的 Base.metadata.create_all 已包含这些字段；离线模式无法读取
-    # Inspector，只需让静态 SQL 顺利遍历迁移链即可。
+    # Inspector，因此生成 PostgreSQL 幂等 DDL，兼容已存在或尚未存在的字段。
     if context.is_offline_mode():
+        op.execute(
+            "ALTER TABLE document_attachments "
+            "ADD COLUMN IF NOT EXISTS parse_retry_count INTEGER NOT NULL DEFAULT 0"
+        )
+        op.execute(
+            "ALTER TABLE document_attachments "
+            "ADD COLUMN IF NOT EXISTS parse_error TEXT"
+        )
+        op.execute(
+            "ALTER TABLE document_attachments "
+            "ADD COLUMN IF NOT EXISTS parse_idempotency_key VARCHAR(128)"
+        )
+        op.execute(
+            "ALTER TABLE attachment_parse_results "
+            "ADD COLUMN IF NOT EXISTS parse_idempotency_key VARCHAR(128)"
+        )
+        op.execute(
+            "DO $$ BEGIN "
+            "IF NOT EXISTS (SELECT 1 FROM pg_constraint "
+            "WHERE conname = 'uq_attachment_parse_results_idempotency') THEN "
+            "ALTER TABLE attachment_parse_results ADD CONSTRAINT "
+            "uq_attachment_parse_results_idempotency UNIQUE "
+            "(attachment_id, document_version_id, parse_idempotency_key); "
+            "END IF; END $$"
+        )
         return
     bind = op.get_bind()
     inspector = sa.inspect(bind)
@@ -56,6 +81,21 @@ def upgrade() -> None:
 def downgrade() -> None:
     """回滚附件解析幂等字段。"""
     if context.is_offline_mode():
+        op.execute(
+            "ALTER TABLE attachment_parse_results "
+            "DROP CONSTRAINT IF EXISTS uq_attachment_parse_results_idempotency"
+        )
+        op.execute(
+            "ALTER TABLE attachment_parse_results "
+            "DROP COLUMN IF EXISTS parse_idempotency_key"
+        )
+        op.execute(
+            "ALTER TABLE document_attachments DROP COLUMN IF EXISTS parse_idempotency_key"
+        )
+        op.execute("ALTER TABLE document_attachments DROP COLUMN IF EXISTS parse_error")
+        op.execute(
+            "ALTER TABLE document_attachments DROP COLUMN IF EXISTS parse_retry_count"
+        )
         return
     bind = op.get_bind()
     inspector = sa.inspect(bind)

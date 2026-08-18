@@ -8,7 +8,7 @@
 from collections.abc import Callable
 from dataclasses import dataclass
 from enum import StrEnum
-from typing import Any
+from typing import Any, TypeAlias
 
 
 class ActionCategory(StrEnum):
@@ -18,7 +18,7 @@ class ActionCategory(StrEnum):
     ANALYSIS = "analysis"
 
 
-type ActionHandler = Callable[..., Any]
+ActionHandler: TypeAlias = Callable[..., Any]
 
 
 @dataclass(frozen=True, slots=True)

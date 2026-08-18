@@ -16,7 +16,6 @@ import { useAppStore } from '@/stores/app'
 import { useAuthStore } from '@/stores/auth'
 import type { AnalysisTask, DocumentDetail, RiskFinding } from '@/types/domain'
 import { reviewStatusView } from '@/types/status'
-import ApiHint from '@/components/ApiHint.vue'
 import ConfirmDialog from '@/components/ConfirmDialog.vue'
 import ErrorState from '@/components/ErrorState.vue'
 import EvidenceDrawer from '@/components/EvidenceDrawer.vue'
@@ -181,7 +180,6 @@ onBeforeUnmount(() => subscription?.close())
   >
     <template #actions>
       <div class="row">
-        <ApiHint text="GET /api/v1/documents/{document_id}/risk-findings" />
         <button
           type="button"
           class="btn btn-secondary"
@@ -213,7 +211,6 @@ onBeforeUnmount(() => subscription?.close())
       >
         <div class="card-title">
           <span>分析进行中</span>
-          <ApiHint text="SSE GET /api/v1/analysis-tasks/{task_id}/events" />
         </div>
         <TaskProgress
           :task="task"

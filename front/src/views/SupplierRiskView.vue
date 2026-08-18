@@ -5,7 +5,6 @@ import { getSupplierRisk } from '@/api/suppliers'
 import { safeErrorMessage } from '@/api/client'
 import type { SupplierRisk } from '@/types/domain'
 import { formatDate, formatMoney } from '@/utils/format'
-import ApiHint from '@/components/ApiHint.vue'
 import ErrorState from '@/components/ErrorState.vue'
 import MetricCard from '@/components/MetricCard.vue'
 import PageShell from '@/components/PageShell.vue'
@@ -40,7 +39,6 @@ onMounted(load)
   >
     <template #actions>
       <div class="row">
-        <ApiHint text="GET /api/v1/suppliers/{supplier_code}/risks" />
         <RiskLevelTag :level="supplier?.risk_status" />
       </div>
     </template>

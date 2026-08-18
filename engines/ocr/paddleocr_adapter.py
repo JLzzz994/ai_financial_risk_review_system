@@ -93,9 +93,9 @@ class PaddleOCRAdapter:
             predict = getattr(pipeline, "predict", None)
             if not callable(predict):
                 raise OcrProcessingError("PaddleOCR pipeline 缺少 predict 方法")
-            # PaddleOCR 3.x 的统一推理入口参数名为 ``input``；不使用旧版
-            # ``source``，避免真实 pipeline 在运行时因关键字不匹配而失败。
-            raw_results = predict(input=temp_path)
+            # PaddleOCR 3.x 的示例使用位置参数传入文件路径；这样也兼容
+            # 仅声明单个 ``source`` 位置参数的私有化 pipeline 包装器。
+            raw_results = predict(temp_path)
             return self._aggregate_results(raw_results)
         except OcrAdapterError:
             raise
@@ -114,7 +114,12 @@ class PaddleOCRAdapter:
             return self._pipeline
         try:
             module = import_module("paddleocr")
-            kwargs: dict[str, Any] = {"lang": self.language}
+            kwargs: dict[str, Any] = {
+                "lang": self.language,
+                "use_doc_orientation_classify": False,
+                "use_doc_unwarping": False,
+                "use_textline_orientation": False,
+            }
             if self.model_dir:
                 kwargs["text_detection_model_dir"] = self.model_dir
             self._pipeline = module.PaddleOCR(**kwargs)

@@ -8,7 +8,6 @@ import { useAppStore } from '@/stores/app'
 import type { AnalysisTask, ReviewSession, SessionMessage } from '@/types/domain'
 import { sessionStatusView } from '@/types/status'
 import { formatDateTime } from '@/utils/format'
-import ApiHint from '@/components/ApiHint.vue'
 import ConfirmDialog from '@/components/ConfirmDialog.vue'
 import ErrorState from '@/components/ErrorState.vue'
 import PageShell from '@/components/PageShell.vue'
@@ -162,7 +161,6 @@ onBeforeUnmount(() => subscription?.close())
   >
     <template #actions>
       <div class="row">
-        <ApiHint text="GET /api/v1/review-sessions/{session_id}/messages" />
         <StatusBadge
           v-if="session"
           v-bind="sessionStatusView(session.session_status)"
@@ -298,7 +296,6 @@ onBeforeUnmount(() => subscription?.close())
         <section class="card">
           <div class="card-title">
             <span>任务进度</span>
-            <ApiHint text="SSE /api/v1/review-sessions/{session_id}/events" />
           </div>
           <TaskProgress
             v-if="task"

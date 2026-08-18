@@ -26,7 +26,6 @@ import {
 } from '@/types/status'
 import { formatDateTime, formatMoney } from '@/utils/format'
 import AmountText from '@/components/AmountText.vue'
-import ApiHint from '@/components/ApiHint.vue'
 import ApprovalDecisionDialog from '@/components/ApprovalDecisionDialog.vue'
 import AttachmentUploader from '@/components/AttachmentUploader.vue'
 import EvidenceDrawer from '@/components/EvidenceDrawer.vue'
@@ -219,7 +218,6 @@ onBeforeUnmount(() => subscription?.close())
   >
     <template #actions>
       <div class="row">
-        <ApiHint text="GET /api/v1/documents/{document_id}" />
         <StatusBadge
           v-if="document"
           v-bind="documentStatusView(document.document_status)"
@@ -268,7 +266,6 @@ onBeforeUnmount(() => subscription?.close())
       >
         <div class="card-title">
           <span>分析进度</span>
-          <ApiHint text="GET /api/v1/analysis-tasks/{task_id} · SSE events" />
         </div>
         <TaskProgress
           :task="activeTask"
@@ -387,12 +384,10 @@ onBeforeUnmount(() => subscription?.close())
           <section class="card">
             <div class="card-title">
               <span>附件证据</span>
-              <ApiHint text="GET /api/v1/documents/{document_id}/attachments" />
             </div>
             <AttachmentUploader
               :document-id="documentId"
               :readonly="!isApplicant"
-              :hint="false"
             />
           </section>
 
@@ -401,7 +396,6 @@ onBeforeUnmount(() => subscription?.close())
             <div class="card-title">
               <span>风险复核 <span class="card-title-sub">共 {{ findings.length }} 条</span></span>
               <div class="row">
-                <ApiHint text="GET /api/v1/documents/{document_id}/risk-findings" />
                 <RouterLink
                   :to="`/documents/${documentId}/risk-analysis`"
                   class="btn-link"
@@ -444,7 +438,6 @@ onBeforeUnmount(() => subscription?.close())
           <section class="card">
             <div class="card-title">
               <span>版本历史</span>
-              <ApiHint text="GET /api/v1/documents/{document_id}/versions" />
             </div>
             <ul class="version-list">
               <li
@@ -471,7 +464,6 @@ onBeforeUnmount(() => subscription?.close())
           <section class="card">
             <div class="card-title">
               <span>审批进度</span>
-              <ApiHint text="GET /api/v1/documents/{document_id}/approval-history" />
             </div>
             <ol class="timeline">
               <li
@@ -517,7 +509,6 @@ onBeforeUnmount(() => subscription?.close())
           <section class="card">
             <div class="card-title">
               <span>审核报告</span>
-              <ApiHint text="GET /api/v1/review-reports/{document_version_id}" />
             </div>
             <template v-if="currentReport">
               <div class="report-row">

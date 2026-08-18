@@ -6,7 +6,6 @@ import { useAppStore } from '@/stores/app'
 import type { WorkflowTemplate } from '@/types/domain'
 import { configStatusView } from '@/types/status'
 import { formatDateTime } from '@/utils/format'
-import ApiHint from '@/components/ApiHint.vue'
 import ConfirmDialog from '@/components/ConfirmDialog.vue'
 import DataTable from '@/components/DataTable.vue'
 import ErrorState from '@/components/ErrorState.vue'
@@ -131,7 +130,6 @@ onMounted(load)
   >
     <template #actions>
       <div class="row">
-        <ApiHint text="GET/POST /api/v1/approval-workflows" />
         <button
           type="button"
           class="btn btn-primary"

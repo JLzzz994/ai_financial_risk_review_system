@@ -18,6 +18,7 @@ npm run test:unit # vitest 单元测试
 
 - `VITE_API_BASE_URL`：API 前缀，默认 `/api/v1`（dev 经 Vite 代理到 `127.0.0.1:8000`，生产建议 nginx 反代）。
 - `VITE_ENABLE_MOCK`：`true` 时启用开发 mock 层（拦截 fetch，按 SPEC 接口返回示例数据并推进状态机）。后端 OpenAPI 固化联调时置为 `false`。
+- `VITE_SHOW_API_HINTS`：仅调试时显示组件内的 API 路径提示，默认 `false`；业务页面默认不展示接口地址。
 
 ## Mock 演示账号（密码均为 `demo1234`）
 

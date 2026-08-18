@@ -233,7 +233,7 @@ async def delete_attachment(
 
 @router.post("/{attachment_id}/parse", response_model=AttachmentResponse)
 async def parse_attachment(
-    document_id: UUID,
+    document_id: UUID | None,
     attachment_id: UUID,
     authorization: str | None = Header(default=None),
     session: AsyncSession = Depends(get_session),
@@ -262,7 +262,7 @@ async def parse_attachment(
         raise HTTPException(status_code=404, detail=str(exc)) from exc
     except PermissionError as exc:
         raise HTTPException(status_code=403, detail=str(exc)) from exc
-    if record.document_id != document_id:
+    if document_id is not None and record.document_id != document_id:
         raise HTTPException(status_code=404, detail="附件不存在")
     if not normalized_idempotency_key:
         raise HTTPException(status_code=422, detail="缺少有效的 Idempotency-Key")
@@ -345,7 +345,7 @@ async def parse_attachment_direct(
 ) -> AttachmentResponse:
     """兼容非嵌套路由，委托同一解析业务逻辑。"""
     return await parse_attachment(
-        UUID(int=0),
+        None,
         attachment_id,
         authorization,
         session,

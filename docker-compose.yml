@@ -1,6 +1,9 @@
 services:
   postgres:
-    image: postgres:16-alpine
+    # 注意：不要改回 postgres:16-alpine。
+    # 阿里云镜像加速器等镜像源提供的 16-alpine 重建产物有缺陷（postgres uid 异常为 70，
+    # initdb 写 postmaster.pid/pg_wal 报 Operation not permitted），Debian 版 postgres:16 已验证正常。
+    image: postgres:16
     environment:
       POSTGRES_DB: ${POSTGRES_DB}
       POSTGRES_USER: ${POSTGRES_USER}
@@ -53,25 +56,82 @@ services:
       - app-network
     restart: unless-stopped
 
-  embedding:
-    image: ghcr.io/huggingface/text-embeddings-inference:cpu-1.8
-    container_name: embedding
-    restart: unless-stopped
-    command: ["--model-id", "${EMBEDDING_MODEL_ID:-/models/bge-large-zh-v1.5}"]
-    ports:
-      - "8081:80"
-    environment:
-      MAX_CONCURRENT_REQUESTS: "16"
-      MAX_BATCH_TOKENS: "16384"
+  # Milvus standalone 依赖 etcd 保存元数据、MinIO 保存向量索引对象。
+  # BGE-M3/Reranker 模型不在本 Compose 中运行，见 RAG_EMBEDDING_BASE_URL /
+  # RAG_RERANKER_BASE_URL。
+  milvus-etcd:
+    image: quay.io/coreos/etcd:v3.5.5
+    command:
+      - etcd
+      - --advertise-client-urls=http://milvus-etcd:2379
+      - --listen-client-urls=http://0.0.0.0:2379
+      - --initial-advertise-peer-urls=http://milvus-etcd:2380
+      - --listen-peer-urls=http://0.0.0.0:2380
+      - --initial-cluster=default=http://milvus-etcd:2380
+      - --initial-cluster-state=new
+      - --data-dir=/etcd
     volumes:
-      - ${EMBEDDING_MODEL_HOST_PATH:-./embedding/bge-large-zh-v1.5}:/models/bge-large-zh-v1.5:ro
+      - milvus_etcd_data:/etcd
+    healthcheck:
+      test: ["CMD", "etcdctl", "endpoint", "health"]
+      interval: 5s
+      timeout: 5s
+      retries: 20
     networks:
       - app-network
+    restart: unless-stopped
+
+  milvus-minio:
+    image: minio/minio:RELEASE.2025-02-28T09-55-16Z
+    command: server /data --console-address ":9001"
+    environment:
+      MINIO_ROOT_USER: ${MILVUS_MINIO_ACCESS_KEY:-milvusadmin}
+      MINIO_ROOT_PASSWORD: ${MILVUS_MINIO_SECRET_KEY:-milvusadmin123}
+    volumes:
+      - milvus_minio_data:/data
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:9000/minio/health/live"]
+      interval: 5s
+      timeout: 3s
+      retries: 20
+    networks:
+      - app-network
+    restart: unless-stopped
+
+  milvus:
+    image: milvusdb/milvus:v2.4.15
+    command: ["milvus", "run", "standalone"]
+    environment:
+      ETCD_ENDPOINTS: milvus-etcd:2379
+      MINIO_ADDRESS: milvus-minio:9000
+      MINIO_ACCESS_KEY_ID: ${MILVUS_MINIO_ACCESS_KEY:-milvusadmin}
+      MINIO_SECRET_ACCESS_KEY: ${MILVUS_MINIO_SECRET_KEY:-milvusadmin123}
+    ports:
+      - "19530:19530"
+      - "9091:9091"
+    volumes:
+      - milvus_data:/var/lib/milvus
+    depends_on:
+      milvus-etcd:
+        condition: service_healthy
+      milvus-minio:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD-SHELL", "curl -f http://localhost:9091/healthz || exit 1"]
+      interval: 10s
+      timeout: 5s
+      retries: 30
+    networks:
+      - app-network
+    restart: unless-stopped
 
 volumes:
   postgres_data:
   redis_data:
   minio_data:
+  milvus_etcd_data:
+  milvus_minio_data:
+  milvus_data:
 
 networks:
   app-network:

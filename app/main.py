@@ -1,5 +1,7 @@
 """FastAPI 应用入口与健康检查。"""
 
+from pathlib import Path
+
 from fastapi import FastAPI
 from fastapi.exceptions import RequestValidationError
 
@@ -10,6 +12,7 @@ from app.errors import (
     request_validation_error_handler,
     unhandled_error_handler,
 )
+from app.frontend import SPAStaticFiles
 from app.logging_config import configure_logging, get_logger, log_boundary
 from app.middleware.request_context import RequestContextMiddleware
 from app.routers.analysis import router as analysis_router
@@ -21,6 +24,7 @@ from app.routers.attachments import router as attachment_router
 from app.routers.audit import router as audit_router
 from app.routers.auth import router as auth_router
 from app.routers.documents import router as documents_router
+from app.routers.rag import router as rag_router
 from app.routers.reports import router as reports_router
 from app.routers.risk import document_risk_router
 from app.routers.risk import router as risk_router
@@ -49,6 +53,7 @@ app.include_router(approval_workflow_router)
 app.include_router(reports_router)
 app.include_router(audit_router)
 app.include_router(documents_router)
+app.include_router(rag_router)
 
 
 @app.get("/health/live")
@@ -77,3 +82,10 @@ async def health_ready() -> dict[str, str]:
     result: dict[str, str] = {"status": readiness.status}
     log_boundary(logger, "health_ready", "exit", status=result["status"])
     return result
+
+
+if settings.frontend_dist_dir:
+    frontend_directory = Path(settings.frontend_dist_dir)
+    if not frontend_directory.is_dir():
+        raise RuntimeError(f"前端静态目录不存在: {frontend_directory}")
+    app.mount("/", SPAStaticFiles(frontend_directory), name="frontend")

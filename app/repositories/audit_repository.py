@@ -14,6 +14,8 @@ class AuditEvent(BaseModel):
     action: str
     resource_type: str
     resource_id: UUID | None = None
+    result: str = "success"
+    request_id: str = ""
     occurred_at: datetime = datetime.now(UTC)
 
 
