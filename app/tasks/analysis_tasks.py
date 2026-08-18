@@ -74,6 +74,7 @@ def advance_analysis_stage(
             next_state = replace(
                 state,
                 stage=next_stage,
+                retry_count=min(state.retry_count, 3),
                 manual_takeover=True,
                 error_message=_safe_error(error),
             )
@@ -240,7 +241,11 @@ def run_analysis_task(
         return asyncio.run(_run_analysis(task_uuid, version_uuid, self.request.retries))
     except RuntimeError as exc:
         # 外部适配器不可用时持久化失败并交给 Celery 做有界重试。
-        state = AnalysisWorkerState(task_uuid, version_uuid, retry_count=self.request.retries + 1)
+        state = AnalysisWorkerState(
+            task_uuid,
+            version_uuid,
+            retry_count=min(self.request.retries + 1, 3),
+        )
         if self.request.retries >= 3:
             state = advance_analysis_stage(state, AnalysisStage.FAILED, error=str(exc)).state
             asyncio.run(_persist_analysis_state(state))
