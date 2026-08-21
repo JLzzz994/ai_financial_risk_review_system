@@ -1,0 +1,30 @@
+services:
+  # 服务器部署时，数据库、缓存、对象存储和向量服务只加入内部网络。
+  # API 仍通过 8000 端口提供服务，生产环境建议再由 Nginx/Caddy 反向代理并配置 HTTPS。
+  postgres:
+    ports: !reset []
+    restart: unless-stopped
+
+  redis:
+    ports: !reset []
+    restart: unless-stopped
+
+  minio:
+    ports: !reset []
+    restart: unless-stopped
+
+  milvus:
+    ports: !reset []
+    restart: unless-stopped
+
+  milvus-etcd:
+    restart: unless-stopped
+
+  milvus-minio:
+    restart: unless-stopped
+
+  api:
+    restart: unless-stopped
+
+  worker:
+    restart: unless-stopped

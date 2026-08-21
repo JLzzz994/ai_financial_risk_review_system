@@ -1,0 +1,1 @@
+import{S as a}from"./StatusBadge-DELSOYv_.js";import{l as t}from"./status-CbzW6Slz.js";import{d as s,o as n,l as r,n as p}from"./index-Dr8WQETq.js";const _=s({__name:"RiskLevelTag",props:{level:{}},setup(o){const l=o,e=p(()=>t(l.level));return(c,m)=>(n(),r(a,{label:e.value.label,tone:e.value.tone},null,8,["label","tone"]))}});export{_};

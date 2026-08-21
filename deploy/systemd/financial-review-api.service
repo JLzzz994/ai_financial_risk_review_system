@@ -1,0 +1,16 @@
+[Unit]
+Description=Financial Review API
+After=network-online.target
+Wants=network-online.target
+
+[Service]
+Type=simple
+User=root
+WorkingDirectory=/opt/financial-review/financial-review
+ExecStart=/opt/financial-review/run_service.sh api
+Restart=always
+RestartSec=5
+TimeoutStopSec=30
+
+[Install]
+WantedBy=multi-user.target

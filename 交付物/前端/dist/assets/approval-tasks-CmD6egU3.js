@@ -1,0 +1,1 @@
+import{K as s}from"./index-Dr8WQETq.js";function i(o={}){return s("/approval-tasks",{query:o})}function p(o,t,a){return s(`/approval-tasks/${o}/decision`,{method:"POST",body:t,idempotencyKey:a})}function n(o){return s(`/documents/${o}/approval-history`)}export{n as g,i as l,p as s};

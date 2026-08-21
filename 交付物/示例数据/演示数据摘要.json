@@ -1,0 +1,11 @@
+{
+  "document_no": "DEMO-20260818-001",
+  "document_type": "expense_reimbursement",
+  "currency": "CNY",
+  "workflow": [
+    {"order": 1, "name": "部门审批", "role": "approver", "username": "demo_approver"},
+    {"order": 2, "name": "财务复核", "role": "finance", "username": "demo_finance"}
+  ],
+  "accounts": ["demo_applicant", "demo_approver", "demo_finance"],
+  "password_for_dev_only": "Demo123!"
+}

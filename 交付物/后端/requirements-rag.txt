@@ -1,0 +1,4 @@
+# 可选 RAG 运行依赖；基础 API/Worker 不需要安装本文件。
+# BGE-M3 与 BGE-Reranker 由外部 HTTP 服务提供，本服务器不安装模型权重。
+pymilvus>=2.5,<3.0
+httpx>=0.28,<1.0
