@@ -1,0 +1,32 @@
+{
+  "reconciliation.settlement_amount_difference": [
+    {
+      "chunk_id": "tmall-settlement-001",
+      "content": "平台结算金额与商家订单应收金额存在差异时，应核对退款、手续费、补贴、赔付及其他调整项，并保留对应账单明细作为复核依据。",
+      "source_title": "演示平台结算规则",
+      "score": 0.94,
+      "rule_version": "demo-2026-09",
+      "page_or_location": "第 3 节 结算差异处理"
+    }
+  ],
+  "reconciliation.duplicate_settlement": [
+    {
+      "chunk_id": "finance-control-002",
+      "content": "同一业务订单出现多笔结算记录时，应先按平台流水号、结算周期和调整类型排除合法拆分，再确认是否属于重复结算。",
+      "source_title": "演示财务对账制度",
+      "score": 0.91,
+      "rule_version": "demo-2026-09",
+      "page_or_location": "4.2 重复结算复核"
+    }
+  ],
+  "reconciliation.remittance_missing": [
+    {
+      "chunk_id": "finance-control-003",
+      "content": "结算已到约定回款日但未匹配到实际银行回款时，系统应标记为待复核，并由财务核对到账流水、主体及账期。",
+      "source_title": "演示财务对账制度",
+      "score": 0.96,
+      "rule_version": "demo-2026-09",
+      "page_or_location": "5.1 回款核销"
+    }
+  ]
+}
