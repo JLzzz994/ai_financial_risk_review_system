@@ -14,9 +14,8 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from app.repositories.sql_reconciliation_repository import SqlReconciliationRepository
 from app.repositories.sql_risk_repository import SqlRiskRepository
 from app.services.reconciliation_explanation_service import ReconciliationExplanationService
-from app.services.reconciliation_report_service import ReconciliationReportService
+from app.services.reconciliation_report_service import FindingReportItem, ReconciliationReportService
 from engines.model.explanation_contracts import ExplanationAdapter, ExplanationRequest
-from engines.risk.contracts import RiskFinding
 from engines.risk.reconciliation_engine import evaluate_reconciliation_rules
 
 logger = logging.getLogger(__name__)
@@ -72,21 +71,27 @@ class ReconciliationWorker:
 
         await progress("rule_evaluating", 40)
         findings = evaluate_reconciliation_rules(context)
-        async with session.begin():
-            await self.risk_repository.append_findings(
-                session,
-                task_id,
-                document_version_id,
-                findings,
-                self.rule_version,
-            )
+        await self.risk_repository.append_findings(
+            session,
+            task_id,
+            document_version_id,
+            findings,
+            self.rule_version,
+        )
+        await session.flush()
 
-        explained: list[tuple[RiskFinding, str, str, tuple[object, ...]]] = []
+        items: list[FindingReportItem] = []
+        explained_count = 0
         actionable = [item for item in findings if item.level in {"high", "medium"}]
-        for index, finding in enumerate(actionable, start=1):
+        for finding in findings:
+            if finding not in actionable:
+                items.append(FindingReportItem(finding=finding))
+                continue
+
+            explained_count += 1
             await progress(
                 "policy_retrieving",
-                45 + min(20, int(index / max(len(actionable), 1) * 20)),
+                45 + min(20, int(explained_count / max(len(actionable), 1) * 20)),
             )
             prepared = await self.explanation_service.prepare(
                 finding,
@@ -102,17 +107,23 @@ class ReconciliationWorker:
                     finding_status=finding.status,
                 )
             )
-            explained.append(
-                (finding, result.explanation, result.suggestion, prepared.policy_evidence)
+            items.append(
+                FindingReportItem(
+                    finding=finding,
+                    policy_evidence=prepared.policy_evidence,
+                    ai_explanation=(
+                        f"{result.explanation}\n\n处理建议：{result.suggestion}"
+                    ),
+                )
             )
 
         await progress("aggregating", 90)
-        report_markdown = self.report_service.build_markdown(
+        report_markdown = self.report_service.render(
+            document_version_id=document_version_id,
             platform=context.platform,
             shop_name=context.shop_name,
             order_no=context.order_no,
-            findings=findings,
-            explanations=explained,
+            items=items,
         )
         await progress("succeeded", 100)
         logger.info(
@@ -128,7 +139,7 @@ class ReconciliationWorker:
             document_version_id=document_version_id,
             order_no=order_no,
             finding_count=len(findings),
-            explained_count=len(explained),
+            explained_count=explained_count,
             report_markdown=report_markdown,
         )
 
